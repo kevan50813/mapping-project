@@ -1,0 +1,36 @@
+# Backups & temporary files
+*~
+*.bak
+*.swp
+
+# Compiled bytecode
+*.class
+
+# Zip archives
+*.zip
+
+# JVM crash logs
+hs_err_pid*
+
+# macOS-specific metadata
+.DS_Store
+
+# Eclipse workspace metadata (but *please* don't use Eclipse...)
+.metadata/
+.recommenders/
+
+# IntelliJ IDEA stuff
+# Note: this keeps things clean but means that you'll need to set up
+# IntelliJ projects independently on your PC and SoC machines
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# VS Code stuff
+.vscode/
+
+# Gradle stuff
+.gradle/
+build/
