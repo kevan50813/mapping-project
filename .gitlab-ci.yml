@@ -1,0 +1,27 @@
+image: docker:latest
+
+stages:
+  - lint
+
+.dist-artifacts: &dist-artifacts
+  after_script:
+    # list files
+    - find dist
+  artifacts:
+    expire_in: 18h
+    paths:
+      - dist
+
+lint:
+  stage: lint
+  image: python:3.7
+  before_script:
+    - python -m pip install "flake8>=3.7.0"
+  script:
+    - python -m flake8 --output-file "flake8-report.txt"
+  after_script:
+    - python -m pip install "flake8-junit-report"
+    - python -m junit_conversor "flake8-report.txt" "junit.xml"
+  artifacts:
+    reports:
+      junit: junit.xml
