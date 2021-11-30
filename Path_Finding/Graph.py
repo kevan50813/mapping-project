@@ -37,7 +37,7 @@ class Graph:
 
         previous = [0 for i in range(vertex)]
         distance = [0 for i in range(vertex)]
-        if self.breath_first_search(adj, start, end, vertex, previous, distance) == False:
+        if self.breath_first_search(adj, start, end, vertex, previous, distance) is False:
             print("No path could be found")
 
         path = []
