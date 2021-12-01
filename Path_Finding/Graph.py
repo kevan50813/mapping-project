@@ -5,24 +5,32 @@ class Graph:
         adj[start].append(end)
         adj[start].append(start)
 
+    # Do a breath first search algorithm to find a route that goes though the least number of nodes
+    # TODO change to include weights, this will be done later
     def breath_first_search(self, adj, start, end, vertex, previous, distance):
+
+        # make an empty list that will que up all nodes to search
         queue = []
 
         visited = [False for i in range(vertex)]
 
+        # fill distance nad previous will arbitrary values distance refers to the number of nodes and previous
+        # refers to the nodes already searched
         for i in range(vertex):
             distance[i] = 10000
             previous[i] = -1
-
+        # add the start node to the visited path to prevent the path finder form including it in the results
         visited[start] = True
         distance[start] = 0
         queue.append(start)
 
+        # while ever there is stuff in the queue continue to search though it
         while (len(queue) != 0):
             u = queue[0]
             queue.pop(0)
+            # check all the neighbors to the current node and visit them
             for i in range(len(adj[u])):
-
+                # if a path is found return ture indicating there was a path that could be found else return false
                 if not visited[adj[u][i]]:
                     visited[adj[u][i]] = True
                     distance[adj[u][i]] = distance[u] + 1
@@ -33,6 +41,7 @@ class Graph:
                         return True
         return False
 
+    # used for printing the path, this will be removed when we have an actual GUI for testing purposes
     def print_path(self, adj, start, end, vertex):
 
         previous = [0 for i in range(vertex)]
@@ -56,8 +65,11 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
+    start = 0
+    end = 7
     v = 8
     adj = [[] for i in range(v)]
+    # create the edges of the graph based on the adjacency's table and the neighboring nodes
     Graph.add_edge(g, adj, 0, 1)
     Graph.add_edge(g, adj, 0, 3)
     Graph.add_edge(g, adj, 1, 2)
@@ -68,7 +80,5 @@ if __name__ == '__main__':
     Graph.add_edge(g, adj, 4, 7)
     Graph.add_edge(g, adj, 5, 6)
     Graph.add_edge(g, adj, 6, 7)
-    start = 0
-    end = 7
 
     Graph.print_path(g, adj, start, end, v)
