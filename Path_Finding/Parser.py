@@ -46,7 +46,7 @@ class Parser:
                 id = len(self.nodes)
 
                 # Append a new node
-                self.nodes.append({"id": id, "name": "", "neighbours": [], "coordinates": (point[0], point[1])})
+                self.nodes.append({"id": id, "name": "", "coordinates": (point[0], point[1])})
 
                 # Append a new edge
                 if (prevId != -1):
@@ -86,6 +86,8 @@ class Parser:
 
     # Dump lists of nodes and edges
     def printLists(self):
+        print("Nodes:")
         for node in self.nodes:
             print(node)
+        print("\nEdges:")
         print(self.edges)
