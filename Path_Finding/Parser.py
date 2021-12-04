@@ -20,7 +20,6 @@ class Parser:
         node = {
             "id": -1,
             "name": "",
-            "neighbours": [],
             "coordinates": ()
         }
 
