@@ -9,7 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
-from typing import Coroutine # for easier code editing
+from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
 
 
@@ -67,7 +67,7 @@ class Parser:
 
             for room in feature["geometry"]["coordinates"]:
                 # Get room vertices
-                roomVertices = [LatLon(0,0)]
+                roomVertices = [LatLon(0, 0)]
                 roomVertices.pop()
 
                 # For every vertex
@@ -78,7 +78,7 @@ class Parser:
                 for node in self.nodes:
                     # Get tuple with node coordinates
                     nodeCoords = LatLon(node["coordinates"][0], node["coordinates"][1])
-                    
+
                     # Check if the node is within room
                     if (nodeCoords.isenclosedBy(roomVertices)):
                         # Edit "name" of the node
@@ -91,3 +91,4 @@ class Parser:
             print(node)
         print("\nEdges:")
         print(self.edges)
+

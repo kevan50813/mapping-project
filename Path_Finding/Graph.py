@@ -1,3 +1,6 @@
+from Parser import Parser
+
+
 class Graph:
 
     # create an edge between the start node and the end node
@@ -65,20 +68,13 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
+    p = Parser()
     start = 0
     end = 7
     v = 8
     adj = [[] for i in range(v)]
     # create the edges of the graph based on the adjacency's table and the neighboring nodes
-    Graph.add_edge(g, adj, 0, 1)
-    Graph.add_edge(g, adj, 0, 3)
-    Graph.add_edge(g, adj, 1, 2)
-    Graph.add_edge(g, adj, 3, 4)
-    Graph.add_edge(g, adj, 3, 7)
-    Graph.add_edge(g, adj, 4, 5)
-    Graph.add_edge(g, adj, 4, 6)
-    Graph.add_edge(g, adj, 4, 7)
-    Graph.add_edge(g, adj, 5, 6)
-    Graph.add_edge(g, adj, 6, 7)
+    for i in p.edges:
+        Graph.add_edge(g, adj, p.edges(i)[0], p.edges(i)[1])
 
     Graph.print_path(g, adj, start, end, v)
