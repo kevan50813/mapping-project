@@ -11,7 +11,6 @@ class Graph:
     # Do a breath first search algorithm to find a route that goes though the least number of nodes
     # TODO change to include weights, this will be done later
     def breath_first_search(self, adj, start, end, vertex, previous, distance):
-
         # make an empty list that will que up all nodes to search
         queue = []
 
@@ -20,7 +19,7 @@ class Graph:
         # fill distance nad previous will arbitrary values distance refers to the number of nodes and previous
         # refers to the nodes already searched
         for i in range(vertex):
-            distance[i] = 0
+            distance[i] = 10000
             previous[i] = -1
         # add the start node to the visited path to prevent the path finder form including it in the results
         visited[start] = True
@@ -39,7 +38,7 @@ class Graph:
                     previous[adj[u][i]] = u
                     queue.append(adj[u][i])
 
-                    if (adj[u][i] == end):
+                    if adj[u][i] == end:
                         return True
         return False
 
@@ -50,31 +49,34 @@ class Graph:
         distance = [0 for i in range(vertex)]
         if self.breath_first_search(adj, start, end, vertex, previous, distance) is False:
             print("No path could be found")
+        else:
+            path = []
+            crawl = end
+            path.append(crawl)
 
-        path = []
-        crawl = end
-        path.append(crawl)
+            while previous[crawl] != -1:
+                path.append(previous[crawl])
+                crawl = previous[crawl]
 
-        while previous[crawl] != -1:
-            path.append(previous[crawl])
-            crawl = previous[crawl]
-
-        print("Shortest Path is " + str(distance[end]))
-        print("\nPath is: ")
-        for i in range(len(path) - 1, -1, -1):
-            print(path[i])
+            print("Shortest Path is " + str(distance[end]))
+            print("\nPath is: ")
+            for i in range(len(path) - 1, -1, -1):
+                print(path[i])
 
 
 if __name__ == '__main__':
     g = Graph()
     p = Parser("/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
-    start = 0
-    end = 18
+    start = 0 # testing purpose will change later
+    end = 3
     v = len(p.nodes)  # the number of vertices is the number of nodes found by the parser
     # create the edges of the graph based on the adjacency's table and the neighboring nodes
     adj = [[] for i in range(v)]
     # loop though the list of edges and created edges on the graph.
     for i in p.edges:
         Graph.add_edge(g, adj, i[0], i[1])
+       # print(i)
+       # print(i[0])
+       # print(i[1])
 
     Graph.print_path(g, adj, start, end, v)
