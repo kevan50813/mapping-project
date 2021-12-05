@@ -20,13 +20,12 @@ class Graph:
         # fill distance nad previous will arbitrary values distance refers to the number of nodes and previous
         # refers to the nodes already searched
         for i in range(vertex):
-            distance[i] = 10000
+            distance[i] = 0
             previous[i] = -1
         # add the start node to the visited path to prevent the path finder form including it in the results
         visited[start] = True
         distance[start] = 0
         queue.append(start)
-
         # while ever there is stuff in the queue continue to search though it
         while (len(queue) != 0):
             u = queue[0]
