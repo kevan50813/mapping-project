@@ -68,13 +68,14 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-    p = Parser()
+    p = Parser("/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
     start = 0
-    end = 7
-    v = 8
-    adj = [[] for i in range(v)]
+    end = 18
+    v = len(p.nodes)  # the number of vertices is the number of nodes found by the parser
     # create the edges of the graph based on the adjacency's table and the neighboring nodes
+    adj = [[] for i in range(v)]
+    # loop though the list of edges and created edges on the graph.
     for i in p.edges:
-        Graph.add_edge(g, adj, p.edges(i)[0], p.edges(i)[1])
+        Graph.add_edge(g, adj, i[0], i[1])
 
     Graph.print_path(g, adj, start, end, v)
