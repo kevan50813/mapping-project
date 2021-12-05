@@ -1,3 +1,6 @@
+from Parser import Parser
+
+
 class Graph:
 
     # create an edge between the start node and the end node
@@ -8,7 +11,6 @@ class Graph:
     # Do a breath first search algorithm to find a route that goes though the least number of nodes
     # TODO change to include weights, this will be done later
     def breath_first_search(self, adj, start, end, vertex, previous, distance):
-
         # make an empty list that will que up all nodes to search
         queue = []
 
@@ -23,7 +25,6 @@ class Graph:
         visited[start] = True
         distance[start] = 0
         queue.append(start)
-
         # while ever there is stuff in the queue continue to search though it
         while (len(queue) != 0):
             u = queue[0]
@@ -37,7 +38,7 @@ class Graph:
                     previous[adj[u][i]] = u
                     queue.append(adj[u][i])
 
-                    if (adj[u][i] == end):
+                    if adj[u][i] == end:
                         return True
         return False
 
@@ -48,37 +49,34 @@ class Graph:
         distance = [0 for i in range(vertex)]
         if self.breath_first_search(adj, start, end, vertex, previous, distance) is False:
             print("No path could be found")
+        else:
+            path = []
+            crawl = end
+            path.append(crawl)
 
-        path = []
-        crawl = end
-        path.append(crawl)
+            while previous[crawl] != -1:
+                path.append(previous[crawl])
+                crawl = previous[crawl]
 
-        while previous[crawl] != -1:
-            path.append(previous[crawl])
-            crawl = previous[crawl]
-
-        print("Shortest Path is " + str(distance[end]))
-        print("\nPath is: ")
-        for i in range(len(path) - 1, -1, -1):
-            print(path[i])
+            print("Shortest Path is " + str(distance[end]))
+            print("\nPath is: ")
+            for i in range(len(path) - 1, -1, -1):
+                print(path[i])
 
 
 if __name__ == '__main__':
     g = Graph()
-    start = 0
-    end = 7
-    v = 8
-    adj = [[] for i in range(v)]
+    p = Parser("/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
+    start = 0 # testing purpose will change later
+    end = 3
+    v = len(p.nodes)  # the number of vertices is the number of nodes found by the parser
     # create the edges of the graph based on the adjacency's table and the neighboring nodes
-    Graph.add_edge(g, adj, 0, 1)
-    Graph.add_edge(g, adj, 0, 3)
-    Graph.add_edge(g, adj, 1, 2)
-    Graph.add_edge(g, adj, 3, 4)
-    Graph.add_edge(g, adj, 3, 7)
-    Graph.add_edge(g, adj, 4, 5)
-    Graph.add_edge(g, adj, 4, 6)
-    Graph.add_edge(g, adj, 4, 7)
-    Graph.add_edge(g, adj, 5, 6)
-    Graph.add_edge(g, adj, 6, 7)
+    adj = [[] for i in range(v)]
+    # loop though the list of edges and created edges on the graph.
+    for i in p.edges:
+        Graph.add_edge(g, adj, i[0], i[1])
+       # print(i)
+       # print(i[0])
+       # print(i[1])
 
     Graph.print_path(g, adj, start, end, v)
