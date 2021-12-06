@@ -9,7 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
-from typing import Coroutine  # for easier code editing
+# from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
 
 
