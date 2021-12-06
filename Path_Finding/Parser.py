@@ -46,7 +46,9 @@ class Parser:
                 id = len(self.nodes)
 
                 # Append a new node
-                self.nodes.append({"id": id, "name": "", "coordinates": (point[0], point[1])})
+                self.nodes.append({"id": id,
+                                   "name": "",
+                                   "coordinates": (point[0], point[1])})
 
                 # Append a new edge
                 if (prevId != -1):
@@ -77,7 +79,8 @@ class Parser:
                 # For every node
                 for node in self.nodes:
                     # Get tuple with node coordinates
-                    nodeCoords = LatLon(node["coordinates"][0], node["coordinates"][1])
+                    nodeCoords = LatLon(node["coordinates"][0],
+                                        node["coordinates"][1])
 
                     # Check if the node is within room
                     if (nodeCoords.isenclosedBy(roomVertices)):
@@ -91,4 +94,3 @@ class Parser:
             print(node)
         print("\nEdges:")
         print(self.edges)
-

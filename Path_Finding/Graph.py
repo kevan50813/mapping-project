@@ -21,7 +21,8 @@ class Graph:
         for i in range(vertex):
             distance[i] = 10000
             previous[i] = -1
-        # add the start node to the visited path to prevent the path finder form including it in the results
+        # add the start node to the visited path to prevent the path finder
+        # form including it in the results
         visited[start] = True
         distance[start] = 0
         queue.append(start)
@@ -31,7 +32,8 @@ class Graph:
             queue.pop(0)
             # check all the neighbors to the current node and visit them
             for i in range(len(adj[u])):
-                # if a path is found return ture indicating there was a path that could be found else return false
+                # if a path is found return ture indicating there was a path
+                # that could be found else return false
                 if not visited[adj[u][i]]:
                     visited[adj[u][i]] = True
                     distance[adj[u][i]] = distance[u] + 1
@@ -42,12 +44,13 @@ class Graph:
                         return True
         return False
 
-    # used for printing the path, this will be removed when we have an actual GUI for testing purposes
+    # used for printing the path, this will be removed when we have an actual
+    # GUI for testing purposes
     def print_path(self, adj, start, end, vertex):
-
         previous = [0 for i in range(vertex)]
         distance = [0 for i in range(vertex)]
-        if self.breath_first_search(adj, start, end, vertex, previous, distance) is False:
+        if self.breath_first_search(
+                adj, start, end, vertex, previous, distance) is False:
             print("No path could be found")
         else:
             path = []
@@ -66,17 +69,20 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-    p = Parser("/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
-    start = 0 # testing purpose will change later
+    p = Parser(
+        "/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
+    start = 0  # testing purpose will change later
     end = 3
-    v = len(p.nodes)  # the number of vertices is the number of nodes found by the parser
-    # create the edges of the graph based on the adjacency's table and the neighboring nodes
+    # the number of vertices is the number of nodes found by the parser
+    v = len(p.nodes)
+    # create the edges of the graph based on the adjacency's table and the
+    # neighboring nodes
     adj = [[] for i in range(v)]
     # loop though the list of edges and created edges on the graph.
     for i in p.edges:
         Graph.add_edge(g, adj, i[0], i[1])
-       # print(i)
-       # print(i[0])
-       # print(i[1])
+        # print(i)
+        # print(i[0])
+        # print(i[1])
 
     Graph.print_path(g, adj, start, end, v)
