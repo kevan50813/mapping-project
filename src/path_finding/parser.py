@@ -14,30 +14,36 @@ from pygeodesy.sphericalNvector import LatLon
 
 
 class Parser:
+    edges = []
+    nodes = []
+    pois = []
+
     # Constructor
     def __init__(self, path):
-        # Node data structure
-        node = {
-            "id": -1,
-            "name": "",
-            "coordinates": ()
-        }
+        self.path = path
 
-        # Nodes (initially empty)
-        self.nodes = [node]
-        self.nodes.pop()
+        self.parse_nodes()
+        self.parse_rooms()
+        self.parse_pois()
 
-        # Edges (initially empty)
-        self.edges = [()]
-        self.edges.pop()
+    def parse_nodes(self):
+        """
+            Node data structure
 
-        # Fill edges and nodes from the files.
+            node = {
+                "id": -1,
+                "name": "",
+                "coordinates": ()
+            }
+
+            Edges are tuples of 2 ids (in nodes)
+        """
         # Read Ways.json
-        file = open(path + "/Ways.json", "r")
-        jsonWays = json.loads(file.read())
+        with open(self.path + "/Ways.json", "r") as file:
+            json_ways = json.loads(file.read())
 
         # For every "way"
-        for feature in jsonWays["features"]:
+        for feature in json_ways["features"]:
             # Prev edge id
             prevId = -1
 
@@ -57,38 +63,52 @@ class Parser:
                 # Store id
                 prevId = id
 
-        # Write node names
+    def parse_rooms(self):
+        """
+            Give each node a name that corresponds
+            to the room that it is located in
+        """
         # Read Rooms.json
-        file = open(path + "/Rooms.json", "r")
-        jsonRooms = json.loads(file.read())
+        with open(self.path + "/Rooms.json", "r") as file:
+            json_rooms = json.loads(file.read())
 
         # For every "room"
-        for feature in jsonRooms["features"]:
+        for feature in json_rooms["features"]:
             # Get room name
             name = feature["properties"]["room-name"]
 
             for room in feature["geometry"]["coordinates"]:
-                # Get room vertices
-                roomVertices = [LatLon(0, 0)]
-                roomVertices.pop()
-
-                # For every vertex
+                # For every room vertex
+                room_vertices = []
                 for vertex in room:
-                    roomVertices.append(LatLon(vertex[0], vertex[1]))
+                    room_vertices.append(LatLon(vertex[0], vertex[1]))
 
                 # For every node
                 for node in self.nodes:
                     # Get tuple with node coordinates
-                    nodeCoords = LatLon(node["coordinates"][0],
-                                        node["coordinates"][1])
+                    node_coords = LatLon(node["coordinates"][0],
+                                         node["coordinates"][1])
 
                     # Check if the node is within room
-                    if (nodeCoords.isenclosedBy(roomVertices)):
+                    if (node_coords.isenclosedBy(room_vertices)):
                         # Edit "name" of the node
                         node["name"] = name
 
-    # Dump lists of nodes and edges
-    def printLists(self):
+    def parse_pois(self):
+        """
+            This should be a method as PoIs could change between parser runs,
+            the map is much less likely to and it would be best to re-parse
+            everything anyway
+        """
+        with open(self.path + "/PoIs.json", "r") as file:
+            json_poi = json.loads(file.read())
+
+        for poi in json_poi["features"]:
+            # find closest point in self.nodes
+            pass
+
+    def print_lists(self):
+        # Dump lists of nodes and edges
         print("Nodes:")
         for node in self.nodes:
             print(node)
