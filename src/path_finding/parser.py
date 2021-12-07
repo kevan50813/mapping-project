@@ -22,6 +22,7 @@ class Parser:
     def __init__(self, path):
         self.path = path
 
+        # parse the files
         self.parse_nodes()
         self.parse_rooms()
         self.parse_pois()
@@ -49,6 +50,7 @@ class Parser:
 
             for point in feature["geometry"]["coordinates"]:
                 # Id for the current node
+                # TODO change this?
                 id = len(self.nodes)
 
                 # Append a new node
@@ -96,16 +98,44 @@ class Parser:
 
     def parse_pois(self):
         """
-            This should be a method as PoIs could change between parser runs,
-            the map is much less likely to and it would be best to re-parse
-            everything anyway
+            Match points-of-interest to the nearest node in the ways nodes
+
+            poi = {
+                "id": -1,
+                "name": "",
+                "coordinates": ()
+                "nearest_path_node": -1 # ID of nearest in self.nodes
+            }
+
+            This could probably have an alternate method for loading from
+            a DB (just the changes ?)
         """
         with open(self.path + "/PoIs.json", "r") as file:
             json_poi = json.loads(file.read())
 
         for poi in json_poi["features"]:
-            # find closest point in self.nodes
-            pass
+            id = len(self.pois)
+
+            # Search through every node, save the closest
+            # suprisingly the fastest way to do this
+            min_distance = -1
+            for node in self.nodes:
+                poi_lat_lon = LatLon(poi["coordinates"])
+                node_lat_lon = LatLon(node["coordinates"])
+                distance = poi_lat_lon.distanceTo(node_lat_lon)
+
+                if min_distance == -1:
+                    nearest = node
+                elif distance < min_distance:
+                    nearest = node
+                    min_distance = distance
+
+            nearest_path_node = nearest["id"]
+
+            self.pois.append({"id": id,
+                              "name": poi["name"],
+                              "coordinates": poi["coordinates"],
+                              "nearest_path_node": nearest_path_node})
 
     def print_lists(self):
         # Dump lists of nodes and edges
