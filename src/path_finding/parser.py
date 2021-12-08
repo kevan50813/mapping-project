@@ -9,6 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
+# from rich import print  # uncomment for prettyprint dicts
 # from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
 
@@ -71,9 +72,15 @@ class Parser:
             Give each node a name that corresponds
             to the room that it is located in
         """
+        # TODO Include access too
         # Read Rooms.json
         with open(self.path + "/Rooms.json", "r") as file:
             json_rooms = json.loads(file.read())
+
+        with open(self.path + "/Access.json", "r") as file:
+            json_access = json.loads(file.read())
+            for f in json_access["features"]:
+                json_rooms["features"].append(f)
 
         # For every "room"
         for feature in json_rooms["features"]:
@@ -119,35 +126,47 @@ class Parser:
         with open(self.path + "/Rooms.json", "r") as file:
             json_rooms = json.loads(file.read())
 
+        with open(self.path + "/Access.json", "r") as file:
+            json_access = json.loads(file.read())
+            for f in json_access["features"]:
+                json_rooms["features"].append(f)
+
         for poi in json_poi["features"]:
             id = len(self.pois)
             point = poi["geometry"]["coordinates"]
+            poi_lat_lon = LatLon(point[0], point[1])
 
-            min_distance = float('inf')
             for feature in json_rooms["features"]:
-                # Load room features and vertices
+                # find what room the POI is in first
                 room_name = feature["properties"]["room-name"]
                 for room in feature["geometry"]["coordinates"]:
                     room_vertices = []
                     for vertex in room:
                         room_vertices.append(LatLon(vertex[0], vertex[1]))
 
-                    # Get only the path nodes that are in the current room
-                    room_nodes = [
-                        x for x in self.nodes if x["name"] == room_name]
+                # Check if the node is within room
+                if (poi_lat_lon.isenclosedBy(room_vertices)):
+                    # Edit "name" of the node
+                    break
 
-                    # Now find the closest path node in the room
-                    for node in room_nodes:
-                        poi_lat_lon = LatLon(point[0], point[1])
-                        node_lat_lon = LatLon(node["coordinates"][0],
-                                              node["coordinates"][1])
-                        distance = poi_lat_lon.distanceTo(node_lat_lon)
+            # TODO this is completely broken lol
+            min_distance = float('inf')
 
-                        if distance < min_distance:
-                            nearest = node
-                            min_distance = distance
+            # Get only the path nodes that are in the current room
+            room_nodes = [
+                x for x in self.nodes if x["name"] == room_name]
 
-                    nearest_path_node = nearest["id"]
+            # Now find the closest path node in the room
+            for node in room_nodes:
+                node_lat_lon = LatLon(node["coordinates"][0],
+                                      node["coordinates"][1])
+                distance = poi_lat_lon.distanceTo(node_lat_lon)
+
+                if distance < min_distance:
+                    nearest = node
+                    min_distance = distance
+
+            nearest_path_node = nearest["id"]
 
             self.pois.append({"id": id,
                               "name": poi["properties"]["name"],
@@ -159,5 +178,8 @@ class Parser:
         print("Nodes:")
         for node in self.nodes:
             print(node)
-        print("\nEdges:")
+        print("Edges:")
         print(self.edges)
+        print("PoIs:")
+        for poi in self.pois:
+            print(poi)
