@@ -34,10 +34,9 @@ pytest:
     - python -m pip install -r requirements.txt
   script:
     - python -m pytest --cov=src/ --junitxml=report.xml
-    - coverage xml
-    - sed -i 's|" filename="|" filename="src/|g' coverage.xml
+    - coverage report -m
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
   artifacts:
     when: always
     reports:
       junit: report.xml
-      cobertura: coverage.xml
