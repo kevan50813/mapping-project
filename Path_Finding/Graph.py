@@ -70,7 +70,7 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-    p = Parser( os.getcwd() + "/Graphs/simple-house")
+    p = Parser(os.getcwd() + "/Graphs/simple-house")
     start = 0  # testing purpose will change later
     end = 15
     # the number of vertices is the number of nodes found by the parser
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # loop though the list of edges and created edges on the graph.
     for i in p.edges:
         Graph.add_edge(g, adj, i[0], i[1])
-        #print(i)
+        # print(i)
         # print(i[0])
         # print(i[1])
 
