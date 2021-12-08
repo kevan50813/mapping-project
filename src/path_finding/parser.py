@@ -120,17 +120,16 @@ class Parser:
 
             # Search through every node, save the closest
             # suprisingly the fastest way to do this
-            min_distance = -1
+            min_distance = float('inf')
+            # TODO make this work for points in the same room.
+            #      Failure to find a same-room node should assign 'None'
             for node in self.nodes:
                 poi_lat_lon = LatLon(point[0], point[1])
                 node_lat_lon = LatLon(node["coordinates"][0],
                                       node["coordinates"][1])
                 distance = poi_lat_lon.distanceTo(node_lat_lon)
 
-                if min_distance == -1:
-                    nearest = node
-                    min_distance = distance
-                elif distance < min_distance:
+                if distance < min_distance:
                     nearest = node
                     min_distance = distance
 
