@@ -72,20 +72,23 @@ class Parser:
             Give each node a name that corresponds
             to the room that it is located in
         """
-        # TODO Include access too
         # Read Rooms.json
         with open(self.path + "/Rooms.json", "r") as file:
             json_rooms = json.loads(file.read())
+            for f in json_rooms["features"]:
+                f["type"] = "room"
 
         with open(self.path + "/Access.json", "r") as file:
             json_access = json.loads(file.read())
             for f in json_access["features"]:
+                f["type"] = "access"
                 json_rooms["features"].append(f)
 
         # For every "room"
         for feature in json_rooms["features"]:
             # Get room name
-            name = feature["properties"]["room-name"]
+            room_name = feature["properties"]["room-name"]
+            room_type = feature["type"]
 
             for room in feature["geometry"]["coordinates"]:
                 # For every room vertex
@@ -102,7 +105,8 @@ class Parser:
                     # Check if the node is within room
                     if (node_coords.isenclosedBy(room_vertices)):
                         # Edit "name" of the node
-                        node["name"] = name
+                        node["name"] = room_name
+                        node["type"] = room_type
 
     def parse_pois(self):
         """
