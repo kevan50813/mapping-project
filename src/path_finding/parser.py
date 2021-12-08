@@ -108,32 +108,46 @@ class Parser:
                 "nearest_path_node": -1 # ID of nearest in self.nodes
             }
 
-            This could probably have an alternate method for loading from
-            a DB (just the changes ?)
+            I think if I do it this way there might be consistency issues
+            if Rooms.json was to change, this is why DB is definitely a better
+            idea (we can parse the json then use the parsed objects to write
+            into a DB table?)
         """
         with open(self.path + "/PoIs.json", "r") as file:
             json_poi = json.loads(file.read())
+
+        with open(self.path + "/Rooms.json", "r") as file:
+            json_rooms = json.loads(file.read())
 
         for poi in json_poi["features"]:
             id = len(self.pois)
             point = poi["geometry"]["coordinates"]
 
-            # Search through every node, save the closest
-            # suprisingly the fastest way to do this
             min_distance = float('inf')
-            # TODO make this work for points in the same room.
-            #      Failure to find a same-room node should assign 'None'
-            for node in self.nodes:
-                poi_lat_lon = LatLon(point[0], point[1])
-                node_lat_lon = LatLon(node["coordinates"][0],
-                                      node["coordinates"][1])
-                distance = poi_lat_lon.distanceTo(node_lat_lon)
+            for feature in json_rooms["features"]:
+                # Load room features and vertices
+                room_name = feature["properties"]["room-name"]
+                for room in feature["geometry"]["coordinates"]:
+                    room_vertices = []
+                    for vertex in room:
+                        room_vertices.append(LatLon(vertex[0], vertex[1]))
 
-                if distance < min_distance:
-                    nearest = node
-                    min_distance = distance
+                    # Get only the path nodes that are in the current room
+                    room_nodes = [
+                        x for x in self.nodes if x["name"] == room_name]
 
-            nearest_path_node = nearest["id"]
+                    # Now find the closest path node in the room
+                    for node in room_nodes:
+                        poi_lat_lon = LatLon(point[0], point[1])
+                        node_lat_lon = LatLon(node["coordinates"][0],
+                                              node["coordinates"][1])
+                        distance = poi_lat_lon.distanceTo(node_lat_lon)
+
+                        if distance < min_distance:
+                            nearest = node
+                            min_distance = distance
+
+                    nearest_path_node = nearest["id"]
 
             self.pois.append({"id": id,
                               "name": poi["properties"]["name"],
