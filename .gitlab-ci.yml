@@ -35,6 +35,7 @@ pytest:
   script:
     - python -m pytest --cov=src/ --junitxml=report.xml
     - coverage xml
+    - sed -i 's|" filename="|" filename="src/|g' coverage.xml
   artifacts:
     when: always
     reports:
