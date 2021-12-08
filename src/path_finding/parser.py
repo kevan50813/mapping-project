@@ -193,8 +193,3 @@ class Parser:
         print(self.edges)
         print("PoIs:")
         print(self.pois)
-
-
-if __name__ == "__main__":
-    p = Parser("../../json-maps/simple-house")
-    p.print_lists()
