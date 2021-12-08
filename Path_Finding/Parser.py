@@ -41,21 +41,23 @@ class Parser:
             # Prev edge id
             prevId = -1
 
-            for point in feature["geometry"]["coordinates"]:
-                # Id for the current node
-                id = len(self.nodes)
+            for points in feature["geometry"]["coordinates"]:
+                for p in points:
+                    # Id for the current node
+                    # TODO change this?
+                    id = len(self.nodes)
 
-                # Append a new node
-                self.nodes.append({"id": id,
-                                   "name": "",
-                                   "coordinates": (point[0], point[1])})
+                    # Append a new node
+                    self.nodes.append({"id": id,
+                                       "name": "",
+                                       "coordinates": (p[0], p[1])})
 
-                # Append a new edge
-                if (prevId != -1):
-                    self.edges.append((prevId, id))
+                    # Append a new edge
+                    if (prevId != -1):
+                        self.edges.append((prevId, id))
 
-                # Store id
-                prevId = id
+                    # Store id
+                    prevId = id
 
         # Write node names
         # Read Rooms.json

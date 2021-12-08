@@ -70,7 +70,7 @@ class Graph:
 if __name__ == '__main__':
     g = Graph()
     p = Parser(
-        "/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Json/simple-house")
+        "/home/kevan/Documents/Uni/comp5530m/comp5530m_mapping_project/Graphs/simple-house")
     start = 0  # testing purpose will change later
     end = 3
     # the number of vertices is the number of nodes found by the parser
