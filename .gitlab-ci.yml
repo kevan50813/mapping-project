@@ -2,6 +2,7 @@ image: docker:latest
 
 stages:
   - lint
+  - test
 
 .dist-artifacts: &dist-artifacts
   after_script:
@@ -12,7 +13,7 @@ stages:
     paths:
       - dist
 
-lint:
+flake8:
   stage: lint
   image: python:3.7
   before_script:
@@ -25,3 +26,16 @@ lint:
   artifacts:
     reports:
       junit: junit.xml
+
+pytest:
+  stage: test
+  image: python:3.7
+  before_script:
+    - python -m pip install "pytest pytest-cov"
+    - python -m pip install -r requirements.txt
+  script:
+    - python -m pytest --cov --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
