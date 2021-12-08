@@ -1,7 +1,6 @@
 image: docker:latest
 
 stages:
-  - lint
   - test
 
 .dist-artifacts: &dist-artifacts
@@ -14,7 +13,7 @@ stages:
       - dist
 
 flake8:
-  stage: lint
+  stage: test
   image: python:3.7
   before_script:
     - python -m pip install "flake8>=3.7.0"
