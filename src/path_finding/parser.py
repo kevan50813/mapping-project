@@ -9,7 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
-# from rich import print  # uncomment for prettyprint dicts
+from rich import print  # uncomment for prettyprint dicts
 # from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
 
@@ -26,7 +26,7 @@ class Parser:
         # parse the files
         self.parse_nodes()
         self.parse_rooms()
-        self.parse_pois()
+        # self.parse_pois()
 
     def parse_nodes(self):
         """
@@ -50,22 +50,28 @@ class Parser:
             prevId = -1
 
             for points in feature["geometry"]["coordinates"]:
-                for p in points:
+                p = (points[0], points[1])
+                # is p already in self.nodes ?
+                # else add it, then do the rest
+                for existing in self.nodes:
+                    if existing["coordinates"] == p:
+                        id = existing["id"]
+                        break
+                else:
                     # Id for the current node
                     # TODO change this?
                     id = len(self.nodes)
 
                     # Append a new node
                     self.nodes.append({"id": id,
-                                       "name": "",
-                                       "coordinates": (p[0], p[1])})
+                                       "name": None,
+                                       "coordinates": p})
+                # Append a new edge
+                if (prevId != -1):
+                    self.edges.append((prevId, id))
 
-                    # Append a new edge
-                    if (prevId != -1):
-                        self.edges.append((prevId, id))
-
-                    # Store id
-                    prevId = id
+                # Store id
+                prevId = id
 
     def parse_rooms(self):
         """
@@ -88,6 +94,7 @@ class Parser:
         for feature in json_rooms["features"]:
             # Get room name
             room_name = feature["properties"]["room-name"]
+            room_number = feature["properties"]["room-no"]
             room_type = feature["type"]
 
             for room in feature["geometry"]["coordinates"]:
@@ -106,6 +113,7 @@ class Parser:
                     if (node_coords.isenclosedBy(room_vertices)):
                         # Edit "name" of the node
                         node["name"] = room_name
+                        node["number"] = room_number
                         node["type"] = room_type
 
     def parse_pois(self):
