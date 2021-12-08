@@ -1,9 +1,4 @@
-<<<<<<< HEAD:src/path_finding/graph.py
 from parser import Parser
-=======
-import os
-from Parser import Parser
->>>>>>> origin/main:Path_Finding/Graph.py
 
 
 class Graph:
@@ -74,7 +69,6 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-<<<<<<< HEAD:src/path_finding/graph.py
     p = Parser("../../json-maps/qgis-bragg")
     p.print_lists()
     # start = 0  # testing purpose will change later
@@ -90,21 +84,5 @@ if __name__ == '__main__':
     #     # print(i)
     #     # print(i[0])
     #     # print(i[1])
-=======
-    p = Parser(os.getcwd() + "/Graphs/simple-house")
-    start = 0  # testing purpose will change later
-    end = 15
-    # the number of vertices is the number of nodes found by the parser
-    v = len(p.nodes)
-    # create the edges of the graph based on the adjacency's table and the
-    # neighboring nodes
-    adj = [[] for i in range(v)]
-    # loop though the list of edges and created edges on the graph.
-    for i in p.edges:
-        Graph.add_edge(g, adj, i[0], i[1])
-        # print(i)
-        # print(i[0])
-        # print(i[1])
->>>>>>> origin/main:Path_Finding/Graph.py
 
     # Graph.print_path(g, adj, start, end, v)
