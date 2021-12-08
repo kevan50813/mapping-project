@@ -184,12 +184,3 @@ class Parser:
                               "name": poi["properties"]["name"],
                               "coordinates": (point[0], point[1]),
                               "nearest_path_node": nearest_path_node})
-
-    def print_lists(self):
-        # Dump lists of nodes and edges
-        print("Nodes:")
-        print(self.nodes)
-        print("Edges:")
-        print(self.edges)
-        print("PoIs:")
-        print(self.pois)
