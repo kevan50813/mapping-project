@@ -1,1 +1,2 @@
 PyGeodesy==21.11.27
+pytest
