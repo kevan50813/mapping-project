@@ -48,22 +48,23 @@ class Parser:
             # Prev edge id
             prevId = -1
 
-            for point in feature["geometry"]["coordinates"]:
-                # Id for the current node
-                # TODO change this?
-                id = len(self.nodes)
+            for points in feature["geometry"]["coordinates"]:
+                for p in points:
+                    # Id for the current node
+                    # TODO change this?
+                    id = len(self.nodes)
 
-                # Append a new node
-                self.nodes.append({"id": id,
-                                   "name": "",
-                                   "coordinates": (point[0], point[1])})
+                    # Append a new node
+                    self.nodes.append({"id": id,
+                                       "name": "",
+                                       "coordinates": (p[0], p[1])})
 
-                # Append a new edge
-                if (prevId != -1):
-                    self.edges.append((prevId, id))
+                    # Append a new edge
+                    if (prevId != -1):
+                        self.edges.append((prevId, id))
 
-                # Store id
-                prevId = id
+                    # Store id
+                    prevId = id
 
     def parse_rooms(self):
         """
@@ -115,17 +116,20 @@ class Parser:
 
         for poi in json_poi["features"]:
             id = len(self.pois)
+            point = poi["geometry"]["coordinates"]
 
             # Search through every node, save the closest
             # suprisingly the fastest way to do this
             min_distance = -1
             for node in self.nodes:
-                poi_lat_lon = LatLon(poi["coordinates"])
-                node_lat_lon = LatLon(node["coordinates"])
+                poi_lat_lon = LatLon(point[0], point[1])
+                node_lat_lon = LatLon(node["coordinates"][0],
+                                      node["coordinates"][1])
                 distance = poi_lat_lon.distanceTo(node_lat_lon)
 
                 if min_distance == -1:
                     nearest = node
+                    min_distance = distance
                 elif distance < min_distance:
                     nearest = node
                     min_distance = distance
@@ -133,8 +137,8 @@ class Parser:
             nearest_path_node = nearest["id"]
 
             self.pois.append({"id": id,
-                              "name": poi["name"],
-                              "coordinates": poi["coordinates"],
+                              "name": poi["properties"]["name"],
+                              "coordinates": (point[0], point[1]),
                               "nearest_path_node": nearest_path_node})
 
     def print_lists(self):
