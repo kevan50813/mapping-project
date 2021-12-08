@@ -26,7 +26,7 @@ class Parser:
         # parse the files
         self.parse_nodes()
         self.parse_rooms()
-        # self.parse_pois()
+        self.parse_pois()
 
     def parse_nodes(self):
         """
@@ -188,10 +188,13 @@ class Parser:
     def print_lists(self):
         # Dump lists of nodes and edges
         print("Nodes:")
-        for node in self.nodes:
-            print(node)
+        print(self.nodes)
         print("Edges:")
         print(self.edges)
         print("PoIs:")
-        for poi in self.pois:
-            print(poi)
+        print(self.pois)
+
+
+if __name__ == "__main__":
+    p = Parser("../../json-maps/simple-house")
+    p.print_lists()
