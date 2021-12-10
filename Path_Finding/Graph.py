@@ -72,7 +72,7 @@ class Graph:
 if __name__ == '__main__':
     g = Graph()
     p = Parser(os.getcwd() + "/Graphs/simple-house")
-    start = 15 # testing purpose will change later
+    start = 15  # testing purpose will change later
     end = 0
     # the number of vertices is the number of nodes found by the parser
     v = len(p.nodes)
