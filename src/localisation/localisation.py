@@ -17,7 +17,7 @@ class Localisation:
 
     def __repr__(self):
         """ Representation of the dict stored in this class
-        :return: out: string representation of the network dictionary
+        :return out: string representation of the network dictionary
         """
 
         out = "      MAC      | Quality | RSSI |   Distance   | SSID\n"
@@ -29,10 +29,10 @@ class Localisation:
     @staticmethod
     def quality_to_rssi(quality):
         """ Converts quality to RSSI, using the formula RSSI = (quality / 2) - 100
-            This is bounded to be within the range -50 ... -100
+        This is bounded to be within the range -50 ... -100
 
-            :param quality: quality of the signal
-            :return the equivalent RSSI value
+        :param quality: quality of the signal
+        :return: the equivalent RSSI value
         """
         if quality <= 0:
             return -100
