@@ -1,4 +1,4 @@
-from path_finding.parser import Parser
+from path_finding.graph_parser import Parser
 
 
 class TestParser:
