@@ -1,15 +1,14 @@
-import os
-from Parser import Parser
+""" graph with pathfinding BFS """
 
 
 class Graph:
-
     # create an edge between the start node and the end node
     def add_edge(self, adj, start, end):
         adj[start].append(end)
         adj[start].append(start)
 
-    # Do a breath first search algorithm to find a route that goes though the least number of nodes
+    # Do a breath first search algorithm to find a route that goes
+    # though the least number of nodes
     # TODO change to include weights, this will be done later
     def breath_first_search(self, adj, start, end, vertex, previous, distance):
         # make an empty list that will que up all nodes to search
@@ -17,7 +16,8 @@ class Graph:
 
         visited = [False for i in range(vertex)]
 
-        # fill distance nad previous will arbitrary values distance refers to the number of nodes and previous
+        # fill distance nad previous will arbitrary values distance refers
+        # to the number of nodes and previous
         # refers to the nodes already searched
         for i in range(vertex):
             distance[i] = 10000
@@ -67,24 +67,3 @@ class Graph:
             print("\nPath is: ")
             for i in range(len(path) - 1, -1, -1):
                 print(path[i])
-
-
-if __name__ == '__main__':
-    g = Graph()
-    p = Parser(os.getcwd() + "/Graphs/simple-house")
-    start = 15  # testing purpose will change later
-    end = 0
-    # the number of vertices is the number of nodes found by the parser
-    v = len(p.nodes)
-    # create the edges of the graph based on the adjacency's table and the
-    # neighboring nodes
-    adj = [[] for i in range(v)]
-    # loop though the list of edges and created edges on the graph.
-    for i in p.edges:
-        Graph.add_edge(g, adj, i[0], i[1])
-        Graph.add_edge(g, adj, i[1], i[0])
-        # print(i)
-        # print(i[0])
-        # print(i[1])
-
-    Graph.print_path(g, adj, start, end, v)
