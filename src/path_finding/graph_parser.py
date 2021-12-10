@@ -92,7 +92,6 @@ class Parser:
                 f["type"] = "access"
                 json_rooms["features"].append(f)
 
-        checks = 0  # DEBUG
         for node in self.nodes:
             node_coords = LatLon(node["coordinates"][0],
                                  node["coordinates"][1])
@@ -106,13 +105,11 @@ class Parser:
                 room_vertices = [LatLon(v[0], v[1]) for v in room]
 
                 if (node_coords.isenclosedBy(room_vertices)):
-                    checks += 1  # DEBUG
                     node["name"] = room_name
                     node["number"] = room_number
                     node["type"] = room_type
                     break
 
-        print(checks)
 
     def parse_pois(self):
         """
@@ -147,19 +144,15 @@ class Parser:
             poi_lat_lon = LatLon(point[0], point[1])
 
             for feature in json_rooms["features"]:
+                room = feature["geometry"]["coordinates"][0]
                 # find what room the POI is in first
                 room_name = feature["properties"]["room-name"]
-                for room in feature["geometry"]["coordinates"]:
-                    room_vertices = []
-                    for vertex in room:
-                        room_vertices.append(LatLon(vertex[0], vertex[1]))
+                room_vertices = [LatLon(v[0], v[1]) for v in room]
 
                 # Check if the node is within room
                 if (poi_lat_lon.isenclosedBy(room_vertices)):
-                    # Edit "name" of the node
                     break
 
-            # TODO this is completely broken lol
             min_distance = float('inf')
 
             # Get only the path nodes that are in the current room
