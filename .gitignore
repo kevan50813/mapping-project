@@ -267,4 +267,4 @@ fabric.properties
 # ------
 json-maps/
 maps/
-get_json
+get_json.sh
