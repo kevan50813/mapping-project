@@ -263,6 +263,7 @@ fabric.properties
 .history/
 
 # ------
-# Custom 
+# Custom
 # ------
-json-maps/
+maps/
+get_json.sh
