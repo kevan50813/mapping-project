@@ -43,7 +43,6 @@ class Graph:
                         distance[adj[u][i]] = distance[u] - 1
                     previous[adj[u][i]] = u
                     queue.append(adj[u][i])
-
                     if adj[u][i] == end:
                         return True
         return False
@@ -73,8 +72,8 @@ class Graph:
 if __name__ == '__main__':
     g = Graph()
     p = Parser(os.getcwd() + "/Graphs/simple-house")
-    start = 0  # testing purpose will change later
-    end = 15
+    start = 15 # testing purpose will change later
+    end = 0
     # the number of vertices is the number of nodes found by the parser
     v = len(p.nodes)
     # create the edges of the graph based on the adjacency's table and the
@@ -83,6 +82,7 @@ if __name__ == '__main__':
     # loop though the list of edges and created edges on the graph.
     for i in p.edges:
         Graph.add_edge(g, adj, i[0], i[1])
+        Graph.add_edge(g, adj, i[1], i[0])
         # print(i)
         # print(i[0])
         # print(i[1])
