@@ -92,38 +92,26 @@ class Parser:
                 f["type"] = "access"
                 json_rooms["features"].append(f)
 
-        checks = 0
-        # For every node
+        checks = 0  # DEBUG
         for node in self.nodes:
-            # For every "room"
+            node_coords = LatLon(node["coordinates"][0],
+                                 node["coordinates"][1])
+
             for feature in json_rooms["features"]:
-                checks += 1
-                # Get tuple with node coordinates
-                node_coords = LatLon(node["coordinates"][0],
-                                     node["coordinates"][1])
-
-                if len(feature["geometry"]["coordinates"]) != 1:
-                    print('Rooms', len(feature["geometry"]["coordinates"]))
                 room = feature["geometry"]["coordinates"][0]
+                room_name = feature["properties"]["room-name"]
+                room_number = feature["properties"]["room-no"]
+                room_type = feature["type"]
 
-                # For every room vertex
-                room_vertices = []
-                for vertex in room:
-                    room_vertices.append(LatLon(vertex[0], vertex[1]))
+                room_vertices = [LatLon(v[0], v[1]) for v in room]
 
-                # Check if the node is within room
                 if (node_coords.isenclosedBy(room_vertices)):
-                    # Get room name
-                    room_name = feature["properties"]["room-name"]
-                    room_number = feature["properties"]["room-no"]
-                    room_type = feature["type"]
-
-                    # Edit "name" of the node
+                    checks += 1  # DEBUG
                     node["name"] = room_name
                     node["number"] = room_number
                     node["type"] = room_type
-
                     break
+
         print(checks)
 
     def parse_pois(self):
@@ -178,6 +166,7 @@ class Parser:
             room_nodes = [x for x in self.nodes if x["name"] == room_name]
 
             # Now find the closest path node in the room
+            nearest = None
             for node in room_nodes:
                 node_lat_lon = LatLon(node["coordinates"][0],
                                       node["coordinates"][1])
