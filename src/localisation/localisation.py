@@ -1,5 +1,7 @@
-import subprocess as sp
-import math
+class Localisation:
 
-from trilateration import trilateration
+    def __init__(self):
+        ...
 
+    def __repr__(self):
+        ...

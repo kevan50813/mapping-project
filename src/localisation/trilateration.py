@@ -77,6 +77,32 @@ def visualise_trilateration(ap_triplet, distance_triplet, location):
 
     plt.show()
 
+    print_representation(ap_triplet, distance_triplet, location)
+
+
+def print_representation(ap_triplet, distance_triplet, location):
+    """ Repr dump for attributes of trilateration ran
+
+        :param ap_triplet
+        :param distance_triplet
+        :param location
+    """
+
+    print("ACCESS POINT TRIPLET")
+
+    # iterate over both dictionaries in tandem
+    for ap_key, distance_key in zip(ap_triplet, distance_triplet):
+
+        # ensure keys are consistent across each triplet
+        if ap_key != distance_key:
+            print("ERR: Key mismatch in trilateration representation")
+            return
+
+        print(f"{ap_key}: pos <{ap_triplet[ap_key][0]}, "
+              f"{ap_triplet[ap_key][1]}>, dist {distance_triplet[distance_key]}")
+
+    print(f"\nPREDICTED LOCATION: <{location[0]}, {location[1]}>")
+
 
 if __name__ == "__main__":
 
@@ -94,5 +120,5 @@ if __name__ == "__main__":
     }
 
     # cast dicts to array for trilateration function
-    location = trilaterate_triplet(list(ap_sample.values()), list(distance_sample.values()))
-    visualise_trilateration(ap_sample, distance_sample, location)
+    pos = trilaterate_triplet(list(ap_sample.values()), list(distance_sample.values()))
+    visualise_trilateration(ap_sample, distance_sample, pos)
