@@ -118,11 +118,27 @@ def approximate_error(ap_dict, distance_dict, location):
         else:
             triangle_points.append(int2)
 
-    t1 = triangle_points[0]
-    t2 = triangle_points[1]
-    t3 = triangle_points[2]
 
+    t1 = triangle_points[0]     # intersection of circle 1 and 2
+    t2 = triangle_points[1]     # intersection of circle 2 and 3
+    t3 = triangle_points[2]     # intersection of circle 3 and 1
+
+    # get area of the triangle formed by the 3 points
     area = abs(0.5 * ((t2[0] - t1[0]) * (t3[1] - t1[1]) - ((t3[0] - t1[0]) * (t2[1] - t1[1]))))
+
+    # now take pairs of the points that make the triangle
+    for index in range(3):
+
+        # if we take the arc of the first 2 points, this will be an arc on circle 2
+        # as they are intersections of 1+2 and 2+3
+        p1 = triangle_points[index]
+        p2 = triangle_points[(index + 1) % 3]
+        r = distance_triplet[(index + 1) % 3]
+
+        angle = math.acos(((2 * r**2) - dist(p1, p2)**2) / (2 * r**2))
+
+        # add area of segment onto total area
+        area += ((angle - math.sin(angle)) / 2) * r**2
 
     return math.sqrt(area / math.pi)
 
@@ -197,6 +213,7 @@ def print_representation(ap_triplet, distance_triplet, location, error):
               f"{ap_triplet[ap_key][1]}>, dist {distance_triplet[distance_key]}")
 
     print(f"\nPREDICTED LOCATION: <{location[0]}, {location[1]}>")
+    print(f"EXPECTED ERROR AREA: {error**2 * math.pi}")
     print(f"EXPECTED ERROR RADIUS: {error}")
 
 
