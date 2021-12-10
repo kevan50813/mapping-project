@@ -266,3 +266,5 @@ fabric.properties
 # Custom 
 # ------
 json-maps/
+maps/
+get_json
