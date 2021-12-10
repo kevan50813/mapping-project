@@ -92,31 +92,39 @@ class Parser:
                 f["type"] = "access"
                 json_rooms["features"].append(f)
 
-        # For every "room"
-        for feature in json_rooms["features"]:
-            # Get room name
-            room_name = feature["properties"]["room-name"]
-            room_number = feature["properties"]["room-no"]
-            room_type = feature["type"]
+        checks = 0
+        # For every node
+        for node in self.nodes:
+            # For every "room"
+            for feature in json_rooms["features"]:
+                checks += 1
+                # Get tuple with node coordinates
+                node_coords = LatLon(node["coordinates"][0],
+                                     node["coordinates"][1])
 
-            for room in feature["geometry"]["coordinates"]:
+                if len(feature["geometry"]["coordinates"]) != 1:
+                    print('Rooms', len(feature["geometry"]["coordinates"]))
+                room = feature["geometry"]["coordinates"][0]
+
                 # For every room vertex
                 room_vertices = []
                 for vertex in room:
                     room_vertices.append(LatLon(vertex[0], vertex[1]))
 
-                # For every node
-                for node in self.nodes:
-                    # Get tuple with node coordinates
-                    node_coords = LatLon(node["coordinates"][0],
-                                         node["coordinates"][1])
+                # Check if the node is within room
+                if (node_coords.isenclosedBy(room_vertices)):
+                    # Get room name
+                    room_name = feature["properties"]["room-name"]
+                    room_number = feature["properties"]["room-no"]
+                    room_type = feature["type"]
 
-                    # Check if the node is within room
-                    if (node_coords.isenclosedBy(room_vertices)):
-                        # Edit "name" of the node
-                        node["name"] = room_name
-                        node["number"] = room_number
-                        node["type"] = room_type
+                    # Edit "name" of the node
+                    node["name"] = room_name
+                    node["number"] = room_number
+                    node["type"] = room_type
+
+                    break
+        print(checks)
 
     def parse_pois(self):
         """
