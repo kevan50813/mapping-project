@@ -20,7 +20,7 @@ class Localisation:
         :return: out: string representation of the network dictionary
         """
 
-        out = f"      MAC      | Quality | RSSI |   Distance   | SSID\n"
+        out = "      MAC      | Quality | RSSI |   Distance   | SSID\n"
         for key, value in self.network_dict.items():
             out += f"{key}, {value[0]}, {value[1]}, {value[2]}, {value[3]}\n"
 
@@ -119,8 +119,8 @@ class Localisation:
 
 if __name__ == "__main__":
 
-    l = Localisation()
-    l.run_process()
-    l.process_network_data()
+    local_test = Localisation()
+    local_test.run_process()
+    local_test.process_network_data()
 
-    print(repr(l))
+    print(repr(local_test))
