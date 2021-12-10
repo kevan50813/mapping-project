@@ -37,16 +37,17 @@ class Graph:
                 # that could be found else return false
                 if not visited[adj[u][i]]:
                     visited[adj[u][i]] = True
-                    distance[adj[u][i]] = distance[u] + 1
+                    if end <= start:
+                        distance[adj[u][i]] = distance[u] + 1
+                    else:
+                        distance[adj[u][i]] = distance[u] - 1
                     previous[adj[u][i]] = u
                     queue.append(adj[u][i])
-
                     if adj[u][i] == end:
                         return True
         return False
 
-    # used for printing the path, this will be removed when we have an actual
-    # GUI for testing purposes
+    # used for printing the path
     def print_path(self, adj, start, end, vertex):
         previous = [0 for i in range(vertex)]
         distance = [0 for i in range(vertex)]
