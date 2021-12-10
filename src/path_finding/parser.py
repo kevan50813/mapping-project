@@ -26,7 +26,7 @@ class Parser:
         # parse the files
         self.parse_nodes()
         self.parse_rooms()
-        # self.parse_pois()
+        self.parse_pois()
 
     def parse_nodes(self):
         """
@@ -184,14 +184,3 @@ class Parser:
                               "name": poi["properties"]["name"],
                               "coordinates": (point[0], point[1]),
                               "nearest_path_node": nearest_path_node})
-
-    def print_lists(self):
-        # Dump lists of nodes and edges
-        print("Nodes:")
-        for node in self.nodes:
-            print(node)
-        print("Edges:")
-        print(self.edges)
-        print("PoIs:")
-        for poi in self.pois:
-            print(poi)
