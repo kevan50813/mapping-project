@@ -116,7 +116,7 @@ if __name__ == "__main__":
     distance_sample = {
         "REF_1": 20,
         "REF_2": 20,
-        "REF_3": 30
+        "REF_3": 20
     }
 
     # cast dicts to array for trilateration function
