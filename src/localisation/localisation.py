@@ -52,7 +52,7 @@ class Localisation:
 
         # RSSI = -10 * n * log(d) + A
         a = -50  # signal strength at 1m
-        n = 2.7  # path loss exponent
+        n = 2   # path loss exponent
         return math.pow(10, (rssi - a) / (-10 * n))
 
     def run_process(self):
@@ -115,6 +115,8 @@ class Localisation:
 
                     # TODO - do we throw an error here? should we handle this?
                     pass
+
+        self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[1][2]))
 
 
 if __name__ == "__main__":

@@ -164,8 +164,10 @@ def visualise_trilateration(ap_triplet, distance_triplet, location, error):
 
     # plot the user location
     ax.plot(location[0], location[1], 'x')
-    error_circle = plt.Circle((location[0], location[1]), error, fill=False, color="red")
-    ax.add_patch(error_circle)
+
+    if error > 0:
+        error_circle = plt.Circle((location[0], location[1]), error, fill=False, color="red")
+        ax.add_patch(error_circle)
 
     plt.show()
 
@@ -208,9 +210,9 @@ if __name__ == "__main__":
     }
 
     distance_sample = {
-        "REF_1": 20,
-        "REF_2": 20,
-        "REF_3": 30
+        "REF_1": 25,
+        "REF_2": 25,
+        "REF_3": 25
     }
 
     pos = trilaterate_triplet(ap_sample, distance_sample)
