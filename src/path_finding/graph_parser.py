@@ -12,6 +12,7 @@ import json
 # from rich import print  # uncomment for prettyprint dicts
 # from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
+from pygeodesy import boundsOf
 
 
 class Parser:
@@ -27,6 +28,17 @@ class Parser:
         self.parse_nodes()
         self.parse_rooms()
         self.parse_pois()
+
+    def __in_bounding_box(self, node, room):
+        bounds = boundsOf(room, LatLon=LatLon)
+        NE = bounds.latlonNE
+        SW = bounds.latlonSW
+
+        if SW.lat <= node.lat and node.lat <= NE.lat \
+           and SW.lon <= node.lon and node.lon <= NE.lon:
+            return True
+
+        return False
 
     def parse_nodes(self):
         """
@@ -96,20 +108,39 @@ class Parser:
             node_coords = LatLon(node["coordinates"][0],
                                  node["coordinates"][1])
 
+            # check bounding boxes first, much faster
+            candidates = []
             for feature in json_rooms["features"]:
                 room = feature["geometry"]["coordinates"][0]
-                room_name = feature["properties"]["room-name"]
-                room_number = feature["properties"]["room-no"]
-                room_type = feature["type"]
-
                 room_vertices = [LatLon(v[0], v[1]) for v in room]
 
-                if (node_coords.isenclosedBy(room_vertices)):
-                    node["name"] = room_name
-                    node["number"] = room_number
-                    node["type"] = room_type
-                    break
+                if self.__in_bounding_box(node_coords, room_vertices):
+                    candidates.append(feature)
 
+            final_feature = None
+            if len(candidates) == 1:
+                final_feature = candidates[0]
+            else:
+                for feature in candidates:
+                    room = feature["geometry"]["coordinates"][0]
+                    room_vertices = [LatLon(v[0], v[1]) for v in room]
+
+                    if node_coords.isenclosedBy(room_vertices):
+                        final_feature = feature
+                        break
+
+            if final_feature is not None:
+                room_name = final_feature["properties"]["room-name"]
+                room_number = final_feature["properties"]["room-no"]
+                room_type = final_feature["type"]
+
+                node["name"] = room_name
+                node["number"] = room_number
+                node["type"] = room_type
+            else:
+                node["name"] = None
+                node["number"] = None
+                node["type"] = None
 
     def parse_pois(self):
         """
@@ -143,15 +174,26 @@ class Parser:
             point = poi["geometry"]["coordinates"]
             poi_lat_lon = LatLon(point[0], point[1])
 
+            candidates = []
             for feature in json_rooms["features"]:
                 room = feature["geometry"]["coordinates"][0]
                 # find what room the POI is in first
                 room_name = feature["properties"]["room-name"]
                 room_vertices = [LatLon(v[0], v[1]) for v in room]
 
-                # Check if the node is within room
-                if (poi_lat_lon.isenclosedBy(room_vertices)):
-                    break
+                if self.__in_bounding_box(poi_lat_lon, room_vertices):
+                    candidates.append(feature)
+
+            if len(candidates) == 1:
+                feature = candidates[0]
+                room_name = feature["properties"]["room-name"]
+            else:
+                for feature in candidates:
+                    room = feature["geometry"]["coordinates"][0]
+                    room_vertices = [LatLon(v[0], v[1]) for v in room]
+                    if poi_lat_lon.isenclosedBy(room_vertices):
+                        room_name = feature["properties"]["room-name"]
+                        break
 
             min_distance = float('inf')
 
@@ -169,7 +211,10 @@ class Parser:
                     nearest = node
                     min_distance = distance
 
-            nearest_path_node = nearest["id"]
+            if nearest is not None:
+                nearest_path_node = nearest["id"]
+            else:
+                nearest_path_node = None
 
             self.pois.append({
                 "id": id,
