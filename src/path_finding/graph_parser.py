@@ -26,7 +26,7 @@ class Parser:
         # parse the files
         self.parse_nodes()
         self.parse_rooms()
-        # self.parse_pois()
+        self.parse_pois()
 
     def parse_nodes(self):
         """
@@ -63,9 +63,11 @@ class Parser:
                     id = len(self.nodes)
 
                     # Append a new node
-                    self.nodes.append({"id": id,
-                                       "name": None,
-                                       "coordinates": p})
+                    self.nodes.append({
+                        "id": id,
+                        "name": None,
+                        "coordinates": p
+                    })
                 # Append a new edge
                 if (prevId != -1):
                     self.edges.append((prevId, id))
@@ -165,8 +167,7 @@ class Parser:
             min_distance = float('inf')
 
             # Get only the path nodes that are in the current room
-            room_nodes = [
-                x for x in self.nodes if x["name"] == room_name]
+            room_nodes = [x for x in self.nodes if x["name"] == room_name]
 
             # Now find the closest path node in the room
             for node in room_nodes:
@@ -180,18 +181,9 @@ class Parser:
 
             nearest_path_node = nearest["id"]
 
-            self.pois.append({"id": id,
-                              "name": poi["properties"]["name"],
-                              "coordinates": (point[0], point[1]),
-                              "nearest_path_node": nearest_path_node})
-
-    def print_lists(self):
-        # Dump lists of nodes and edges
-        print("Nodes:")
-        for node in self.nodes:
-            print(node)
-        print("Edges:")
-        print(self.edges)
-        print("PoIs:")
-        for poi in self.pois:
-            print(poi)
+            self.pois.append({
+                "id": id,
+                "name": poi["properties"]["name"],
+                "coordinates": (point[0], point[1]),
+                "nearest_path_node": nearest_path_node
+            })
