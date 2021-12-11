@@ -36,8 +36,11 @@ class Controller():
                 u["lon"] = u["coordinates"][1]
                 u.pop("coordinates", None)
 
-            # TODO: select from graph first rather than making a new node
-            node1 = Node(label='node', properties=u)
+            # the alias is there to stop duplication, it needs to start with
+            # a letter for some reason
+            node1 = Node(label='node',
+                         properties=u,
+                         alias="n"+str(u["id"]))
             graph.add_node(node1)
 
             adjacent = []
@@ -55,7 +58,9 @@ class Controller():
                         n["lon"] = n["coordinates"][1]
                         n.pop("coordinates", None)
 
-                    node2 = Node(label='node', properties=n)
+                    node2 = Node(label='node',
+                                 properties=n,
+                                 alias="n"+str(n["id"]))
                     graph.add_node(node2)
 
                     edge = Edge(node1, 'path', node2)
