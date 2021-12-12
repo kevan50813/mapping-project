@@ -1,9 +1,6 @@
 import json
 import sys
 import os
-# from rich import print  # uncomment for prettyprint dicts
-# from typing import Coroutine  # for easier code editing
-#from pygeodesy.sphericalNvector import LatLon
 
 class AP_Parser():
     # declare the nodes array to store the node data
@@ -20,7 +17,7 @@ class AP_Parser():
         """
             Node data structure
 
-            node = {
+            ap_node = {
                 "ap": "",
                 "mac": "",
                 "coordinates": ()
