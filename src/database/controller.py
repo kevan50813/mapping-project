@@ -99,12 +99,27 @@ class Controller():
                for k, v in poi.items()}
         poi["lat"] = poi["coordinates"][0]
         poi["lon"] = poi["coordinates"][1]
-        poi["graph"] = graph_name
         poi.pop("coordinates", None)
 
         poi_id = f"poi:{graph_name}:{str(poi.pop('id'))}"
         self.log.debug(f"Adding POI: {poi_id}")
         self.search_client.redis.hset(poi_id, mapping=poi)
 
-    def get_pois_from_name(self, poi_name):
-        pass
+    def get_poi_from_name(self, poi_name):
+        res = self.search_client.search(poi_name)
+        pois = []
+
+        for doc in res.docs:
+            # transform back to the standard form
+            d = doc.__dict__
+            d.pop("payload")
+
+            coordinates = (d.pop("lat"), d.pop("lon"))
+            d["coordinates"] = coordinates
+
+            d["id"] = int(d["id"].split(":")[-1])
+            d["nearest_path_node"] = int(d["nearest_path_node"])
+
+            pois.append(d)
+
+        return pois
