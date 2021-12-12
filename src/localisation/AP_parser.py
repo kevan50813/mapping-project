@@ -7,7 +7,7 @@ import os
 
 class AP_Parser():
     # declare the nodes array to store the node data
-    nodes = []
+    ap_nodes = []
 
     # Constructor
     def __init__(self, path):
@@ -40,13 +40,13 @@ class AP_Parser():
             ap = feature["properties"]["AP_Name"]
 
             #create node with Json node data
-            self.nodes.append({
+            self.ap_nodes.append({
                     "ap": ap,
                     "mac": mac,
                     "coordinates": coord
                 })
          #print nodes for testing   
-        print(self.nodes)
+        print(self.ap_nodes)
 
 #run parser for testing
 if __name__ == '__main__':
