@@ -18,8 +18,8 @@ class AP_Parser():
             Node data structure
 
             ap_node = {
-                "ap": "",
-                "mac": "",
+                "ap_name": "",
+                "macaddress": "",
                 "coordinates": ()
             }
         """
@@ -38,12 +38,13 @@ class AP_Parser():
 
             #create node with Json node data
             self.ap_nodes.append({
-                    "ap": ap,
-                    "mac": mac,
+                    "ap_name": ap,
+                    "macaddress": mac,
                     "coordinates": coord
                 })
          #print nodes for testing   
-        print(self.ap_nodes)
+        for node in self.ap_nodes:
+            print(node, '\n')
 
 #run parser for testing
 if __name__ == '__main__':
