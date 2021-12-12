@@ -1,11 +1,27 @@
 """ Redis DB controller using RedisGraph """
+import logging
 import redis
 from redisgraph import Node, Edge, Graph
+from redisearch import Client, IndexDefinition, TextField
 
 
 class Controller():
     def __init__(self, host, port):
+        self.log = logging.getLogger(__name__)
         self.db = redis.Redis(host=host, port=port)
+        # FIXME debug -> remove for db persistence
+        self.db.execute_command("FLUSHALL")
+
+        self.search_client = Client("points_of_interest", conn=self.db)
+        definition = IndexDefinition(prefix=["poi:"])
+        schema = (TextField("name"))
+
+        try:
+            self.search_client.info()
+        except redis.ResponseError:
+            self.log.debug("Index does not exist, creating index")
+            # Index does not exist. We need to create it!
+            self.search_client.create_index(schema, definition=definition)
 
     def save_graph(self, graph_name, nodes, edges):
         """
@@ -69,29 +85,26 @@ class Controller():
                     visited.append(n)
                     queue.append(n)
 
+        self.log.debug(f"commiting graph {graph_name}")
         graph.commit()
 
     def add_poi(self, graph_name, poi):
         """
             Add a POI to a given graph_name
-        """
-        graph = Graph(graph_name, self.db)
 
+            TODO: Should this be a seperate table for every POI
+                  TAGGED with the graph_name you can find it on
+        """
         poi = {k: ('' if v is None else v)
                for k, v in poi.items()}
         poi["lat"] = poi["coordinates"][0]
         poi["lon"] = poi["coordinates"][1]
+        poi["graph"] = graph_name
         poi.pop("coordinates", None)
 
-        poi_node = Node(label='poi', properties=poi)
-        graph.add_node(poi_node)
-        graph.commit()
+        poi_id = f"poi:{graph_name}:{str(poi.pop('id'))}"
+        self.log.debug(f"Adding POI: {poi_id}")
+        self.search_client.redis.hset(poi_id, mapping=poi)
 
-        # Now find path node it is associated with, and create edge
-        query = """MATCH (n:node {id: $id}), (p:poi {id:$poi_id})
-                   CREATE (p)-[:poi_nearest]->(n)"""
-        graph.query(query, {"id": poi["nearest_path_node"],
-                            "poi_id": poi["id"]})
-
-    def get_poi(self, graph_name, poi):
+    def get_pois_from_name(self, poi_name):
         pass
