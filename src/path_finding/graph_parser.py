@@ -45,9 +45,10 @@ class Parser:
             Node data structure
 
             node = {
-                "id": -1,
+                "id": int,
                 "name": "",
-                "coordinates": ()
+                "lat": float,
+                "lon": float
             }
 
             Edges are tuples of 2 ids (in nodes)
@@ -66,7 +67,7 @@ class Parser:
                 # is p already in self.nodes ?
                 # else add it, then do the rest
                 for existing in self.nodes:
-                    if existing["coordinates"] == p:
+                    if (existing["lat"], existing["lon"]) == p:
                         id = existing["id"]
                         break
                 else:
@@ -78,7 +79,8 @@ class Parser:
                     self.nodes.append({
                         "id": id,
                         "name": None,
-                        "coordinates": p
+                        "lat": p[0],
+                        "lon": p[1]
                     })
                 # Append a new edge
                 if (prevId != -1):
@@ -105,8 +107,8 @@ class Parser:
                 json_rooms["features"].append(f)
 
         for node in self.nodes:
-            node_coords = LatLon(node["coordinates"][0],
-                                 node["coordinates"][1])
+            node_coords = LatLon(node["lat"],
+                                 node["lon"])
 
             # check bounding boxes first, much faster
             candidates = []
@@ -147,10 +149,11 @@ class Parser:
             Match points-of-interest to the nearest node in the ways nodes
 
             poi = {
-                "id": -1,
-                "name": "",
-                "coordinates": ()
-                "nearest_path_node": -1 # ID of nearest in self.nodes
+                "id": int,
+                "name": str,
+                "lat": float
+                "lon": float,
+                "nearest_path_node": int # ID of nearest in self.nodes
             }
 
             I think if I do it this way there might be consistency issues
@@ -203,8 +206,8 @@ class Parser:
             # Now find the closest path node in the room
             nearest = None
             for node in room_nodes:
-                node_lat_lon = LatLon(node["coordinates"][0],
-                                      node["coordinates"][1])
+                node_lat_lon = LatLon(node["lat"],
+                                      node["lon"])
                 distance = poi_lat_lon.distanceTo(node_lat_lon)
 
                 if distance < min_distance:
@@ -219,6 +222,7 @@ class Parser:
             self.pois.append({
                 "id": id,
                 "name": poi["properties"]["name"],
-                "coordinates": (point[0], point[1]),
+                "lat": point[0],
+                "lon": point[1],
                 "nearest_path_node": nearest_path_node
             })
