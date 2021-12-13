@@ -9,6 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
+import os
 # from rich import print  # uncomment for prettyprint dicts
 # from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
@@ -21,8 +22,14 @@ class Parser:
     pois = []
 
     # Constructor
-    def __init__(self, path):
+    def __init__(self, path, graph_name=None):
         self.path = path
+
+        if graph_name is not None:
+            self.graph_name = graph_name
+        else:
+            # get graph_name from path
+            self.graph_name = os.path.split(path)[-1]
 
         # parse the files
         self.parse_nodes()
