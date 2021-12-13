@@ -48,8 +48,8 @@ class AP_Parser():
             # create a temporary data dictionary to store the information
             self.data = {
                 "ap_name": ap,
-                "longitude": lon,
-                "latitude" : lat
+                "lon": lon,
+                "lat" : lat
 
             }
 
