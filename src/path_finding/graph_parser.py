@@ -63,6 +63,8 @@ class Parser:
             Ways.json should be GEOJson file containing only LineString
             features (no MultiLineString).
 
+            Also assigns to edges (sparse adajcency matrix)
+
             Node data structure
 
             node = {
@@ -72,7 +74,7 @@ class Parser:
                 "lon": float
             }
 
-            Edges are tuples of 2 ids (in nodes)
+            Edges are tuples of 2 ids (in self.nodes)
         """
         # Read Ways.json
         with open(self.path + "/Ways.json", "r") as file:
@@ -80,7 +82,6 @@ class Parser:
 
         # For every "way"
         for feature in json_ways["features"]:
-            # Prev edge id
             prevId = -1
 
             for points in feature["geometry"]["coordinates"]:
@@ -205,15 +206,18 @@ class Parser:
             poi_lat_lon = LatLon(point[0], point[1])
 
             candidates = []
+            # Generate a list of candidate rooms that the POI is in the
+            # bounding box of
             for feature in json_rooms["features"]:
                 room = feature["geometry"]["coordinates"][0]
-                # find what room the POI is in first
                 room_name = feature["properties"]["room-name"]
                 room_vertices = [LatLon(v[0], v[1]) for v in room]
 
                 if self.__in_bounding_box(poi_lat_lon, room_vertices):
                     candidates.append(feature)
 
+            # If there's only one candidate then we know it's that room
+            # Otherwise, we have to check with the slower 'isenclosedBy'
             if len(candidates) == 1:
                 feature = candidates[0]
                 room_name = feature["properties"]["room-name"]
@@ -223,15 +227,20 @@ class Parser:
                     room_vertices = [LatLon(v[0], v[1]) for v in room]
                     if poi_lat_lon.isenclosedBy(room_vertices):
                         room_name = feature["properties"]["room-name"]
+                        # Since we've found it we break, if the map is badly
+                        # constructed there's a chance a point could be in two
+                        # rooms at once, but we'll assume it's in the first one
+                        # we find
                         break
 
-            min_distance = float('inf')
-
             # Get only the path nodes that are in the current room
-            room_nodes = [x for x in self.nodes if x["name"] == room_name]
+            room_nodes = [n for n in self.nodes if n["name"] == room_name]
 
-            # Now find the closest path node in the room
+            # Loop through all the path nodes that are in the room and find the
+            # closest one, this is probably the fastest way of doing
+            # nearest-neighbour (and there aren't that many nodes)
             nearest = None
+            min_distance = float('inf')
             for node in room_nodes:
                 node_lat_lon = LatLon(node["lat"],
                                       node["lon"])
