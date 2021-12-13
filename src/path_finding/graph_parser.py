@@ -30,6 +30,23 @@ class Parser:
         self.parse_pois()
 
     def __in_bounding_box(self, node, room):
+        """
+            Check if a LatLon object is within the
+            bounding box of a list of LatLon objects.
+
+            This is much fater than using isenclosedBy, check with bounding
+            box first, then check with isenclosedBy later
+
+            Args:
+                node (LatLon): point you wish to check is in a bounding box
+                room (LatLon[]): list of LatLon objects that form a polygon
+
+            Returns:
+                True if node is in the bounding box of the polygon described
+                by room
+
+                False if the node is not in the bounding box
+        """
         bounds = boundsOf(room, LatLon=LatLon)
         NE = bounds.latlonNE
         SW = bounds.latlonSW
@@ -42,6 +59,10 @@ class Parser:
 
     def parse_nodes(self):
         """
+            Parse nodes from the Ways.json layer of a given map
+            Ways.json should be GEOJson file containing only LineString
+            features (no MultiLineString).
+
             Node data structure
 
             node = {
@@ -72,7 +93,8 @@ class Parser:
                         break
                 else:
                     # Id for the current node
-                    # TODO change this?
+                    # TODO change this? -> Include ID information of what map
+                    # we are looking at
                     id = len(self.nodes)
 
                     # Append a new node
@@ -93,6 +115,9 @@ class Parser:
         """
             Give each node a name that corresponds
             to the room that it is located in
+
+            Reads from Rooms.json and Access.json to assign room names
+            tags each accordingly (room vs access) for routing later.
         """
         # Read Rooms.json
         with open(self.path + "/Rooms.json", "r") as file:
@@ -148,6 +173,7 @@ class Parser:
         """
             Match points-of-interest to the nearest node in the ways nodes
 
+            POI data structure
             poi = {
                 "id": int,
                 "name": str,
@@ -156,6 +182,7 @@ class Parser:
                 "nearest_path_node": int # ID of nearest in self.nodes
             }
 
+            NOTE:
             I think if I do it this way there might be consistency issues
             if Rooms.json was to change, this is why DB is definitely a better
             idea (we can parse the json then use the parsed objects to write
