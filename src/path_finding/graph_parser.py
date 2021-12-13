@@ -102,8 +102,8 @@ class Parser:
                     self.nodes.append({
                         "id": id,
                         "name": None,
-                        "lat": p[0],
-                        "lon": p[1]
+                        "lon": p[0],
+                        "lat": p[1]
                     })
                 # Append a new edge
                 if (prevId != -1):
@@ -140,7 +140,7 @@ class Parser:
             candidates = []
             for feature in json_rooms["features"]:
                 room = feature["geometry"]["coordinates"][0]
-                room_vertices = [LatLon(v[0], v[1]) for v in room]
+                room_vertices = [LatLon(v[1], v[0]) for v in room]
 
                 if self.__in_bounding_box(node_coords, room_vertices):
                     candidates.append(feature)
@@ -151,7 +151,7 @@ class Parser:
             else:
                 for feature in candidates:
                     room = feature["geometry"]["coordinates"][0]
-                    room_vertices = [LatLon(v[0], v[1]) for v in room]
+                    room_vertices = [LatLon(v[1], v[0]) for v in room]
 
                     if node_coords.isenclosedBy(room_vertices):
                         final_feature = feature
@@ -203,7 +203,7 @@ class Parser:
         for poi in json_poi["features"]:
             id = len(self.pois)
             point = poi["geometry"]["coordinates"]
-            poi_lat_lon = LatLon(point[0], point[1])
+            poi_lat_lon = LatLon(point[1], point[0])
 
             candidates = []
             # Generate a list of candidate rooms that the POI is in the
@@ -211,7 +211,7 @@ class Parser:
             for feature in json_rooms["features"]:
                 room = feature["geometry"]["coordinates"][0]
                 room_name = feature["properties"]["room-name"]
-                room_vertices = [LatLon(v[0], v[1]) for v in room]
+                room_vertices = [LatLon(v[1], v[0]) for v in room]
 
                 if self.__in_bounding_box(poi_lat_lon, room_vertices):
                     candidates.append(feature)
@@ -224,7 +224,7 @@ class Parser:
             else:
                 for feature in candidates:
                     room = feature["geometry"]["coordinates"][0]
-                    room_vertices = [LatLon(v[0], v[1]) for v in room]
+                    room_vertices = [LatLon(v[1], v[0]) for v in room]
                     if poi_lat_lon.isenclosedBy(room_vertices):
                         room_name = feature["properties"]["room-name"]
                         # Since we've found it we break, if the map is badly
@@ -258,7 +258,7 @@ class Parser:
             self.pois.append({
                 "id": id,
                 "name": poi["properties"]["name"],
-                "lat": point[0],
-                "lon": point[1],
+                "lon": point[0],
+                "lat": point[1],
                 "nearest_path_node": nearest_path_node
             })
