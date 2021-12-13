@@ -267,3 +267,4 @@ fabric.properties
 # ------
 maps/
 get_json.sh
+test.py
