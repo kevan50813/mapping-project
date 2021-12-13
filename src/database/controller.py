@@ -6,26 +6,36 @@ from redisearch import Client, IndexDefinition, TextField
 
 
 class Controller():
+    """
+        Redis database controller
+
+        Redis database must have Graph and Search modules
+    """
     def __init__(self, host, port):
         self.log = logging.getLogger(__name__)
         self.db = redis.Redis(host=host, port=port)
+
         # FIXME debug -> remove for db persistence
+        self.log.warning("CLEARING WHOLE DB, REMOVE BEFORE REAL USE")
         self.db.execute_command("FLUSHALL")
+        # FIXME
 
         self.search_client = Client("points_of_interest", conn=self.db)
         definition = IndexDefinition(prefix=["poi:"])
+        # TODO index the graph room name
         schema = (TextField("name"))
 
+        # Check to see if index is already in db
         try:
             self.search_client.info()
         except redis.ResponseError:
             self.log.debug("Index does not exist, creating index")
-            # Index does not exist. We need to create it!
             self.search_client.create_index(schema, definition=definition)
 
     def save_graph(self, graph_name, nodes, edges):
         """
-            Save a graph given the nodes and edges to the database
+            Save a graph given the nodes and edges to the database,
+            breadth-first traversal
 
             Args:
                 graph_name  (str): Name of the graph to save
@@ -35,7 +45,7 @@ class Controller():
                        (sparse adjacency matrix)
         """
         graph = Graph(graph_name, self.db)
-        # clean None from dict
+        # clean None from dict, redis doesn't understand it
         nodes = [{k: ('' if v is None else v)
                   for k, v in d.items()} for d in nodes]
 
@@ -47,11 +57,6 @@ class Controller():
         while len(queue) != 0:
             u = queue.pop(0)
 
-            if "coordinates" in u.keys():
-                u["lat"] = u["coordinates"][0]
-                u["lon"] = u["coordinates"][1]
-                u.pop("coordinates", None)
-
             # the alias is there to stop duplication, it needs to start with
             # a letter for some reason
             node1 = Node(label='node',
@@ -59,6 +64,8 @@ class Controller():
                          alias="n"+str(u["id"]))
             graph.add_node(node1)
 
+            # TODO I'm sure there's a better way of doing this, ensure
+            # bi-directonality
             adjacent = []
             for e in edges:
                 if u["id"] == e[0]:
@@ -69,17 +76,12 @@ class Controller():
             adjn = [n for n in nodes if n["id"] in adjacent]
             for n in adjn:
                 if n not in visited:
-                    if "coordinates" in n.keys():
-                        n["lat"] = n["coordinates"][0]
-                        n["lon"] = n["coordinates"][1]
-                        n.pop("coordinates", None)
-
                     node2 = Node(label='node',
                                  properties=n,
                                  alias="n"+str(n["id"]))
-                    graph.add_node(node2)
-
                     edge = Edge(node1, 'path', node2)
+
+                    graph.add_node(node2)
                     graph.add_edge(edge)
 
                     visited.append(n)
@@ -92,20 +94,29 @@ class Controller():
         """
             Add a POI to a given graph_name
 
-            TODO: Should this be a seperate table for every POI
-                  TAGGED with the graph_name you can find it on
+            Args:
+                graph_name (str): name of the graph this PoI is identified with
+                poi (dict): poi dictionary (from parser)
+
         """
         poi = {k: ('' if v is None else v)
                for k, v in poi.items()}
-        poi["lat"] = poi["coordinates"][0]
-        poi["lon"] = poi["coordinates"][1]
-        poi.pop("coordinates", None)
 
         poi_id = f"poi:{graph_name}:{str(poi.pop('id'))}"
+
         self.log.debug(f"Adding POI: {poi_id}")
         self.search_client.redis.hset(poi_id, mapping=poi)
 
     def get_poi_from_name(self, poi_name):
+        """
+            Search for a POI using Redisearch
+
+            Args:
+                poi_name (str): Search string for the POI
+
+            Returns:
+                Dictionary of POIs that match poi_name search string
+        """
         res = self.search_client.search(poi_name)
         pois = []
 
@@ -113,10 +124,6 @@ class Controller():
             # transform back to the standard form
             d = doc.__dict__
             d.pop("payload")
-
-            coordinates = (d.pop("lat"), d.pop("lon"))
-            d["coordinates"] = coordinates
-
             d["id"] = int(d["id"].split(":")[-1])
             d["nearest_path_node"] = int(d["nearest_path_node"])
 
