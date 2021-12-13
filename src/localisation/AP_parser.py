@@ -6,6 +6,8 @@ class AP_Parser():
     # declare the nodes array to store the node data
     ap_nodes = []
 
+    data = []
+
     # Constructor
     def __init__(self, path):
         self.path = str(path)
@@ -17,11 +19,16 @@ class AP_Parser():
         """
             Node data structure
 
-            ap_node = {
+            data = {
                 "ap_name": "",
-                "macaddress": "",
-                "coordinates": ()
+                "longitude": "",
+                "latitude": ""
             }
+
+            ap_nodes = {
+                macaddress : data,
+            }
+            
         """
 
         #Read Wifi_Nodes.json
@@ -35,12 +42,20 @@ class AP_Parser():
             coord = feature["geometry"]["coordinates"]
             mac = feature["properties"]["MacAddress"]
             ap = feature["properties"]["AP_Name"]
+            lon = coord[0]
+            lat = coord[1]
+
+            # create a temporary data dictionary to store the information
+            self.data = {
+                "ap_name": ap,
+                "longitude": lon,
+                "latitude" : lat
+
+            }
 
             #create node with Json node data
             self.ap_nodes.append({
-                    "ap_name": ap,
-                    "macaddress": mac,
-                    "coordinates": coord
+                    mac : self.data
                 })
          #print nodes for testing   
         for node in self.ap_nodes:
