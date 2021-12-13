@@ -8,7 +8,7 @@ cache:
 
 stages:
   - test
-  - deploy
+  # - deploy
 
 .dist-artifacts: &dist-artifacts
   after_script:
@@ -46,13 +46,13 @@ pytest:
     reports:
       junit: report.xml
 
-sphinx:
-  stage: deploy
-  script:
-    - pip install -U sphinx
-    - sphinx-build -b html . public
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
+# sphinx:
+#   stage: deploy
+#   script:
+#     - pip install -U sphinx
+#     - sphinx-build -b html . public
+#   artifacts:
+#     paths:
+#       - public
+#   only:
+#     - main
