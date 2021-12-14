@@ -1,7 +1,14 @@
-image: docker:latest
+image: python:3.7
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+cache:
+  paths:
+    - .cache/pip
 
 stages:
   - test
+  # - deploy
 
 .dist-artifacts: &dist-artifacts
   after_script:
@@ -14,7 +21,6 @@ stages:
 
 flake8:
   stage: test
-  image: python:3.7
   before_script:
     - python -m pip install "flake8>=3.7.0"
   script:
@@ -28,7 +34,6 @@ flake8:
 
 pytest:
   stage: test
-  image: python:3.7
   before_script:
     - python -m pip install pytest pytest-cov
     - python -m pip install -r requirements.txt
@@ -40,3 +45,14 @@ pytest:
     when: always
     reports:
       junit: report.xml
+
+# sphinx:
+#   stage: deploy
+#   script:
+#     - pip install -U sphinx
+#     - sphinx-build -b html . public
+#   artifacts:
+#     paths:
+#       - public
+#   only:
+#     - main
