@@ -96,7 +96,7 @@ class Parser:
                 # is p already in self.nodes ?
                 # else add it, then do the rest
                 for existing in self.nodes:
-                    if (existing["lat"], existing["lon"]) == p:
+                    if (existing["lon"], existing["lat"]) == p:
                         id = existing["id"]
                         break
                 else:
