@@ -98,7 +98,78 @@ class Controller():
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
 
-    def add_poi(self, graph_name: str, poi: dict) -> None:
+    def load_graph(self, graph_name) -> (list, list):
+        """
+            Returns the whole graph nodes, edges
+
+            Args:
+                graph_name: graph of which to return nodes and edges from
+
+            Returns:
+                tuple with two lists, first element is nodes, second is edges
+        """
+        nodes = self.load_nodes(graph_name)
+        edges = self.load_edges(graph_name)
+
+        return (nodes, edges)
+
+    def load_nodes(self, graph_name) -> list:
+        """
+            Return all nodes in a given graph
+
+            Args:
+                graph_name: graph of which to return nodes from
+
+            Returns:
+                List of nodes (see graph_parser for definition of their format)
+        """
+        graph = Graph(graph_name, self.redis_db)
+        query = """MATCH (n:node) RETURN n"""
+        result = graph.query(query)
+
+        nodes = []
+        for res in result.result_set:
+            nodes.append(res[0].properties)
+
+        return nodes
+
+    def load_edges(self, graph_name) -> list:
+        """
+            Returns all edges in a given graph
+
+            Args:
+                graph_name: graph of which to return edges from
+
+            Returns:
+                list of tuples that contain two node ids that are connected
+        """
+        graph = Graph(graph_name, self.redis_db)
+        query = """MATCH (n:node)-->(m:node) RETURN n.id, m.id"""
+        result = graph.query(query)
+
+        edges = []
+        for res in result.result_set:
+            edges.append((res[0], res[1]))
+
+        return edges
+
+    def load_pois(self, graph_name) -> list:
+        """
+            Returns all Pois in a building
+            Try to use this sparingly
+        """
+        # FIXME this is NOT a good implementation (keys is blocking)
+        pois = []
+        for key in self.redis_db.keys(f"poi:{graph_name}:*"):
+            vals = self.redis_db.hgetall(key)
+            # TODO parse these again they are all binary strings
+            pois.append(vals)
+        # query = """SCAN 0 MATCH poi:$name:"""
+        # for key in self.redis_db.hscan_iter(f"poi:{building_name}"):
+        #     print(key)
+        return pois
+
+    def add_poi(self, building_name: str, poi: dict) -> None:
         """
             Add a POI to a given graph_name
 
@@ -110,9 +181,8 @@ class Controller():
         poi = {k: ('' if v is None else v)
                for k, v in poi.items()}
 
-        poi_id = f"poi:{graph_name}:{str(poi.pop('id'))}"
+        poi_id = f"poi:{building_name}:{str(poi['id'])}"
 
-        self.log.debug("Adding POI: %s", poi_id)
         self.search_client.redis.hset(poi_id, mapping=poi)
 
     def search_poi_by_name(self, poi_name: str) -> list:
@@ -142,11 +212,17 @@ class Controller():
     def search_room_nodes(self, graph_name: str, search_string: str) -> list:
         """
             Search for room nodes by name
+
+            Args:
+                graph_name (str): name of the graph to search in
+                search_string (str): search string
+
+            Returns:
+                List of path nodes that match search_string
         """
         graph = Graph(graph_name, self.redis_db)
 
-        # We should query the graph for two things, both the name and the
-        # room number
+        # redisearch fulltext search makes this mad easy
         query = """CALL db.idx.fulltext.queryNodes('node', $search_string)
                    YIELD node RETURN node"""
         res = graph.query(query, {"search_string": search_string})
