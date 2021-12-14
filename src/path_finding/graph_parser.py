@@ -108,6 +108,7 @@ class Parser:
                     # Append a new node
                     self.nodes.append({
                         "id": id,
+                        "floor": feature["properties"]["floor"],
                         "name": None,
                         "lon": p[0],
                         "lat": p[1]
@@ -265,6 +266,7 @@ class Parser:
             self.pois.append({
                 "id": id,
                 "name": poi["properties"]["name"],
+                "floor": poi["properties"]["floor"],
                 "lon": point[0],
                 "lat": point[1],
                 "nearest_path_node": nearest_path_node
