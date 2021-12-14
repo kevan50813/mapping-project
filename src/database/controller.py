@@ -23,7 +23,6 @@ class Controller():
 
         self.search_client = Client("points_of_interest", conn=self.redis_db)
         definition = IndexDefinition(prefix=["poi:"])
-        # TODO index the graph room name
         schema = (TextField("name"))
 
         # Check to see if index is already in db
@@ -148,8 +147,13 @@ class Controller():
 
         # We should query the graph for two things, both the name and the
         # room number
-        query = """CALL db.idx.fulltext.queryNodes(node, $search_string)
-                   YIELD node RETURN node.title, node.score"""
+        query = """CALL db.idx.fulltext.queryNodes('node', $search_string)
+                   YIELD node RETURN node"""
         res = graph.query(query, {"search_string": search_string})
 
-        return res.result_set
+        nodes = []
+        for node in res.result_set:
+            # transform back to nodes we use, grab it's properties
+            nodes.append(node[0].properties)
+
+        return nodes
