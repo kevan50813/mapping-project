@@ -32,7 +32,7 @@ class Controller():
             self.log.debug("Index does not exist, creating index")
             self.search_client.create_index(schema, definition=definition)
 
-    def save_graph(self, graph_name, nodes, edges):
+    def save_graph(self, graph_name, nodes, edges) -> None:
         """
             Save a graph given the nodes and edges to the database,
             breadth-first traversal
@@ -55,42 +55,42 @@ class Controller():
         queue.append(nodes[0])
         visited.append(nodes[0])
         while len(queue) != 0:
-            u = queue.pop(0)
+            outer_node = queue.pop(0)
 
             # the alias is there to stop duplication, it needs to start with
             # a letter for some reason
             node1 = Node(label='node',
-                         properties=u,
-                         alias="n"+str(u["id"]))
+                         properties=outer_node,
+                         alias="n"+str(outer_node["id"]))
             graph.add_node(node1)
 
             # TODO I'm sure there's a better way of doing this, ensure
             # bi-directonality
             adjacent = []
-            for e in edges:
-                if u["id"] == e[0]:
-                    adjacent.append(e[1])
-                elif u["id"] == e[1]:
-                    adjacent.append(e[0])
+            for edge in edges:
+                if outer_node["id"] == edge[0]:
+                    adjacent.append(edge[1])
+                elif outer_node["id"] == edge[1]:
+                    adjacent.append(edge[0])
 
             adjn = [n for n in nodes if n["id"] in adjacent]
-            for n in adjn:
-                if n not in visited:
+            for node in adjn:
+                if node not in visited:
                     node2 = Node(label='node',
-                                 properties=n,
-                                 alias="n"+str(n["id"]))
+                                 properties=node,
+                                 alias="n"+str(node["id"]))
                     edge = Edge(node1, 'path', node2)
 
                     graph.add_node(node2)
                     graph.add_edge(edge)
 
-                    visited.append(n)
-                    queue.append(n)
+                    visited.append(node)
+                    queue.append(node)
 
-        self.log.debug(f"commiting graph {graph_name}")
+        self.log.debug("commiting graph %s", graph_name)
         graph.commit()
 
-    def add_poi(self, graph_name, poi):
+    def add_poi(self, graph_name, poi) -> None:
         """
             Add a POI to a given graph_name
 
@@ -104,10 +104,10 @@ class Controller():
 
         poi_id = f"poi:{graph_name}:{str(poi.pop('id'))}"
 
-        self.log.debug(f"Adding POI: {poi_id}")
+        self.log.debug("Adding POI: %s", poi_id)
         self.search_client.redis.hset(poi_id, mapping=poi)
 
-    def get_poi_from_name(self, poi_name):
+    def search_poi_by_name(self, poi_name) -> list:
         """
             Search for a POI using Redisearch
 
@@ -122,11 +122,17 @@ class Controller():
 
         for doc in res.docs:
             # transform back to the standard form
-            d = doc.__dict__
-            d.pop("payload")
-            d["id"] = int(d["id"].split(":")[-1])
-            d["nearest_path_node"] = int(d["nearest_path_node"])
+            poi = doc.__dict__
+            poi.pop("payload")
+            poi["id"] = int(poi["id"].split(":")[-1])
+            poi["nearest_path_node"] = int(poi["nearest_path_node"])
 
-            pois.append(d)
+            pois.append(poi)
 
         return pois
+
+    def search_room_nodes(self, search_string) -> list:
+        """
+            Search for room nodes by name
+        """
+        return []
