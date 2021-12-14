@@ -131,6 +131,9 @@ class Controller():
         for res in result.result_set:
             nodes.append(res[0].properties)
 
+        nodes = [{k: (None if v == '' else v)
+                  for k, v in d.items()} for d in nodes]
+
         return nodes
 
     def load_edges(self, graph_name) -> list:
