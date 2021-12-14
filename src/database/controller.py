@@ -11,16 +11,16 @@ class Controller():
 
         Redis database must have Graph and Search modules
     """
-    def __init__(self, host, port):
+    def __init__(self, host:str, port:str):
         self.log = logging.getLogger(__name__)
-        self.db = redis.Redis(host=host, port=port)
+        self.redis_db = redis.Redis(host=host, port=port)
 
         # FIXME debug -> remove for db persistence
         self.log.warning("CLEARING WHOLE DB, REMOVE BEFORE REAL USE")
-        self.db.execute_command("FLUSHALL")
+        self.redis_db.execute_command("FLUSHALL")
         # FIXME
 
-        self.search_client = Client("points_of_interest", conn=self.db)
+        self.search_client = Client("points_of_interest", conn=self.redis_db)
         definition = IndexDefinition(prefix=["poi:"])
         # TODO index the graph room name
         schema = (TextField("name"))
@@ -32,7 +32,7 @@ class Controller():
             self.log.debug("Index does not exist, creating index")
             self.search_client.create_index(schema, definition=definition)
 
-    def save_graph(self, graph_name, nodes, edges) -> None:
+    def save_graph(self, graph_name:str, nodes:list, edges:list) -> None:
         """
             Save a graph given the nodes and edges to the database,
             breadth-first traversal
@@ -44,7 +44,7 @@ class Controller():
                 edges (list): A list of tuples mapping node id to node id
                        (sparse adjacency matrix)
         """
-        graph = Graph(graph_name, self.db)
+        graph = Graph(graph_name, self.redis_db)
         # clean None from dict, redis doesn't understand it
         nodes = [{k: ('' if v is None else v)
                   for k, v in d.items()} for d in nodes]
@@ -90,7 +90,7 @@ class Controller():
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
 
-    def add_poi(self, graph_name, poi) -> None:
+    def add_poi(self, graph_name: str, poi: dict) -> None:
         """
             Add a POI to a given graph_name
 
@@ -107,7 +107,7 @@ class Controller():
         self.log.debug("Adding POI: %s", poi_id)
         self.search_client.redis.hset(poi_id, mapping=poi)
 
-    def search_poi_by_name(self, poi_name) -> list:
+    def search_poi_by_name(self, poi_name: str) -> list:
         """
             Search for a POI using Redisearch
 
