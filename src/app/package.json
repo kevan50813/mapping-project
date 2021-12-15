@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "ar-core-react-native": "^1.2.4",
     "react": "17.0.2",
     "react-native": "0.66.4"
   },
