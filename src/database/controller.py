@@ -37,63 +37,64 @@ class Controller():
             Save a graph given the nodes and edges to the database,
             breadth-first traversal
 
+            This clears the whole graph at a given name!
+
             Args:
                 graph_name  (str): Name of the graph to save
                 nodes (list): A list of nodes (dicts in format specified
                        by graph_parser)
                 edges (list): A list of tuples mapping node id to node id
                        (sparse adjacency matrix)
-
         """
-        # TODO: should we make sure the graph is clear first
         graph = Graph(graph_name, self.redis_db)
 
         # For full-text search in the graph we need to create an index
-        index_query = """CALL db.idx.fulltext.createNodeIndex
-                         ('node', 'name', 'number')"""
-        graph.query(index_query)
+        # Since we delete the graph before adding this needs to be done every
+        # time.
+        graph.query("""CALL db.idx.fulltext.createNodeIndex
+                    ('node', 'name', 'number')""")
 
         # clean None from dict, redis doesn't understand it
         nodes = [{k: ('' if v is None else v)
                   for k, v in d.items()} for d in nodes]
 
+        # Breadth-first traversal to discover and save nodes
         queue = []
         visited = []
-
         queue.append(nodes[0])
         visited.append(nodes[0])
         while len(queue) != 0:
-            u = queue.pop(0)
+            outer_node = queue.pop(0)
 
             # the alias is there to stop duplication, it needs to start with
-            # a letter for some reason
+            # a letter for some reason, NB this assumes there are no self-
+            # connected nodes (why would there be?)
             node1 = Node(label='node',
-                         properties=u,
-                         alias="n"+str(u["id"]))
+                         properties=outer_node,
+                         alias="n"+str(outer_node["id"]))
             graph.add_node(node1)
 
-            # TODO I'm sure there's a better way of doing this, ensure
-            # bi-directonality
+            # gets the opposite value of the edges tuple
             adjacent = []
-            for e in edges:
-                if u["id"] == e[0]:
-                    adjacent.append(e[1])
-                elif u["id"] == e[1]:
-                    adjacent.append(e[0])
+            for edg in edges:
+                if outer_node["id"] == edg[0]:
+                    adjacent.append(edg[1])
+                elif outer_node["id"] == edg[1]:
+                    adjacent.append(edg[0])
 
             adjn = [n for n in nodes if n["id"] in adjacent]
-            for n in adjn:
-                if n not in visited:
+            for inner_node in adjn:
+                if inner_node not in visited:
                     node2 = Node(label='node',
-                                 properties=n,
-                                 alias="n"+str(n["id"]))
+                                 properties=inner_node,
+                                 alias="n"+str(inner_node["id"]))
                     edge = Edge(node1, 'path', node2)
 
                     graph.add_node(node2)
                     graph.add_edge(edge)
 
-                    visited.append(n)
-                    queue.append(n)
+                    visited.append(inner_node)
+                    queue.append(inner_node)
 
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
@@ -164,12 +165,21 @@ class Controller():
         # FIXME this is NOT a good implementation (keys is blocking)
         pois = []
         for key in self.redis_db.keys(f"poi:{graph_name}:*"):
-            vals = self.redis_db.hgetall(key)
-            # TODO parse these again they are all binary strings
-            pois.append(vals)
-        # query = """SCAN 0 MATCH poi:$name:"""
-        # for key in self.redis_db.hscan_iter(f"poi:{building_name}"):
-        #     print(key)
+            poi = self.redis_db.hgetall(key)
+
+            # decode binary strings (utf-8) -> python string
+            poi = {k.decode('utf-8'): v.decode('utf-8')
+                   for k, v in poi.items()}
+
+            # parse these again they are all strings
+            poi["id"] = int(poi["id"])
+            poi["floor"] = float(poi["floor"])
+            poi["lat"] = float(poi["lat"])
+            poi["lon"] = float(poi["lon"])
+            poi["nearest_path_node"] = int(poi["nearest_path_node"])
+
+            pois.append(poi)
+
         return pois
 
     def add_poi(self, building_name: str, poi: dict) -> None:
