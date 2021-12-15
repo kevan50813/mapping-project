@@ -188,12 +188,26 @@ class Controller():
 
         return pois
 
+    def add_pois(self, building_name: str, pois: list) -> None:
+        """
+            Add a POIs to a given graph_name
+
+            Args:
+                building_name (str): name of the graph this PoI is identified
+                                     with
+                poi (dict): poi dictionary (from parser)
+
+        """
+        for poi in pois:
+            self.add_poi(building_name, poi)
+
     def add_poi(self, building_name: str, poi: dict) -> None:
         """
             Add a POI to a given graph_name
 
             Args:
-                graph_name (str): name of the graph this PoI is identified with
+                building_name (str): name of the graph this PoI is identified
+                                     with
                 poi (dict): poi dictionary (from parser)
 
         """
