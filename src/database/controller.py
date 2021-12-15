@@ -157,10 +157,16 @@ class Controller():
 
         return edges
 
-    def load_pois(self, graph_name) -> list:
+    def load_pois(self, graph_name: str) -> list:
         """
             Returns all Pois in a building
-            Try to use this sparingly
+            Try to use this sparingly as it currently is blocking on the db
+
+            Args:
+                graph_name (str): Name of graph you want PoIs for
+
+            Returns:
+                list of PoI objects for a given graph
         """
         # FIXME this is NOT a good implementation (keys is blocking)
         pois = []
@@ -239,6 +245,29 @@ class Controller():
         query = """CALL db.idx.fulltext.queryNodes('node', $search_string)
                    YIELD node RETURN node"""
         res = graph.query(query, {"search_string": search_string})
+
+        nodes = []
+        for node in res.result_set:
+            # transform back to nodes we use, grab it's properties
+            nodes.append(node[0].properties)
+
+        return nodes
+
+    def get_node_neighbours(self, graph_name: str, node_id: int) -> list:
+        """
+            Returns list of neighbouring nodes to an ID
+
+            Args:
+                graph_name (str): name of graph to query
+                node_id (int): ID of node you want neighbours of
+
+            Returns:
+                List of neighbouring node objects
+        """
+        graph = Graph(graph_name, self.redis_db)
+
+        query = """MATCH (:node {id: $id})-->(m:node) RETURN m"""
+        res = graph.query(query, {"id": node_id})
 
         nodes = []
         for node in res.result_set:
