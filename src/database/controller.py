@@ -12,14 +12,18 @@ class Controller():
         Redis database must have Graph and Search modules
     """
 
-    def __init__(self, host: str, port: str):
+    def __init__(self, host="127.0.0.1", port="6379", url=None):
         self.log = logging.getLogger(__name__)
-        self.redis_db = redis.Redis(host=host, port=port)
 
-        # FIXME debug -> remove for db persistence
+        if url is None:
+            self.redis_db = redis.Redis(host=host, port=port)
+        else:
+            self.redis_db = redis.from_url(url)
+
+        # # FIXME debug -> remove for db persistence
         self.log.warning("CLEARING WHOLE DB, REMOVE BEFORE REAL USE")
         self.redis_db.execute_command("FLUSHALL")
-        # FIXME
+        # # FIXME
 
         self.search_client = Client("points_of_interest", conn=self.redis_db)
         definition = IndexDefinition(prefix=["poi:"])
