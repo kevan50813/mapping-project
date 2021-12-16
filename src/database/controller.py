@@ -12,14 +12,15 @@ class Controller():
         Redis database must have Graph and Search modules
     """
 
-    def __init__(self, host: str, port: str):
+    def __init__(self, host="127.0.0.1", port="6379"):
         self.log = logging.getLogger(__name__)
+
         self.redis_db = redis.Redis(host=host, port=port)
 
-        # FIXME debug -> remove for db persistence
+        # # FIXME debug -> remove for db persistence
         self.log.warning("CLEARING WHOLE DB, REMOVE BEFORE REAL USE")
         self.redis_db.execute_command("FLUSHALL")
-        # FIXME
+        # # FIXME
 
         self.search_client = Client("points_of_interest", conn=self.redis_db)
         definition = IndexDefinition(prefix=["poi:"])
@@ -82,19 +83,21 @@ class Controller():
                 elif outer_node["id"] == edg[1]:
                     adjacent.append(edg[0])
 
+            print(outer_node, adjacent)
+
             adjn = [n for n in nodes if n["id"] in adjacent]
             for inner_node in adjn:
                 if inner_node not in visited:
-                    node2 = Node(label='node',
-                                 properties=inner_node,
-                                 alias="n"+str(inner_node["id"]))
-                    edge = Edge(node1, 'path', node2)
-
-                    graph.add_node(node2)
-                    graph.add_edge(edge)
-
                     visited.append(inner_node)
                     queue.append(inner_node)
+
+                node2 = Node(label='node',
+                             properties=inner_node,
+                             alias="n"+str(inner_node["id"]))
+                edge = Edge(node1, 'path', node2)
+
+                graph.add_node(node2)
+                graph.add_edge(edge)
 
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
@@ -150,6 +153,7 @@ class Controller():
         graph = Graph(graph_name, self.redis_db)
         query = """MATCH (n:node)-->(m:node) RETURN n.id, m.id"""
         result = graph.query(query)
+        print(result.result_set)
 
         edges = []
         for res in result.result_set:
@@ -236,6 +240,11 @@ class Controller():
             poi = doc.__dict__
             poi.pop("payload")
             poi["id"] = int(poi["id"].split(":")[-1])
+
+            poi["id"] = int(poi["id"])
+            poi["floor"] = float(poi["floor"])
+            poi["lat"] = float(poi["lat"])
+            poi["lon"] = float(poi["lon"])
             poi["nearest_path_node"] = int(poi["nearest_path_node"])
 
             pois.append(poi)

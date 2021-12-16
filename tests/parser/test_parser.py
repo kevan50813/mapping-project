@@ -4,7 +4,7 @@ from path_finding.graph_parser import Parser
 class TestParser:
     @classmethod
     def setup_class(cls):
-        cls.p = Parser("tests/test_map")
+        cls.p = Parser("tests/parser/test_map")
 
     def test_nodes(cls):
         expected = [{'id': 0,
