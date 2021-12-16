@@ -83,8 +83,6 @@ class Controller():
                 elif outer_node["id"] == edg[1]:
                     adjacent.append(edg[0])
 
-            print(outer_node, adjacent)
-
             adjn = [n for n in nodes if n["id"] in adjacent]
             for inner_node in adjn:
                 if inner_node not in visited:
@@ -153,7 +151,6 @@ class Controller():
         graph = Graph(graph_name, self.redis_db)
         query = """MATCH (n:node)-->(m:node) RETURN n.id, m.id"""
         result = graph.query(query)
-        print(result.result_set)
 
         edges = []
         for res in result.result_set:
