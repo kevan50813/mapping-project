@@ -34,7 +34,8 @@ flake8:
 
 pytest:
   services:
-    - redislabs/redismod:latest
+    - name: redislabs/redismod:latest
+      alias: redis
   stage: test
   before_script:
     - python -m pip install pytest pytest-cov
