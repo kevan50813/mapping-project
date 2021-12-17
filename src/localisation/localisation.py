@@ -20,9 +20,9 @@ class Localisation:
         :return out: string representation of the network dictionary
         """
 
-        out = "      MAC      | Quality | RSSI |   Distance   | SSID\n"
+        out = "MAC,Quality,RSSI,Distance,SSID\n"
         for key, value in self.network_dict.items():
-            out += f"{key}, {value[0]}, {value[1]}, {value[2]}, {value[3]}\n"
+            out += f"{key},{value[0]},{value[1]},{value[2]},{value[3]}\n"
 
         return out
 
@@ -119,10 +119,21 @@ class Localisation:
         self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[1][2]))
 
 
+
+
 if __name__ == "__main__":
 
     local_test = Localisation()
-    local_test.run_process()
-    local_test.process_network_data()
+
+    remote = False
+
+    if remote:
+        local_test.load_offline_data("/readings/studyroom_r1.csv")
+    else:
+        local_test.run_process()
+        local_test.process_network_data()
 
     print(repr(local_test))
+
+    with open("studyroom_r3.csv", "w") as f:
+        f.write(repr(local_test))
