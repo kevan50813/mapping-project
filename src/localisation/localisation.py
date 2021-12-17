@@ -1,8 +1,12 @@
 import subprocess as sp
 import math
 
+from AP_parser import AP_Parser
+
 OFFLINE = True
 OFFLINE_PATH = "readings/studyroom_r1.csv"
+AP_DATA_PATH = "Wifi_Nodes.json"
+PRINT_REPR = False
 
 class Localisation:
 
@@ -13,6 +17,11 @@ class Localisation:
         # Quality is not required - a value of -1 means quality was not obtained
         # SSID is also not required, but kept for reference
         self.network_dict = {}
+
+        # list of networks in the building from AP_parser.py
+        parser = AP_Parser(AP_DATA_PATH)
+        parser.parse_ap_nodes()
+        self.network_reference = parser.get_ap_nodes()
 
         # stores raw output from process pipe
         self.process_output = ""

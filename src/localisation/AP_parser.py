@@ -2,20 +2,32 @@ import json
 import sys
 import os
 
-class AP_Parser():
-    # declare the nodes array to store the node data
-    ap_nodes = []
+PRINT_REPR = False
 
-    data = []
+class AP_Parser():
 
     # Constructor
     def __init__(self, path):
         self.path = str(path)
 
-        # parse the file
-        self.parse_AP_nodes()
+        # declare the nodes dict to store the node data
+        self.ap_nodes = {}
+
+
+    def __repr__(self):
+
+        out = "MAC,ap_name,lon,lat\n"
+        for key, value in self.ap_nodes.items():
+            out += f"{key},{value['ap_name']},{value['lon']},{value['lat']}\n"
+
+        return out
+
+
+    def get_ap_nodes(self):
+        return self.ap_nodes
+
     
-    def parse_AP_nodes(self):
+    def parse_ap_nodes(self):
         """
             Node data structure
 
@@ -32,7 +44,7 @@ class AP_Parser():
         """
 
         #Read Wifi_Nodes.json
-        with open(self.path + "/Wifi_Nodes.json", "r") as file:
+        with open(self.path, "r") as file:
             json_ways = json.loads(file.read())
 
         #for every access point
@@ -46,7 +58,7 @@ class AP_Parser():
             lat = coord[1]
 
             # create a temporary data dictionary to store the information
-            self.data = {
+            data = {
                 "ap_name": ap,
                 "lon": lon,
                 "lat" : lat
@@ -54,15 +66,11 @@ class AP_Parser():
             }
 
             #create node with Json node data
-            self.ap_nodes.append({
-                    mac : self.data
-                })
-         #print nodes for testing   
-        for node in self.ap_nodes:
-            print(node, '\n')
+            self.ap_nodes[mac] = data
 
 #run parser for testing
 if __name__ == '__main__':
-    cwd = str(os.getcwd())
-    foo = AP_Parser(cwd)
-    AP_Parser.parse_AP_nodes(foo)
+    parser = AP_Parser("Wifi_Nodes.json")
+    parser.parse_ap_nodes()
+
+    print(repr(parser))
