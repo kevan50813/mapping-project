@@ -6,8 +6,8 @@ class Localisation:
 
     def __init__(self):
 
-        # dict will store networks in the follow format:
-        # { MAC_ADDRESS: (Quality, RSSI, Distance, SSID) }
+        # dict will store networks in the following dict format:
+        # { MAC_ADDRESS: {quality: <>, RSSI: <>, distance: <>, SSID: <>) }
         # Quality is not required - a value of -1 means quality was not obtained
         # SSID is also not required, but kept for reference
         self.network_dict = {}
@@ -22,7 +22,7 @@ class Localisation:
 
         out = "MAC,Quality,RSSI,Distance,SSID\n"
         for key, value in self.network_dict.items():
-            out += f"{key},{value[0]},{value[1]},{value[2]},{value[3]}\n"
+            out += f"{key},{value['quality']},{value['RSSI']},{value['distance']},{value['SSID']}\n"
 
         return out
 
@@ -84,14 +84,13 @@ class Localisation:
         cur_ssid = "ERR"
 
         for line in data:
-
             line = line.strip()
 
             # will give the key for this dict entry - MAC address
             if "Cell " in line:
                 cur_key = line.split(": ")[1]
 
-            # store ssid for adding to the tuple later
+            # store ssid for adding to the dict later
             elif "SSID" in line:
                 cur_ssid = line.split(':"')[1][:-1]
 
@@ -107,9 +106,15 @@ class Localisation:
                     rssi = self.quality_to_rssi(quality)
                     distance = self.rssi_to_distance(rssi)
 
-                    # add the tuple to the network dictionary
-                    network_tuple = (quality, rssi, distance, cur_ssid)
-                    self.network_dict[cur_key] = network_tuple
+                    # add the dict to the network dictionary
+                    network_data = {
+                        "quality": quality,
+                        "RSSI": rssi,
+                        "distance": distance,
+                        "SSID": cur_ssid
+                    }
+
+                    self.network_dict[cur_key] = network_data
 
                 except IndexError:
 
@@ -119,21 +124,45 @@ class Localisation:
         self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[1][2]))
 
 
+    def load_offline_data(self, path):
+        """ Loads network data from .csv file for offline testing
+
+        :param path: path to the file to read from
+        Populates internal dict network_dict, does not return anything
+        """
+
+        # get all data from csv file
+        with open(path, 'r') as f:
+            data = f.readlines()
+
+        # skip the top line, as its the CSV header and not actual data
+        for line in data[1:]:
+            line = line.strip()
+
+            # line is in form MAC,Quality,RSSI,Distance,SSID
+            parts = line.split(",")
+            self.network_dict[parts[0]] = {
+                "quality": parts[1],
+                "RSSI": parts[2],
+                "distance": parts[3],
+                "SSID": parts[4]
+            }
 
 
 if __name__ == "__main__":
 
     local_test = Localisation()
-
-    remote = False
+    remote = True
 
     if remote:
-        local_test.load_offline_data("/readings/studyroom_r1.csv")
+        local_test.load_offline_data("readings/studyroom_r1.csv")
     else:
         local_test.run_process()
         local_test.process_network_data()
 
     print(repr(local_test))
 
-    with open("studyroom_r3.csv", "w") as f:
+    '''
+    with open("studyroom_r3.csv", 'w') as f:
         f.write(repr(local_test))
+    '''

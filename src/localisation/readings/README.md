@@ -6,6 +6,6 @@ The Distance value of these are calculated using the current algorithms, and may
 The MAC, SSID and Quality are all read directly from the device's wireless card, so are accurate. 
 RSSI should be accurate, but a better Quality -> RSSI algorithm may be found at some point.
 
-The files are in the format \<vauge room name>_r<reading_number>.csv
+The files are in the format \<vauge room name>_r\<reading number>.csv
 
 studyroom is one of the small tutorial rooms next to the 24h learning lab (2.13)
