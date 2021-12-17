@@ -33,6 +33,9 @@ flake8:
       junit: junit.xml
 
 pytest:
+  services:
+    - name: redislabs/redismod:latest
+      alias: redis
   stage: test
   before_script:
     - python -m pip install pytest pytest-cov

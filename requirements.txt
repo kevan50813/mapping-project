@@ -1,1 +1,5 @@
 PyGeodesy==21.11.27
+networkx
+redis
+redisgraph
+redisearch

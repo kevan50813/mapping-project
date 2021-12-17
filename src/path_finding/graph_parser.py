@@ -9,6 +9,7 @@
         parser = Parser(<<path to directory containing json files>>)
 '''
 import json
+import os
 # from rich import print  # uncomment for prettyprint dicts
 # from typing import Coroutine  # for easier code editing
 from pygeodesy.sphericalNvector import LatLon
@@ -21,8 +22,14 @@ class Parser:
     pois = []
 
     # Constructor
-    def __init__(self, path):
+    def __init__(self, path, graph_name=None):
         self.path = path
+
+        if graph_name is not None:
+            self.graph_name = graph_name
+        else:
+            # get graph_name from path
+            self.graph_name = os.path.split(path)[-1]
 
         # parse the files
         self.parse_nodes()
@@ -89,7 +96,7 @@ class Parser:
                 # is p already in self.nodes ?
                 # else add it, then do the rest
                 for existing in self.nodes:
-                    if (existing["lat"], existing["lon"]) == p:
+                    if (existing["lon"], existing["lat"]) == p:
                         id = existing["id"]
                         break
                 else:
@@ -101,6 +108,7 @@ class Parser:
                     # Append a new node
                     self.nodes.append({
                         "id": id,
+                        "floor": feature["properties"]["floor"],
                         "name": None,
                         "lon": p[0],
                         "lat": p[1]
@@ -258,6 +266,7 @@ class Parser:
             self.pois.append({
                 "id": id,
                 "name": poi["properties"]["name"],
+                "floor": poi["properties"]["floor"],
                 "lon": point[0],
                 "lat": point[1],
                 "nearest_path_node": nearest_path_node
