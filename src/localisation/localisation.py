@@ -172,7 +172,6 @@ if __name__ == "__main__":
 
     print(repr(local_test))
 
-    '''
-    with open("studyroom_r3.csv", 'w') as f:
+
+    with open("readings/nearlift_r3.csv", 'w') as f:
         f.write(repr(local_test))
-    '''
