@@ -1,7 +1,8 @@
 import subprocess as sp
 import math
 
-from src import config
+OFFLINE = True
+OFFLINE_PATH = "readings/studyroom_r1.csv"
 
 class Localisation:
 
@@ -154,8 +155,8 @@ if __name__ == "__main__":
 
     local_test = Localisation()
 
-    if config.LOCALISATION_OFFLINE:
-        local_test.load_offline_data(config.LOCALISATION_OFFLINE_PATH)
+    if OFFLINE:
+        local_test.load_offline_data(OFFLINE_PATH)
     else:
         local_test.run_process()
         local_test.process_network_data()
