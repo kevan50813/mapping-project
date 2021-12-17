@@ -1,42 +1,55 @@
-import React from 'react';
-import { Text, View } from 'react-native';
-import ArCoreReactNativeViewManager from "ar-core-react-native"; //AR stuff
+import React, {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {
+  ViroARScene,
+  ViroText,
+  ViroConstants,
+  ViroARSceneNavigator,
+} from '@viro-community/react-viro';
 
-import { UIManager, findNodeHandle} from 'react-native';
-import ArCoreReactNativeViewManager from "ar-core-react-native";
+const HelloWorldSceneAR = () => {
+  const [text, setText] = useState('Initializing AR...');
 
+  function onInitialized(state, reason) {
+    console.log('guncelleme', state, reason);
+    if (state === ViroConstants.TRACKING_NORMAL) {
+      setText('Hello World!');
+    } else if (state === ViroConstants.TRACKING_NONE) {
+      // Handle loss of tracking
+    }
+  }
 
-// code snippit form https://www.npmjs.com/package/ar-core-react-native/v/1.2.4
-<ArCoreReactNativeViewManager ref="arCoreView" />
-// on action button or any
-// you send 2 parameter
-// name_object - type:string : name object in 3D view.
-// path_file - type:string : path file to glb in device.
-function addObject(){
-    UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.arCoreView),
-        "CMD_RUN_SET_OBJECT",
-        [name_object, path_file]);
-}
-
-// on action delete
-function deleteObjectSeleted(){
-  UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this.refs.arCoreView),
-      "CMD_RUN_DELETE_OBJECT",
-      []);
-}
-
-const HelloWorldApp = () => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
-      }}>
-      <Text>Hello, world!</Text>
-    </View>
-  )
-}
-export default HelloWorldApp;
+    <ViroARScene onTrackingUpdated={onInitialized}>
+      <ViroText
+        text={text}
+        scale={[0.5, 0.5, 0.5]}
+        position={[0, 0, -1]}
+        style={styles.helloWorldTextStyle}
+      />
+    </ViroARScene>
+  );
+};
+
+export default () => {
+  return (
+    <ViroARSceneNavigator
+      autofocus={true}
+      initialScene={{
+        scene: HelloWorldSceneAR,
+      }}
+      style={styles.f1}
+    />
+  );
+};
+
+var styles = StyleSheet.create({
+  f1: {flex: 1},
+  helloWorldTextStyle: {
+    fontFamily: 'Arial',
+    fontSize: 30,
+    color: '#ffffff',
+    textAlignVertical: 'center',
+    textAlign: 'center',
+  },
+});

@@ -3,7 +3,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '11.0'
 
-target 'test' do
+target 'myviroapp' do
   config = use_native_modules!
 
   use_react_native!(
@@ -12,7 +12,10 @@ target 'test' do
     :hermes_enabled => false
   )
 
-  target 'testTests' do
+  pod 'ViroReact', :path => '../node_modules/@viro-community/react-viro/ios/'
+  pod 'ViroKit_static_lib', :path => '../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/static_lib'
+
+  target 'myviroappTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -21,10 +24,9 @@ target 'test' do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable the next line.
-  use_flipper!()
+  #use_flipper!()
 
   post_install do |installer|
     react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end
