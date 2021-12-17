@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint_junit": "eslint --format junit . > ../junit.xml"
   },
   "dependencies": {
     "@viro-community/react-viro": "^2.20.2",
