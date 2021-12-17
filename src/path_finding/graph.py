@@ -1,14 +1,14 @@
-from parser import Parser
+""" graph with pathfinding BFS """
 
 
 class Graph:
-
     # create an edge between the start node and the end node
     def add_edge(self, adj, start, end):
         adj[start].append(end)
         adj[start].append(start)
 
-    # Do a breath first search algorithm to find a route that goes though the least number of nodes
+    # Do a breath first search algorithm to find a route that goes
+    # though the least number of nodes
     # TODO change to include weights, this will be done later
     def breath_first_search(self, adj, start, end, vertex, previous, distance):
         # make an empty list that will que up all nodes to search
@@ -16,7 +16,8 @@ class Graph:
 
         visited = [False for i in range(vertex)]
 
-        # fill distance nad previous will arbitrary values distance refers to the number of nodes and previous
+        # fill distance nad previous will arbitrary values distance refers
+        # to the number of nodes and previous
         # refers to the nodes already searched
         for i in range(vertex):
             distance[i] = 10000
@@ -36,16 +37,17 @@ class Graph:
                 # that could be found else return false
                 if not visited[adj[u][i]]:
                     visited[adj[u][i]] = True
-                    distance[adj[u][i]] = distance[u] + 1
+                    if end <= start:
+                        distance[adj[u][i]] = distance[u] + 1
+                    else:
+                        distance[adj[u][i]] = distance[u] - 1
                     previous[adj[u][i]] = u
                     queue.append(adj[u][i])
-
                     if adj[u][i] == end:
                         return True
         return False
 
-    # used for printing the path, this will be removed when we have an actual
-    # GUI for testing purposes
+    # used for printing the path
     def print_path(self, adj, start, end, vertex):
         previous = [0 for i in range(vertex)]
         distance = [0 for i in range(vertex)]
@@ -65,24 +67,3 @@ class Graph:
             print("\nPath is: ")
             for i in range(len(path) - 1, -1, -1):
                 print(path[i])
-
-
-if __name__ == '__main__':
-    g = Graph()
-    p = Parser("../../json-maps/qgis-bragg")
-    p.print_lists()
-    # start = 0  # testing purpose will change later
-    # end = 3
-    # # the number of vertices is the number of nodes found by the parser
-    # v = len(p.nodes)
-    # # create the edges of the graph based on the adjacency's table and the
-    # # neighboring nodes
-    # adj = [[] for i in range(v)]
-    # # loop though the list of edges and created edges on the graph.
-    # for i in p.edges:
-    #     Graph.add_edge(g, adj, i[0], i[1])
-    #     # print(i)
-    #     # print(i[0])
-    #     # print(i[1])
-
-    # Graph.print_path(g, adj, start, end, v)
