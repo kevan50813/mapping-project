@@ -7,7 +7,7 @@ class TestDatabase:
     def setup_class(cls):
         cls.controller = Controller(host="redis")
 
-    def test_save_and_load_graph(cls):
+    async def test_save_and_load_graph(cls):
         nodes = [{'id': 0,
                   'floor': 0.0,
                   'name': 'sauna',
@@ -34,14 +34,14 @@ class TestDatabase:
         # set with both returned, but the upper / lower half of the adj matrix
         # can be passed to it with no worry
         edges = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
-        cls.controller.save_graph("test", nodes, edges)
+        await cls.controller.save_graph("test", nodes, edges)
 
         lnodes, ledges = cls.controller.load_graph("test")
 
         assert lnodes == nodes
         assert ledges == edges
 
-    def test_save_and_load_poi(cls):
+    async def test_save_and_load_poi(cls):
         pois = [{'id': 0,
                  'name': 'living room',
                  'floor': 0.0,
@@ -55,7 +55,7 @@ class TestDatabase:
                  'lat': 53.81906966597811,
                  'nearest_path_node': 8}]
 
-        cls.controller.add_pois("test", pois)
+        await cls.controller.add_pois("test", pois)
         lpois = cls.controller.load_pois("test")
 
         # sort the dicts so we can compare them
