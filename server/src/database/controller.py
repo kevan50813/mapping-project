@@ -230,7 +230,7 @@ class Controller():
         poi_id = f"poi:{building_name}:{str(poi['id'])}"
         self.search_client.redis.hset(poi_id, mapping=poi)
 
-    def search_poi_by_name(self, poi_name: str) -> list:
+    def search_poi_by_name(self, poi_name: str) -> List[dict]:
         """
             Search for a POI using Redisearch
 
@@ -259,7 +259,8 @@ class Controller():
 
         return pois
 
-    def search_room_nodes(self, graph_name: str, search_string: str) -> list:
+    def search_room_nodes(self, graph_name: str,
+                          search_string: str) -> List[dict]:
         """
             Search for room nodes by name
 
@@ -284,7 +285,7 @@ class Controller():
 
         return nodes
 
-    def get_node_neighbours(self, graph_name: str, node_id: int) -> list:
+    def get_node_neighbours(self, graph_name: str, node_id: int) -> List[dict]:
         """
             Returns list of neighbouring nodes to an ID
 
