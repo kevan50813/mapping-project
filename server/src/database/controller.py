@@ -28,9 +28,7 @@ class Controller():
             self.search_client.info()
         except redis.ResponseError:
             self.log.debug("Index does not exist, creating index")
-            asyncio.create_task(
-                self.search_client.create_index(
-                    schema, definition=definition))
+            self.search_client.create_index(schema, definition=definition)
 
     async def save_graph(self, graph_name: str,
                          nodes: List[dict], edges: List[tuple]) -> None:
@@ -52,8 +50,8 @@ class Controller():
         # For full-text search in the graph we need to create an index
         # Since we delete the graph before adding this needs to be done every
         # time.
-        asyncio.create_task(graph.query("""CALL db.idx.fulltext.createNodeIndex
-                    ('node', 'name', 'number')"""))
+        graph.query("""CALL db.idx.fulltext.createNodeIndex
+                    ('node', 'name', 'number')""")
 
         # clean None from dict, redis doesn't understand it
         nodes = [{k: ('' if v is None else v)
@@ -73,7 +71,7 @@ class Controller():
             node1 = Node(label='node',
                          properties=outer_node,
                          alias="n"+str(outer_node["id"]))
-            asyncio.create_task(graph.add_node(node1))
+            graph.add_node(node1)
 
             # gets the opposite value of the edges tuple
             adjacent = []
@@ -94,13 +92,13 @@ class Controller():
                              alias="n"+str(inner_node["id"]))
                 edge = Edge(node1, 'path', node2)
 
-                asyncio.create_task(graph.add_node(node2))
-                asyncio.create_task(graph.add_edge(edge))
+                graph.add_node(node2)
+                graph.add_edge(edge)
 
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
 
-    def load_graph(self, graph_name: str) -> (List[dict], List[tuple]):
+    async def load_graph(self, graph_name: str) -> (List[dict], List[tuple]):
         """
             Returns the whole graph nodes, edges
 
@@ -110,8 +108,8 @@ class Controller():
             Returns:
                 tuple with two lists, first element is nodes, second is edges
         """
-        nodes, edges = asyncio.gather(self.load_nodes(graph_name),
-                                      self.load_edges(graph_name))
+        nodes, edges = await asyncio.gather(self.load_nodes(graph_name),
+                                            self.load_edges(graph_name))
 
         return (nodes, edges)
 
@@ -158,7 +156,7 @@ class Controller():
 
         return edges
 
-    def load_pois(self, graph_name: str) -> List[dict]:
+    async def load_pois(self, graph_name: str) -> List[dict]:
         """
             Returns all Pois in a building
             Try to use this sparingly as it currently is blocking on the db
@@ -173,7 +171,9 @@ class Controller():
         # TODO this can be async I think
         # format string in query?
         keys = self.redis_db.keys(f"poi:{graph_name}:*")
-        pois = asyncio.gather(*[self.load_poi(key) for key in keys])
+        print(keys)
+        pois = await asyncio.gather(*[self.load_poi(key) for key in keys])
+        print(pois)
         return pois
 
     async def load_poi(self, key: str) -> dict:
@@ -213,7 +213,7 @@ class Controller():
                 poi (dict): poi dictionary (from parser)
 
         """
-        asyncio.gather(*[self.add_poi(building_name, poi) for poi in pois])
+        await asyncio.gather(*[self.add_poi(building_name, poi) for poi in pois])
 
     async def add_poi(self, building_name: str, poi: dict) -> None:
         """
@@ -228,7 +228,7 @@ class Controller():
         poi = {k: ('' if v is None else v)
                for k, v in poi.items()}
         poi_id = f"poi:{building_name}:{str(poi['id'])}"
-        asyncio.create_task(self.search_client.redis.hset(poi_id, mapping=poi))
+        self.search_client.redis.hset(poi_id, mapping=poi)
 
     def search_poi_by_name(self, poi_name: str) -> list:
         """

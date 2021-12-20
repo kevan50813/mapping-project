@@ -1,5 +1,6 @@
 """ Test redis controller """
 from database.controller import Controller
+import pytest
 
 
 class TestDatabase:
@@ -7,6 +8,11 @@ class TestDatabase:
     def setup_class(cls):
         cls.controller = Controller(host="redis")
 
+    @classmethod
+    def teardown_class(cls):
+        cls.controller.redis_db.execute_command("FLUSHALL")
+
+    @pytest.mark.asyncio
     async def test_save_and_load_graph(cls):
         nodes = [{'id': 0,
                   'floor': 0.0,
@@ -36,11 +42,12 @@ class TestDatabase:
         edges = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
         await cls.controller.save_graph("test", nodes, edges)
 
-        lnodes, ledges = cls.controller.load_graph("test")
+        lnodes, ledges = await cls.controller.load_graph("test")
 
         assert lnodes == nodes
         assert ledges == edges
 
+    @pytest.mark.asyncio
     async def test_save_and_load_poi(cls):
         pois = [{'id': 0,
                  'name': 'living room',
@@ -56,11 +63,13 @@ class TestDatabase:
                  'nearest_path_node': 8}]
 
         await cls.controller.add_pois("test", pois)
-        lpois = cls.controller.load_pois("test")
+        lpois = await cls.controller.load_pois("test")
 
         # sort the dicts so we can compare them
         pois = sorted(pois, key=lambda x: x["id"])
         lpois = sorted(lpois, key=lambda x: x["id"])
+
+        print(lpois)
 
         assert lpois == pois
 
