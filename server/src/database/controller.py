@@ -171,9 +171,7 @@ class Controller():
         # TODO this can be async I think
         # format string in query?
         keys = self.redis_db.keys(f"poi:{graph_name}:*")
-        print(keys)
         pois = await asyncio.gather(*[self.load_poi(key) for key in keys])
-        print(pois)
         return pois
 
     async def load_poi(self, key: str) -> dict:

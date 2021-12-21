@@ -69,8 +69,6 @@ class TestDatabase:
         pois = sorted(pois, key=lambda x: x["id"])
         lpois = sorted(lpois, key=lambda x: x["id"])
 
-        print(lpois)
-
         assert lpois == pois
 
     def test_room_search(cls):
