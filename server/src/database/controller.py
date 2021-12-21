@@ -1,5 +1,7 @@
-""" Redis DB controller using RedisGraph """
+""" Redis DB controller using RedisGraph & Redisearch """
 import logging
+import asyncio
+from typing import List
 import redis
 from redisgraph import Node, Edge, Graph
 from redisearch import Client, IndexDefinition, TextField
@@ -17,11 +19,6 @@ class Controller():
 
         self.redis_db = redis.Redis(host=host, port=port)
 
-        # # FIXME debug -> remove for db persistence
-        self.log.warning("CLEARING WHOLE DB, REMOVE BEFORE REAL USE")
-        self.redis_db.execute_command("FLUSHALL")
-        # # FIXME
-
         self.search_client = Client("points_of_interest", conn=self.redis_db)
         definition = IndexDefinition(prefix=["poi:"])
         schema = (TextField("name"))
@@ -33,7 +30,8 @@ class Controller():
             self.log.debug("Index does not exist, creating index")
             self.search_client.create_index(schema, definition=definition)
 
-    def save_graph(self, graph_name: str, nodes: list, edges: list) -> None:
+    async def save_graph(self, graph_name: str,
+                         nodes: List[dict], edges: List[tuple]) -> None:
         """
             Save a graph given the nodes and edges to the database,
             breadth-first traversal
@@ -100,7 +98,7 @@ class Controller():
         self.log.debug("commiting graph %s", graph_name)
         graph.commit()
 
-    def load_graph(self, graph_name) -> (list, list):
+    async def load_graph(self, graph_name: str) -> (List[dict], List[tuple]):
         """
             Returns the whole graph nodes, edges
 
@@ -110,12 +108,12 @@ class Controller():
             Returns:
                 tuple with two lists, first element is nodes, second is edges
         """
-        nodes = self.load_nodes(graph_name)
-        edges = self.load_edges(graph_name)
+        nodes, edges = await asyncio.gather(self.load_nodes(graph_name),
+                                            self.load_edges(graph_name))
 
         return (nodes, edges)
 
-    def load_nodes(self, graph_name) -> list:
+    async def load_nodes(self, graph_name: str) -> List[dict]:
         """
             Return all nodes in a given graph
 
@@ -138,7 +136,7 @@ class Controller():
 
         return nodes
 
-    def load_edges(self, graph_name) -> list:
+    async def load_edges(self, graph_name: str) -> List[tuple]:
         """
             Returns all edges in a given graph
 
@@ -158,7 +156,7 @@ class Controller():
 
         return edges
 
-    def load_pois(self, graph_name: str) -> list:
+    async def load_pois(self, graph_name: str) -> List[dict]:
         """
             Returns all Pois in a building
             Try to use this sparingly as it currently is blocking on the db
@@ -170,26 +168,40 @@ class Controller():
                 list of PoI objects for a given graph
         """
         # FIXME this is NOT a good implementation (keys is blocking)
-        pois = []
-        for key in self.redis_db.keys(f"poi:{graph_name}:*"):
-            poi = self.redis_db.hgetall(key)
-
-            # decode binary strings (utf-8) -> python string
-            poi = {k.decode('utf-8'): v.decode('utf-8')
-                   for k, v in poi.items()}
-
-            # parse these again they are all strings
-            poi["id"] = int(poi["id"])
-            poi["floor"] = float(poi["floor"])
-            poi["lat"] = float(poi["lat"])
-            poi["lon"] = float(poi["lon"])
-            poi["nearest_path_node"] = int(poi["nearest_path_node"])
-
-            pois.append(poi)
-
+        # TODO this can be async I think
+        # format string in query?
+        keys = self.redis_db.keys(f"poi:{graph_name}:*")
+        pois = await asyncio.gather(*[self.load_poi(key) for key in keys])
         return pois
 
-    def add_pois(self, building_name: str, pois: list) -> None:
+    async def load_poi(self, key: str) -> dict:
+        """
+            Load a single PoI given a key
+
+            Args:
+                key (str): Key that corresponds to the PoI
+
+            Returns:
+                Key properties dict
+        """
+        poi = self.redis_db.hgetall(key)
+
+        # decode binary strings (utf-8) -> python string
+        poi = {k.decode('utf-8'): v.decode('utf-8')
+               for k, v in poi.items()}
+
+        # parse these again they are all strings
+        # TODO write a better parser than this. Redis doesn't save type
+        # hints...
+        poi["id"] = int(poi["id"])
+        poi["floor"] = float(poi["floor"])
+        poi["lat"] = float(poi["lat"])
+        poi["lon"] = float(poi["lon"])
+        poi["nearest_path_node"] = int(poi["nearest_path_node"])
+
+        return poi
+
+    async def add_pois(self, building_name: str, pois: list) -> None:
         """
             Add a POIs to a given graph_name
 
@@ -199,10 +211,9 @@ class Controller():
                 poi (dict): poi dictionary (from parser)
 
         """
-        for poi in pois:
-            self.add_poi(building_name, poi)
+        await asyncio.gather(*[self.add_poi(building_name, poi) for poi in pois])
 
-    def add_poi(self, building_name: str, poi: dict) -> None:
+    async def add_poi(self, building_name: str, poi: dict) -> None:
         """
             Add a POI to a given graph_name
 
@@ -214,12 +225,10 @@ class Controller():
         """
         poi = {k: ('' if v is None else v)
                for k, v in poi.items()}
-
         poi_id = f"poi:{building_name}:{str(poi['id'])}"
-
         self.search_client.redis.hset(poi_id, mapping=poi)
 
-    def search_poi_by_name(self, poi_name: str) -> list:
+    def search_poi_by_name(self, poi_name: str) -> List[dict]:
         """
             Search for a POI using Redisearch
 
@@ -248,7 +257,8 @@ class Controller():
 
         return pois
 
-    def search_room_nodes(self, graph_name: str, search_string: str) -> list:
+    def search_room_nodes(self, graph_name: str,
+                          search_string: str) -> List[dict]:
         """
             Search for room nodes by name
 
@@ -273,7 +283,7 @@ class Controller():
 
         return nodes
 
-    def get_node_neighbours(self, graph_name: str, node_id: int) -> list:
+    def get_node_neighbours(self, graph_name: str, node_id: int) -> List[dict]:
         """
             Returns list of neighbouring nodes to an ID
 

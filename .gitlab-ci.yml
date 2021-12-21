@@ -51,7 +51,7 @@ pytest:
       alias: redis
   stage: test
   before_script:
-    - python -m pip install pytest pytest-cov
+    - python -m pip install pytest pytest-cov pytest-asyncio
     - python -m pip install -r requirements.txt
   script:
     - python -m pytest --cov=server/src/ --junitxml=report.xml
