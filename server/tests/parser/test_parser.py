@@ -1,10 +1,11 @@
+import asyncio
 from path_finding.graph_parser import Parser
 
 
 class TestParser:
     @classmethod
     def setup_class(cls):
-        cls.p = Parser("server/tests/parser/test_map")
+        cls.p = asyncio.run(Parser.create("server/tests/parser/test_map"))
 
     def test_nodes(cls):
         expected = [{'id': 0,
