@@ -1,46 +1,46 @@
 import React, {useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {Button, StyleSheet} from 'react-native';
 import {
   ViroARScene,
   ViroText,
   ViroConstants,
   ViroARSceneNavigator,
+  ViroBox
 } from '@viro-community/react-viro';
 
-const HelloWorldSceneAR = () => {
-  const [text, setText] = useState('Initializing AR...');
 
-  function onInitialized(state, reason) {
-    console.log('guncelleme', state, reason);
-    if (state === ViroConstants.TRACKING_NORMAL) {
-      setText('Hello World!');
-    } else if (state === ViroConstants.TRACKING_NONE) {
-      // Handle loss of tracking
-    }
-  }
 
-  return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
+// all AR related stuff from vriomidea timeplate -- creates a baisc hellowlrd applation
+
+const InitialScene=()=>{
+  //equivlent of a view in a 2d scene
+  return(
+   <ViroARScene>
       <ViroText
-        text={text}
-        scale={[0.5, 0.5, 0.5]}
-        position={[0, 0, -1]}
-        style={styles.helloWorldTextStyle}
+      text={"Hello World"}
+      position={[-2,-5,-1]}
+      style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
-    </ViroARScene>
+          <ViroBox
+          height={2} // for creating a 3D cube
+          length={2}
+          width={2}
+          position={[0,0,0]}
+        />
+     </ViroARScene>
   );
 };
 
 export default () => {
-  return (
-    <ViroARSceneNavigator
-      autofocus={true}
-      initialScene={{
-        scene: HelloWorldSceneAR,
-      }}
-      style={styles.f1}
-    />
-  );
+    return(
+      //used for rendering all AR things
+      <ViroARSceneNavigator
+        initialScene={{
+          scene:InitialScene
+        }}
+        styles={{flex:1}}
+      />
+    );
 };
 
 var styles = StyleSheet.create({
