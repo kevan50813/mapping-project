@@ -2,7 +2,6 @@
     Node type resolvers
     These define how to resolve fields in the node type
 """
-import json
 from ariadne import ObjectType
 from src.types.map_types import Polygon
 from api.api_database import db
@@ -28,11 +27,3 @@ async def resolve_polygon(obj, *_):
         return None
 
     return await db.load_entry_by_id(obj.graph, obj.poly_id, Polygon)
-
-
-@node.field("tags")
-async def resolve_tags(obj, *_):
-    """
-        Dumps tags as json object
-    """
-    return json.dumps(obj.tags)
