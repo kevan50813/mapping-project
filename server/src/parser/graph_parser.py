@@ -40,6 +40,7 @@ class Parser:
         self.parse_nodes()
         self.nodes = self.poly_parser.parse_rooms(self.nodes)
         self.parse_pois()
+        self.edges += self.poly_parser.connect_stairways(self.nodes)
 
     @staticmethod
     def _nearest_node(point, nodes: list) -> int:
