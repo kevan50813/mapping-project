@@ -5,7 +5,7 @@ import imutils
 import sys
 
 DEFAULT_FILE_NAME = "imgg.png"
-DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png"
+DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png.png"
 
 if len(sys.argv ) == 1:
     FLOOR_PLAN_LOCATION = "imgg.png"
@@ -19,7 +19,7 @@ elif len(sys.argv) == 3:
     TEMPLATE_FILE_LOCATION = sys.argv[2]
     FLOOR_PLAN_LOCATION = sys.argv[1]
 
-ALL_ROTATIONS = 1 # set to 1 to show one corner (red), 0 for no corner detection, 4 for all corners
+ALL_ROTATIONS = 4 # set to 1 to show one corner (red), 0 for no corner detection, 4 for all corners
 EDGE_DETECTION = 0 # 0 = None, 1 = Canny, 2 = Sobel edge detection
 ##################################################################
 
@@ -34,15 +34,14 @@ def contour_detection_method(img,imgc):
     """
     contours = cv2.findContours(img.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
-
     contours = imutils.grab_contours(contours)
     for c in contours[:-5]:
         cv2.drawContours(imgc,[c],-1,(0,200,255),2)
-    
+
     cv2.imwrite("contour.png",imgc)
-    
+
     ##uncomment to see the contour image
-    
+
     # cv2.imshow("contour_image",imgc)
 
 def run_edge_detection(img):
@@ -66,7 +65,7 @@ if __name__ == '__main__':
     ## open the floor plan image twice once in greyscale then in (c)olour
     img = cv.imread(FLOOR_PLAN_LOCATION, 0)
     imgc = cv.imread(FLOOR_PLAN_LOCATION, 1)
-    
+
     ## uncomment to see the floor plan
     # cv2.imshow("floorplan", img)
 
@@ -90,20 +89,20 @@ if __name__ == '__main__':
     ## i thought this would be easier to see then using an image in one of the other files you can also use a corner file if you uncomment the section bellow
 
     ## slow method for template generation
-    corner_template =np.array( [[0,0,0,0,0, 0, 0,0, 0, 0 ,0,0,0,0,0,0],
-                                [0,0,0, 0,0,0, 0,0,0, 0 ,0,0,0,0,0,0],
-                                [0,0,0,0,0,0,0,255,255,255,255,255,255,255,255,255],
-                                [0,0,0,0,0,0,0,255,255,255,255,255,255,255,255,255],
-                                [0,0,0,0,0,0,0,255,255,255,255,255,255,255,255,255],
-                                [0,0,0,0,0,0,0,255,255,255,255,255,255,255,255,255]])
+    corner_template =np.array( [
+                                [0, 0,0,0, 0 ,0,0,0,0,0,0],
+                                [0,0,255,255,255,255,255,255,255,255,255],
+                                [0,0,255,255,255,255,255,255,255,255,255],
+                                [0,0,255,255,255,255,255,255,255,255,255],
+                                [0,0,255,255,255,255,255,255,255,255,255]])
 
 
     import time
     ## if you choose to use an image as corner_template uncomment the bellow
 
-    # corner_template = cv.imread('corner_left.jpg', 0)
+    # corner_template = cv.imread(str(TEMPLATE_FILE_LOCATION), 0)
     # (thresh,corner_template) = cv2.threshold(corner_template,110,255,cv2.THRESH_BINARY)
-    
+
     ## un comment to see the sorner_template
     # cv2.imshow("corner_template", corner_template)
 
