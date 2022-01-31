@@ -5,10 +5,10 @@ import imutils
 import sys
 
 DEFAULT_FILE_NAME = "imgg.png"
-DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png.png"
+DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png"
 
 if len(sys.argv ) == 1:
-    FLOOR_PLAN_LOCATION = "imgg.png"
+    FLOOR_PLAN_LOCATION = DEFAULT_FILE_NAME
     TEMPLATE_FILE_LOCATION = DEFAULT_SEARCH_TAMPLATE_FILE_NAME
 
 elif len(sys.argv) == 2:
