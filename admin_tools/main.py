@@ -5,7 +5,7 @@ import imutils
 import sys
 
 DEFAULT_FILE_NAME = "imgg.png"
-DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png.png"
+DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png"
 
 if len(sys.argv ) == 1:
     FLOOR_PLAN_LOCATION = "imgg.png"
@@ -33,7 +33,7 @@ def contour_detection_method(img,imgc):
     :return: NA
     """
     contours = cv2.findContours(img.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    print(contours)
+
 
     contours = imutils.grab_contours(contours)
     for c in contours[:-5]:
