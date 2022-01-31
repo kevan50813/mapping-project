@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, StyleSheet} from 'react-native';
-import {
+import { // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
   ViroARScene,
   ViroText,
   ViroConstants,
@@ -10,13 +10,12 @@ import {
 
 
 
-// all AR related stuff from vriomidea timeplate -- creates a baisc hellowlrd applation
-
+// all AR related stuff from vriomidea timeplate
 const InitialScene=()=>{
   //equivlent of a view in a 2d scene
   return(
    <ViroARScene>
-      <ViroText
+      <ViroText // exsmaple of text
       text={"Hello World"}
       position={[-2,-5,-1]}
       style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
@@ -43,6 +42,7 @@ export default () => {
     );
 };
 
+//creats a style sheet that is used for styling the text etc...
 var styles = StyleSheet.create({
   f1: {flex: 1},
   helloWorldTextStyle: {
