@@ -1,16 +1,26 @@
-# This is a sample Python script.
 import cv2
 import numpy as np
 import cv2 as cv
-from matplotlib import pyplot as plt
-from skimage.morphology import skeletonize, thin
-import matplotlib.pyplot as plt
-from skimage.util import invert
 import imutils
+import sys
 
+DEFAULT_FILE_NAME = "imgg.png"
+DEFAULT_SEARCH_TAMPLATE_FILE_NAME = "corner_template.png.png"
+
+if len(sys.argv ) == 1:
+    FLOOR_PLAN_LOCATION = "imgg.png"
+    TEMPLATE_FILE_LOCATION = DEFAULT_SEARCH_TAMPLATE_FILE_NAME
+
+elif len(sys.argv) == 2:
+    TEMPLATE_FILE_LOCATION = DEFAULT_SEARCH_TAMPLATE_FILE_NAME
+    FLOOR_PLAN_LOCATION = sys.argv[1]
+
+elif len(sys.argv) == 3:
+    TEMPLATE_FILE_LOCATION = sys.argv[2]
+    FLOOR_PLAN_LOCATION = sys.argv[1]
 
 ALL_ROTATIONS = 1 # set to 1 to show one corner (red), 0 for no corner detection, 4 for all corners
-EDGE_DETECTION = 1 # 0 = None, 1 = Canny, 2 = Sobel edge detection
+EDGE_DETECTION = 0 # 0 = None, 1 = Canny, 2 = Sobel edge detection
 ##################################################################
 
 
@@ -23,14 +33,17 @@ def contour_detection_method(img,imgc):
     :return: NA
     """
     contours = cv2.findContours(img.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    print(contours)
+
     contours = imutils.grab_contours(contours)
-    cv2.imshow("IMG", img)
-
-    for c in contours:
+    for c in contours[:-5]:
         cv2.drawContours(imgc,[c],-1,(0,200,255),2)
-
-    cv2.imshow("contour_image",imgc)
+    
     cv2.imwrite("contour.png",imgc)
+    
+    ##uncomment to see the contour image
+    
+    # cv2.imshow("contour_image",imgc)
 
 def run_edge_detection(img):
     """
@@ -49,12 +62,13 @@ def run_edge_detection(img):
     return edgesx,edgesc
 
 
-
 if __name__ == '__main__':
-
     ## open the floor plan image twice once in greyscale then in (c)olour
-    img = cv.imread('imgg.png', 0)
-    imgc = cv.imread('imgg.png', 1)
+    img = cv.imread(FLOOR_PLAN_LOCATION, 0)
+    imgc = cv.imread(FLOOR_PLAN_LOCATION, 1)
+    
+    ## uncomment to see the floor plan
+    # cv2.imshow("floorplan", img)
 
 
     edgesx,edgesc = run_edge_detection(img)
@@ -89,12 +103,14 @@ if __name__ == '__main__':
 
     # corner_template = cv.imread('corner_left.jpg', 0)
     # (thresh,corner_template) = cv2.threshold(corner_template,110,255,cv2.THRESH_BINARY)
+    
+    ## un comment to see the sorner_template
     # cv2.imshow("corner_template", corner_template)
 
 
 
-    cv2.imwrite("corner_template.png",corner_template)
-    corner_template = cv.imread('corner_template.png', 0)
+    cv2.imwrite(TEMPLATE_FILE_LOCATION,corner_template)
+    corner_template = cv.imread(TEMPLATE_FILE_LOCATION, 0)
 
 
 
@@ -127,6 +143,7 @@ if __name__ == '__main__':
 
     ##holds runtime so images dont automatically close on end of programm
     cv2.waitKey(0)
+
 
 
 
