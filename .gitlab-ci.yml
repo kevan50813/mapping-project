@@ -72,6 +72,8 @@ pytest:
       junit: dist/coverage/python/coverage.xml
 
 package:
+  services:
+    - docker
   stage: build
   only:
     - main
