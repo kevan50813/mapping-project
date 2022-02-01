@@ -1,7 +1,7 @@
 """
     Edge type resolvers
 """
-from api.api_database import db
+from src.api.api_database import db
 from ariadne import ObjectType
 
 edge = ObjectType("Edge")
@@ -10,7 +10,7 @@ edge = ObjectType("Edge")
 @edge.field("adjacent_nodes")
 async def resolved_adj_nodes(obj, *_):
     """
-        Get two adjacent nodes with edge
+    Get two adjacent nodes with edge
     """
     nodes = []
     for node_id in obj["edge"]:

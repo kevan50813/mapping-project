@@ -331,3 +331,9 @@ fabric.properties
 maps/
 get_json.sh
 test.py
+
+# Pants workspace files
+/.pants.d/
+/dist/
+/.pids
+/.pants.workdir.file_lock*
