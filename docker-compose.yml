@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  redisgraph:
+    image: redislabs/redismod
+    container_name: redisg
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - redisgn
+    hostname: redis
+  mappingserver:
+    image: mapping-app
+    container_name: mapping
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - redisgn
+networks:
+  redisgn:

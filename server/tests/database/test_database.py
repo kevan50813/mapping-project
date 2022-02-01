@@ -1,7 +1,7 @@
 """ Test redis controller """
+import pytest
 from src.database.controller import Controller
 from src.types.map_types import PathNode, PoI, Polygon
-import pytest
 
 
 class TestDatabase:
@@ -15,27 +15,35 @@ class TestDatabase:
 
     @pytest.mark.asyncio
     async def test_save_and_load_graph(cls):
-        nodes = [{'id': 0,
-                  'level': 0.0,
-                  'graph': 'test',
-                  'lon': -1.56783186301712,
-                  'lat': 53.8190438905365,
-                  'tags': {'indoor': 'way'},
-                  'poly_id': 0},
-                 {'id': 1,
-                  'level': 0.0,
-                  'graph': 'test',
-                  'lon': -1.56780921638632,
-                  'lat': 53.8190394208067,
-                  'tags': {'indoor': 'way'},
-                  'poly_id': 0},
-                 {'id': 2,
-                  'level': 0.0,
-                  'graph': 'test',
-                  'lon': -1.5677800141519,
-                  'lat': 53.8190263095994,
-                  'tags': {'indoor': 'way'},
-                  'poly_id': 6}]
+        nodes = [
+            {
+                "id": 0,
+                "level": 0.0,
+                "graph": "test",
+                "lon": -1.56783186301712,
+                "lat": 53.8190438905365,
+                "tags": {"indoor": "way"},
+                "poly_id": 0,
+            },
+            {
+                "id": 1,
+                "level": 0.0,
+                "graph": "test",
+                "lon": -1.56780921638632,
+                "lat": 53.8190394208067,
+                "tags": {"indoor": "way"},
+                "poly_id": 0,
+            },
+            {
+                "id": 2,
+                "level": 0.0,
+                "graph": "test",
+                "lon": -1.5677800141519,
+                "lat": 53.8190263095994,
+                "tags": {"indoor": "way"},
+                "poly_id": 6,
+            },
+        ]
 
         node_objects = [PathNode(**node) for node in nodes]
 
@@ -52,19 +60,25 @@ class TestDatabase:
 
     @pytest.mark.asyncio
     async def test_save_and_load_poi(cls):
-        pois = [{'id': 0,
-                 'graph': 'test',
-                 'level': 0.0,
-                 'lon': -1.567805044638543,
-                 'lat': 53.819084565077326,
-                 'nearest_path_node': 10,
-                 'tags': {"amenity": "living room"}},
-                {'id': 1,
-                 'graph': 'test',
-                 'level': 0.0,
-                 'lon': -1.567729804187531,
-                 'lat': 53.81906966597811,
-                 'nearest_path_node': 8}]
+        pois = [
+            {
+                "id": 0,
+                "graph": "test",
+                "level": 0.0,
+                "lon": -1.567805044638543,
+                "lat": 53.819084565077326,
+                "nearest_path_node": 10,
+                "tags": {"amenity": "living room"},
+            },
+            {
+                "id": 1,
+                "graph": "test",
+                "level": 0.0,
+                "lon": -1.567729804187531,
+                "lat": 53.81906966597811,
+                "nearest_path_node": 8,
+            },
+        ]
 
         poi_objects = [PoI(**poi) for poi in pois]
 
@@ -80,28 +94,38 @@ class TestDatabase:
     @pytest.mark.asyncio
     async def test_room_search(cls):
         """Check that it's actually working on redis database."""
-        rooms = [Polygon(0,
-                         'test',
-                         0.0,
-                         [(0, 0), (0, 1)],
-                         (0, 0),
-                         (0, 1),
-                         {"room-name": "sauna", "room-no": "5"})]
+        rooms = [
+            Polygon(
+                0,
+                "test",
+                0.0,
+                [(0, 0), (0, 1)],
+                (0, 0),
+                (0, 1),
+                {"room-name": "sauna", "room-no": "5"},
+            )
+        ]
 
-        nodes = [{'id': 0,
-                  'level': 0.0,
-                  'graph': 'test',
-                  'lon': -1.56783186301712,
-                  'lat': 53.8190438905365,
-                  'tags': {'indoor': 'way'},
-                  'poly_id': 0},
-                 {'id': 1,
-                  'level': 0.0,
-                  'graph': 'test',
-                  'lon': -1.56780921638632,
-                  'lat': 53.8190394208067,
-                  'tags': {'indoor': 'way'},
-                  'poly_id': 0}]
+        nodes = [
+            {
+                "id": 0,
+                "level": 0.0,
+                "graph": "test",
+                "lon": -1.56783186301712,
+                "lat": 53.8190438905365,
+                "tags": {"indoor": "way"},
+                "poly_id": 0,
+            },
+            {
+                "id": 1,
+                "level": 0.0,
+                "graph": "test",
+                "lon": -1.56780921638632,
+                "lat": 53.8190394208067,
+                "tags": {"indoor": "way"},
+                "poly_id": 0,
+            },
+        ]
 
         node_objects = [PathNode(**node) for node in nodes]
 
@@ -112,13 +136,17 @@ class TestDatabase:
 
     @pytest.mark.asyncio
     async def test_poi_search(cls):
-        pois = [PoI(0,
-                    'test',
-                    0.0,
-                    -1.567805044638543,
-                    53.819084565077326,
-                    10,
-                    {"amenity": "living room"})]
+        pois = [
+            PoI(
+                0,
+                "test",
+                0.0,
+                -1.567805044638543,
+                53.819084565077326,
+                10,
+                {"amenity": "living room"},
+            )
+        ]
 
         await cls.controller.add_entries("test", pois)
         res = await cls.controller.search_poi_by_name("living room")
@@ -127,20 +155,26 @@ class TestDatabase:
 
     @pytest.mark.asyncio
     async def test_get_neighbours(cls):
-        neighbours = [{'id': 1,
-                       'graph': 'test',
-                       'level': 0.0,
-                       'lon': -1.56780921638632,
-                       'lat': 53.8190394208067,
-                       'tags': {'indoor': 'way'},
-                       'poly_id': 0},
-                      {'id': 2,
-                       'graph': 'test',
-                       'level': 0.0,
-                       'lon': -1.5677800141519,
-                       'lat': 53.8190263095994,
-                       'tags': {'indoor': 'way'},
-                       'poly_id': 6}]
+        neighbours = [
+            {
+                "id": 1,
+                "graph": "test",
+                "level": 0.0,
+                "lon": -1.56780921638632,
+                "lat": 53.8190394208067,
+                "tags": {"indoor": "way"},
+                "poly_id": 0,
+            },
+            {
+                "id": 2,
+                "graph": "test",
+                "level": 0.0,
+                "lon": -1.5677800141519,
+                "lat": 53.8190263095994,
+                "tags": {"indoor": "way"},
+                "poly_id": 6,
+            },
+        ]
 
         n_objs = [PathNode(**n) for n in neighbours]
 

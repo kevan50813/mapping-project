@@ -10,7 +10,7 @@ polygon = ObjectType("Polygon")
 @polygon.field("ne")
 async def resolve_ne(obj, *_):
     """
-        returns NE field
+    returns NE field
     """
     return obj.NE
 
@@ -18,6 +18,6 @@ async def resolve_ne(obj, *_):
 @polygon.field("sw")
 async def resolve_sw(obj, *_):
     """
-        returns SW field
+    returns SW field
     """
     return obj.SW

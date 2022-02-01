@@ -11,11 +11,11 @@ from redisearch import Client, IndexDefinition, TextField
 from src.types.map_types import PathNode, PoI, Polygon
 
 
-class Controller():
+class Controller:
     """
-        Redis database controller
+    Redis database controller
 
-        Redis database must have Graph and Search modules
+    Redis database must have Graph and Search modules
     """
 
     def __init__(self, host="127.0.0.1", port="6379"):
@@ -23,10 +23,9 @@ class Controller():
         self.redis_db = redis.Redis(host=host, port=port)
 
         # define a search client and index fields for poi
-        self.poi_search_client = Client("points_of_interest",
-                                        conn=self.redis_db)
+        self.poi_search_client = Client("points_of_interest", conn=self.redis_db)
         poi_definition = IndexDefinition(prefix=["PoI:"])
-        poi_schema = (TextField("amenity"))
+        poi_schema = TextField("amenity")
 
         self.room_search_client = Client("rooms", conn=self.redis_db)
         room_definition = IndexDefinition(prefix=["Polygon:"])
@@ -41,28 +40,28 @@ class Controller():
             self.room_search_client.info()
         except redis.ResponseError:
             self.log.debug("Index does not exist, creating index")
-            self.poi_search_client.create_index(poi_schema,
-                                                definition=poi_definition)
-            self.room_search_client.create_index(room_schema,
-                                                 definition=room_definition)
+            self.poi_search_client.create_index(poi_schema, definition=poi_definition)
+            self.room_search_client.create_index(
+                room_schema, definition=room_definition
+            )
 
     @staticmethod
     def __serialise_list(ser_list):
         """
-            Serialise a list, for use in the database
+        Serialise a list, for use in the database
         """
         return "serialised:" + json.dumps(ser_list)
 
     @staticmethod
     def __deserialise_list(ser_list):
         """
-            Deserialise a list
+        Deserialise a list
         """
         return json.loads(ser_list.split(":", 1)[1])
 
     def __dataclass_to_flat_dict(self, dataclass):
         """
-            Prepares dataclass to a flat dict object
+        Prepares dataclass to a flat dict object
         """
         # See how to make this faster
         flat_dict = {}
@@ -76,14 +75,13 @@ class Controller():
             elif key != "tags":
                 flat_dict[key] = value
 
-        flat_dict = {k: ('' if v is None else v) for k, v in flat_dict.items()}
+        flat_dict = {k: ("" if v is None else v) for k, v in flat_dict.items()}
 
         return flat_dict
 
-    def __flat_dict_to_dataclass(
-            self, dictionary: dict, target_class: Type) -> Type:
+    def __flat_dict_to_dataclass(self, dictionary: dict, target_class: Type) -> Type:
         """
-            Attempts to turn a dict into an instance of the given dataclass
+        Attempts to turn a dict into an instance of the given dataclass
         """
         fields = [field.name for field in dataclasses.fields(target_class)]
         fields.remove("tags")
@@ -96,14 +94,14 @@ class Controller():
         for key, value in kwargs.items():
             if isinstance(value, str) and value.startswith("serialised:"):
                 kwargs[key] = self.__deserialise_list(value)
-            elif value == '':
+            elif value == "":
                 kwargs[key] = None
 
         return target_class(**kwargs)
 
     def __redisgraph_result_to_node(self, res) -> List[PathNode]:
         """
-            Transforms a redisgraph result into a list of PathNode objects
+        Transforms a redisgraph result into a list of PathNode objects
         """
         nodes = []
         for node in res.result_set:
@@ -112,20 +110,21 @@ class Controller():
             nodes.append(node_object)
         return nodes
 
-    async def save_graph(self, graph_name: str,
-                         nodes: List[PathNode], edges: List[tuple]) -> None:
+    async def save_graph(
+        self, graph_name: str, nodes: List[PathNode], edges: List[tuple]
+    ) -> None:
         """
-            Save a graph given the nodes and edges to the database,
-            breadth-first traversal
+        Save a graph given the nodes and edges to the database,
+        breadth-first traversal
 
-            This clears the whole graph at a given name!
+        This clears the whole graph at a given name!
 
-            Args:
-                graph_name  (str): Name of the graph to save
-                nodes (list): A list of nodes (dicts in format specified
-                       by graph_parser)
-                edges (list): A list of tuples mapping node id to node id
-                       (sparse adjacency matrix)
+        Args:
+            graph_name  (str): Name of the graph to save
+            nodes (list): A list of nodes (dicts in format specified
+                   by graph_parser)
+            edges (list): A list of tuples mapping node id to node id
+                   (sparse adjacency matrix)
         """
         graph = Graph(graph_name, self.redis_db)
 
@@ -148,12 +147,12 @@ class Controller():
 
                 if node_alias not in graph.nodes:
                     node_properties = dataclasses.asdict(
-                        node, dict_factory=self.__dataclass_to_flat_dict)
+                        node, dict_factory=self.__dataclass_to_flat_dict
+                    )
 
                     node_obj = Node(
-                        label=node_label,
-                        properties=node_properties,
-                        alias=node_alias)
+                        label=node_label, properties=node_properties, alias=node_alias
+                    )
 
                     node_objs.append(node_obj)
                     graph.add_node(node_obj)
@@ -169,30 +168,33 @@ class Controller():
         self.log.debug("Commiting graph %s", graph_name)
         graph.commit()
 
-    async def load_graph(self, graph_name: str) -> (List[PathNode], List[tuple]):  # noqa: E501
+    async def load_graph(
+        self, graph_name: str
+    ) -> (List[PathNode], List[tuple]):  # noqa: E501
         """
-            Returns the whole graph nodes, edges
+        Returns the whole graph nodes, edges
 
-            Args:
-                graph_name: graph of which to return nodes and edges from
+        Args:
+            graph_name: graph of which to return nodes and edges from
 
-            Returns:
-                tuple with two lists, first element is nodes, second is edges
+        Returns:
+            tuple with two lists, first element is nodes, second is edges
         """
-        nodes, edges = await asyncio.gather(self.load_nodes(graph_name),
-                                            self.load_edges(graph_name))
+        nodes, edges = await asyncio.gather(
+            self.load_nodes(graph_name), self.load_edges(graph_name)
+        )
 
         return (nodes, edges)
 
     async def load_nodes(self, graph_name: str) -> List[PathNode]:
         """
-            Return all nodes in a given graph
+        Return all nodes in a given graph
 
-            Args:
-                graph_name: graph of which to return nodes from
+        Args:
+            graph_name: graph of which to return nodes from
 
-            Returns:
-                List of nodes (see graph_parser for definition of their format)
+        Returns:
+            List of nodes (see graph_parser for definition of their format)
         """
         graph = Graph(graph_name, self.redis_db)
         query = """MATCH (n:way) RETURN n"""
@@ -210,13 +212,13 @@ class Controller():
 
     async def load_edges(self, graph_name: str) -> List[tuple]:
         """
-            Returns all edges in a given graph
+        Returns all edges in a given graph
 
-            Args:
-                graph_name: graph of which to return edges from
+        Args:
+            graph_name: graph of which to return edges from
 
-            Returns:
-                list of tuples that contain two node ids that are connected
+        Returns:
+            list of tuples that contain two node ids that are connected
         """
         graph = Graph(graph_name, self.redis_db)
         query = """MATCH (n:way)-->(m:way) RETURN n.id, m.id"""
@@ -228,93 +230,94 @@ class Controller():
 
         return edges
 
-    async def load_entries(self, graph_name: str, entry_type: Type) -> List[Type]:  # noqa: E501
+    async def load_entries(
+        self, graph_name: str, entry_type: Type
+    ) -> List[Type]:  # noqa: E501
         """
-            Returns all entries in a building matching a dataclass
+        Returns all entries in a building matching a dataclass
 
-            Args:
-                graph_name (str): Name of graph you want PoIs for
-                dataclass (Type): Dataclass to fetch from the DB
+        Args:
+            graph_name (str): Name of graph you want PoIs for
+            dataclass (Type): Dataclass to fetch from the DB
 
-            Returns:
-                list of dataclass entries for a given graph
+        Returns:
+            list of dataclass entries for a given graph
         """
-        keys = self.redis_db.scan_iter(
-            f"{entry_type.__name__}:{graph_name}:*")
-        entries = await asyncio.gather(*[self.load_entry(key, entry_type)
-                                       for key in keys])
+        keys = self.redis_db.scan_iter(f"{entry_type.__name__}:{graph_name}:*")
+        entries = await asyncio.gather(
+            *[self.load_entry(key, entry_type) for key in keys]
+        )
         return entries
 
     async def load_entry(self, key: str, entry_type: Type) -> Type:
         """
-            Load a single PoI given a key
+        Load a single PoI given a key
 
-            Args:
-                key (str): Key that corresponds to the entry
-                entry_type (Type): Dataclass of key
+        Args:
+            key (str): Key that corresponds to the entry
+            entry_type (Type): Dataclass of key
 
-            Returns:
-                dataclass object of entry
+        Returns:
+            dataclass object of entry
         """
         entry = self.redis_db.hgetall(key)
 
         # decode binary strings (utf-8) -> python string
-        entry = {k.decode('utf-8'): v.decode('utf-8')
-                 for k, v in entry.items()}
+        entry = {k.decode("utf-8"): v.decode("utf-8") for k, v in entry.items()}
 
         return self.__flat_dict_to_dataclass(entry, entry_type)
 
-    async def load_entry_by_id(self, graph_name: str, entry_id: int, entry_type: Type) -> Type:  # noqa: E501
+    async def load_entry_by_id(
+        self, graph_name: str, entry_id: int, entry_type: Type
+    ) -> Type:  # noqa: E501
         """
-            Builds key for entry and uses load_entry to load it
+        Builds key for entry and uses load_entry to load it
 
-            Args:
-                graph_name (str): Name of graph entry is in
-                entry_id (int): ID of entry to find
-                entry_type (Type): Dataclass of key
+        Args:
+            graph_name (str): Name of graph entry is in
+            entry_id (int): ID of entry to find
+            entry_type (Type): Dataclass of key
 
-            Returns:
-                dataclass object of entry
+        Returns:
+            dataclass object of entry
         """
         key = f"{entry_type.__name__}:{graph_name}:{str(entry_id)}"
         return await self.load_entry(key, entry_type)
 
     async def add_entries(self, graph_name: str, entries: List[Type]) -> None:
         """
-            Adds a generic record from a list of dataclasses
+        Adds a generic record from a list of dataclasses
 
-            Args:
-                graph_name (str): name of the graph this PoI is identified
-                                  with
-                entries (List[Type]): list of dataclass objects to add to db
-                                      dataclass must have 'id' field
+        Args:
+            graph_name (str): name of the graph this PoI is identified
+                              with
+            entries (List[Type]): list of dataclass objects to add to db
+                                  dataclass must have 'id' field
         """
-        await asyncio.gather(*[self.add_entry(graph_name, entry)
-                               for entry in entries])
+        await asyncio.gather(*[self.add_entry(graph_name, entry) for entry in entries])
 
     async def add_entry(self, graph_name: str, entry: Type) -> None:
         """
-            Add a record to a given graph_name
+        Add a record to a given graph_name
 
-            Args:
-                graph_name (str): name of the graph this room is in
-                entry (Type): Generic dataclass object
-                              dataclass must have 'id' field
+        Args:
+            graph_name (str): name of the graph this room is in
+            entry (Type): Generic dataclass object
+                          dataclass must have 'id' field
         """
         entry_id = f"{type(entry).__name__}:{graph_name}:{str(entry.id)}"
-        mapping = dataclasses.asdict(
-            entry, dict_factory=self.__dataclass_to_flat_dict)
+        mapping = dataclasses.asdict(entry, dict_factory=self.__dataclass_to_flat_dict)
         self.redis_db.hset(entry_id, mapping=mapping)
 
     async def search_poi_by_name(self, poi_name: str) -> List[PoI]:
         """
-            Search for a POI using Redisearch
+        Search for a POI using Redisearch
 
-            Args:
-                poi_name (str): Search string for the POI
+        Args:
+            poi_name (str): Search string for the POI
 
-            Returns:
-                Dictionary of POIs that match poi_name search string
+        Returns:
+            Dictionary of POIs that match poi_name search string
         """
         res = self.poi_search_client.search(poi_name)
         pois = []
@@ -332,26 +335,26 @@ class Controller():
 
         return pois
 
-    async def search_poi_by_name_in_graph(self, graph: str,
-                                          poi_name: str) -> List[PoI]:
+    async def search_poi_by_name_in_graph(self, graph: str, poi_name: str) -> List[PoI]:
         """
-            Search then filter for the graph you are looking for
-            probably a nicer way of doing this really lol
+        Search then filter for the graph you are looking for
+        probably a nicer way of doing this really lol
         """
         results = await self.search_poi_by_name(poi_name)
         return [r for r in results if r.graph == graph]
 
-    async def search_room_nodes(self, graph_name: str,
-                                search_string: str) -> Tuple[List[Polygon], List[PathNode]]:  # noqa: E501
+    async def search_room_nodes(
+        self, graph_name: str, search_string: str
+    ) -> Tuple[List[Polygon], List[PathNode]]:  # noqa: E501
         """
-            Search for room nodes by name
+        Search for room nodes by name
 
-            Args:
-                graph_name (str): name of the graph to search in
-                search_string (str): search string
+        Args:
+            graph_name (str): name of the graph to search in
+            search_string (str): search string
 
-            Returns:
-                List of room objects and list of corresponding nodes
+        Returns:
+            List of room objects and list of corresponding nodes
         """
         # First search the rooms keys for the search string
         res = self.room_search_client.search(search_string)
@@ -381,17 +384,18 @@ class Controller():
 
         return rooms, nodes
 
-    async def get_node_neighbours(self, graph_name: str,
-                                  node_id: int) -> List[PathNode]:
+    async def get_node_neighbours(
+        self, graph_name: str, node_id: int
+    ) -> List[PathNode]:
         """
-            Returns list of neighbouring nodes to an ID
+        Returns list of neighbouring nodes to an ID
 
-            Args:
-                graph_name (str): name of graph to query
-                node_id (int): ID of node you want neighbours of
+        Args:
+            graph_name (str): name of graph to query
+            node_id (int): ID of node you want neighbours of
 
-            Returns:
-                List of neighbouring node objects
+        Returns:
+            List of neighbouring node objects
         """
         graph = Graph(graph_name, self.redis_db)
 
@@ -402,11 +406,11 @@ class Controller():
 
     async def get_node_by_id(self, graph_name: str, node_id: int) -> PathNode:
         """
-            Get one node by it's ID
+        Get one node by it's ID
 
-            Args:
-                graph_name (str): Name of the graph to find the node in
-                node_id (str): Integer ID of the node
+        Args:
+            graph_name (str): Name of the graph to find the node in
+            node_id (str): Integer ID of the node
         """
         graph = Graph(graph_name, self.redis_db)
 
@@ -419,7 +423,9 @@ class Controller():
         nodes = self.__redisgraph_result_to_node(res)
 
         if len(nodes) > 1:
-            warnings.warn("There appears to be more than one node with this ID"
-                          "Returning the first")
+            warnings.warn(
+                "There appears to be more than one node with this ID"
+                "Returning the first"
+            )
 
         return nodes[0]
