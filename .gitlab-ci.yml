@@ -72,12 +72,11 @@ pytest:
       junit: dist/coverage/python/coverage.xml
 
 package:
+  image: cimg/python
   stage: build
   only:
     - main
   before_script:
-    - apt-get -qy update
-    - apt-get install -qy docker
     - ./pants --version
   script:
     - "./pants package Dockerfile"
