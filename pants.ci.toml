@@ -16,3 +16,6 @@ global_report = true
 
 [pytest]
 args = ["-vv", "--no-header"]
+
+[docker]
+env_vars = ["DOCKER_HOST=tcp://dockerdaemon:2375/"]
