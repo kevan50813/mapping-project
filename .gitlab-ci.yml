@@ -72,11 +72,21 @@ pytest:
       junit: dist/coverage/python/coverage.xml
 
 package:
-  image: cimg/python
+  needs: []
   stage: build
+  image: cimg/python:3.8
+  services:
+    - name: docker:dind
+      alias: dockerdaemon
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://dockerdaemon:2375/
+    DOCKER_TLS_CERTDIR: ""
   only:
     - main
   before_script:
     - ./pants --version
   script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - "./pants package Dockerfile"
+    - "docker push $CI_REGISTRY_IMAGE/mapping-app:$GIT_COMMIT"
