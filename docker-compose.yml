@@ -10,7 +10,7 @@ services:
       - redisgn
     hostname: redis
   mappingserver:
-    image: mapping-app
+    image: comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:main
     container_name: mapping
     ports:
       - "80:80"

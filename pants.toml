@@ -20,7 +20,7 @@ root_patterns = [
 interpreter_constraints = [">=3.8,<3.9"]
 
 [docker]
-build_args = ["GIT_COMMIT"]
+build_args = ["BUILD_TAG"]
 
 [docker.registries.gitlab]
 address = "registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project"
