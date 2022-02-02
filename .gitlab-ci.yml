@@ -15,9 +15,9 @@ cache:
   paths:
     - .cache/pip
     - .npm/
-    - $PWD/.cache/pants/setup
-    - $PWD/.cache/pants/named_caches
-    - $PWD/.cache/pants/lmdb_store
+    - $HOME/.cache/pants/setup
+    - $HOME/.cache/pants/named_caches
+    - $HOME/.cache/pants/lmdb_store
 
 .dist-artifacts: &dist-artifacts
   after_script:
@@ -30,6 +30,8 @@ cache:
 
 flake8:
   stage: lint
+  cache:
+    key: shared-cache
   before_script:
     # bootstrap pants
     - ./pants --version
@@ -45,6 +47,8 @@ flake8:
 eslint:
   stage: lint
   image: node:latest
+  cache:
+    key: shared-cache
   before_script:
     - cd app/
     - npm --cache .npm install
@@ -59,6 +63,8 @@ pytest:
     - name: redislabs/redismod:latest
       alias: redis
   stage: test
+  cache:
+    key: shared-cache
   needs: []
   before_script:
     # Bootstrap pants
@@ -74,6 +80,8 @@ pytest:
 package:
   stage: build
   image: cimg/python:3.8
+  cache:
+    key: shared-cache
   services:
     - name: docker:dind
       alias: dockerdaemon
