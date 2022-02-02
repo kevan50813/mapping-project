@@ -14,8 +14,7 @@ cache:
   key: shared-cache
   paths:
     - .cache/pip
-    - $HOME/.npm/
-    - node_modules/
+    - .npm/
     - $HOME/.cache/pants/setup
     - $HOME/.cache/pants/named_caches
     - $HOME/.cache/pants/lmdb_store
@@ -52,7 +51,7 @@ eslint:
     key: shared-cache
   before_script:
     - cd app/
-    - npm install
+    - npm ci --cache .npm --prefer-offline
   script:
     - npm run lint_junit
   artifacts:
