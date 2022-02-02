@@ -13,6 +13,7 @@ def trilaterate_triplet(ap_dict):
 
     pos = []
     dist = []
+    
 
     for key in ap_dict:
 
@@ -141,6 +142,13 @@ def visualise_trilateration(ap_dict, location, error):
     """
 
     plt.axis('square')
+
+    img = plt.imread("Map1.jpeg")
+    fig, ax = plt.subplots()
+    x = range(300)
+    ax.imshow(img)
+    ax.imshow(img, extent=[0,400,0,300])
+    ax.plot(x,x, '--', linewidth=5, color='firebrick')
 
     # setup axis to generic values
     fig, ax = plt.subplots()
