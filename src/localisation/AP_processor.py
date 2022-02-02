@@ -8,7 +8,7 @@ OFFLINE_PATH = "readings/studyroom_r1.csv"
 AP_DATA_PATH = "Wifi_Nodes.json"
 PRINT_REPR = True
 
-class Localisation:
+class AP_Processor:
 
     def __init__(self):
 
@@ -163,7 +163,7 @@ class Localisation:
 
 if __name__ == "__main__":
 
-    local_test = Localisation()
+    local_test = AP_Processor()
 
     if OFFLINE:
         local_test.load_offline_data(OFFLINE_PATH)
