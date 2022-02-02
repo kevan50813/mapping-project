@@ -142,17 +142,19 @@ def visualise_trilateration(ap_reference, ap_dict, used_dict, location, error):
     :param error: The radius of the circle of expected error
     """
 
-    plt.axis('square')
-    plt.rcParams.update({'font.size': 5})
+    #plt.rcParams.update({'font.size': 5})
+    #plt.axis('square')
 
     # setup axis to generic values
     fig, ax = plt.subplots()
     fig.tight_layout()
 
+    #add image to the background
     img = plt.imread("Map1.jpeg")
-
-    x = range(300)
-    implot = ax.imshow(img)
+    #ax.imshow(img)
+    
+    #flip the y axes so it ascends instead of descends
+    plt.gca().invert_yaxis()
 
     # keep track of maximum and minimum lon and lat found, for drawing
     max_lat = -999
@@ -178,7 +180,7 @@ def visualise_trilateration(ap_reference, ap_dict, used_dict, location, error):
             ax.plot(used_dict[key]["lat"], used_dict[key]["lon"], 'ro')
             ax.annotate(key, (used_dict[key]["lat"], used_dict[key]["lon"]),
                 textcoords="offset points", xytext=(0, 10), ha="center")
-            ax.add_patch(circle)
+            #ax.add_patch(circle)
 
         elif key in ap_dict:
             ax.plot(ap_dict[key]["lat"], ap_dict[key]["lon"], 'bo')
@@ -191,8 +193,9 @@ def visualise_trilateration(ap_reference, ap_dict, used_dict, location, error):
     x_padding = (max_lon - min_lon) * 0.2
     y_padding = (max_lat - min_lat) * 0.2
 
-    ax.set_ylim((min_lon - x_padding, max_lon + x_padding))
-    ax.set_xlim((min_lat - y_padding, max_lat + y_padding))
+
+    #ax.set_xlim((min_lon - x_padding, max_lon + x_padding))
+    #ax.set_ylim((min_lat - y_padding, max_lat + y_padding))
 
     # plot the user location, if valid
     if type(location) is LatLon:
