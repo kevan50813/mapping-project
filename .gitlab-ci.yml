@@ -15,6 +15,7 @@ cache:
   paths:
     - .cache/pip
     - $HOME/.npm/
+    - node_modules/
     - $HOME/.cache/pants/setup
     - $HOME/.cache/pants/named_caches
     - $HOME/.cache/pants/lmdb_store
