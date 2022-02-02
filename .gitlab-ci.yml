@@ -15,9 +15,9 @@ cache:
   paths:
     - .cache/pip
     - .npm/
-    - $HOME/.cache/pants/setup
-    - $HOME/.cache/pants/named_caches
-    - $HOME/.cache/pants/lmdb_store
+    - $PWD/.cache/pants/setup
+    - $PWD/.cache/pants/named_caches
+    - $PWD/.cache/pants/lmdb_store
 
 .dist-artifacts: &dist-artifacts
   after_script:
