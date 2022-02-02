@@ -141,18 +141,21 @@ def visualise_trilateration(ap_dict, location, error):
     :param error: The radius of the circle of expected error
     """
 
-    plt.axis('square')
+    #plt.axis('square')
 
-    img = plt.imread("Map1.jpeg")
-    fig, ax = plt.subplots()
-    x = range(300)
-    ax.imshow(img)
-    ax.imshow(img, extent=[0,400,0,300])
-    ax.plot(x,x, '--', linewidth=5, color='firebrick')
+    
 
     # setup axis to generic values
     fig, ax = plt.subplots()
     fig.tight_layout()
+
+    #add image to the background
+    img = plt.imread("Map1.jpeg")
+    ax.imshow(img)
+    
+    #flip the y axes so it ascends instead of descends
+    ax = plt.gca()
+    ax.set_ylim(ax.get_ylim()[::-1])
 
     # keep track of maximum and minimum lon and lat found, for drawing
     max_lat = -999
@@ -182,8 +185,8 @@ def visualise_trilateration(ap_dict, location, error):
     x_padding = (max_lon - min_lon) * 0.2
     y_padding = (max_lat - min_lat) * 0.2
 
-    ax.set_xlim((min_lon - x_padding, max_lon + x_padding))
-    ax.set_ylim((min_lat - y_padding, max_lat + y_padding))
+    #ax.set_xlim((min_lon - x_padding, max_lon + x_padding))
+    #ax.set_ylim((min_lat - y_padding, max_lat + y_padding))
 
     # plot the user location, if valid
     if type(location) is LatLon:
