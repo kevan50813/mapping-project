@@ -18,7 +18,7 @@ def trilaterate_triplet(ap_dict):
     for key in ap_dict:
 
         location = ap_dict[key]
-        pos.append(LatLon(location["latitude"], location["longitude"]))
+        pos.append(LatLon(location["lat"], location["lon"]))
 
         dist.append(ap_dict[key]["distance"])
 
@@ -130,29 +130,29 @@ def approximate_error(ap_dict, ap_dict, location):
     return math.sqrt(area / math.pi)
 
 '''
-def visualise_trilateration(ap_dict, location, error):
-    """ Given 3 access point locations and distances, and the position of the user, visualises them using pyplot
-    Note that the keys for the ap_triplet and distance_triplet dictionaries must be identical
+def visualise_trilateration(ap_reference, ap_dict, used_dict, location, error):
+    """
 
     X is longitude, Y is latitude
 
-    :param ap_dict: 3-length dictionary of access points' locations and distances
+    :param ap_ref: dictionary of ALL access points on current floor
+    :param ap_dict: dictionary of all scanned access points on current floor
+    :param used_dict: dictionary of the relevant access points used for trilateration
     :param location: LatLon of the user's predicted position
     :param error: The radius of the circle of expected error
     """
 
     plt.axis('square')
-
-    img = plt.imread("Map1.jpeg")
-    fig, ax = plt.subplots()
-    x = range(300)
-    ax.imshow(img)
-    ax.imshow(img, extent=[0,400,0,300])
-    ax.plot(x,x, '--', linewidth=5, color='firebrick')
+    plt.rcParams.update({'font.size': 5})
 
     # setup axis to generic values
     fig, ax = plt.subplots()
     fig.tight_layout()
+
+    img = plt.imread("Map1.jpeg")
+
+    x = range(300)
+    implot = ax.imshow(img)
 
     # keep track of maximum and minimum lon and lat found, for drawing
     max_lat = -999
@@ -160,30 +160,39 @@ def visualise_trilateration(ap_dict, location, error):
     min_lat = 999
     min_lon = 999
 
-    # iterate over both dictionaries in tandem
-    for key in ap_dict:
+    # iterate over the dictionary of points
+    for key in ap_reference:
 
-        max_lat = max(max_lat, ap_dict[key]["latitude"])
-        max_lon = max(max_lon, ap_dict[key]["longitude"])
-        min_lat = min(min_lat, ap_dict[key]["latitude"])
-        min_lon = min(min_lon, ap_dict[key]["longitude"])
+        max_lat = max(max_lat, ap_reference[key]["lat"])
+        max_lon = max(max_lon, ap_reference[key]["lon"])
+        min_lat = min(min_lat, ap_reference[key]["lat"])
+        min_lon = min(min_lon, ap_reference[key]["lon"])
 
-        # create a circle from the data given
-        # TODO - convert distance into somethign meaningful. right now plot is in lat/lon, making dist useless
-        circle = plt.Circle((ap_dict[key]["longitude"], ap_dict[key]["latitude"]), ap_dict[key]["distance"], fill=False)
+        if key in used_dict:
 
-        # plot center of circle, and add it to the plot
-        ax.plot(ap_dict[key]["longitude"], ap_dict[key]["latitude"], 'o')
-        ax.annotate(key, (ap_dict[key]["longitude"], ap_dict[key]["latitude"]),
-            textcoords="offset points", xytext=(0, 10), ha="center")
-        ax.add_patch(circle)
+            # create a circle from the data given
+            # TODO - convert distance into somethign meaningful. right now plot is in lat/lon, making dist useless
+            circle = plt.Circle((used_dict[key]["lat"], used_dict[key]["lon"]), used_dict[key]["distance"], fill=False)
+
+            # plot center of circle, and add it to the plot
+            ax.plot(used_dict[key]["lat"], used_dict[key]["lon"], 'ro')
+            ax.annotate(key, (used_dict[key]["lat"], used_dict[key]["lon"]),
+                textcoords="offset points", xytext=(0, 10), ha="center")
+            ax.add_patch(circle)
+
+        elif key in ap_dict:
+            ax.plot(ap_dict[key]["lat"], ap_dict[key]["lon"], 'bo')
+
+        else:
+            ax.plot(ap_reference[key]["lat"], ap_reference[key]["lon"], 'yo')
+
 
     # padding for around the APs, so they are not on the edge of the graph
     x_padding = (max_lon - min_lon) * 0.2
     y_padding = (max_lat - min_lat) * 0.2
 
-    ax.set_xlim((min_lon - x_padding, max_lon + x_padding))
-    ax.set_ylim((min_lat - y_padding, max_lat + y_padding))
+    ax.set_ylim((min_lon - x_padding, max_lon + x_padding))
+    ax.set_xlim((min_lat - y_padding, max_lat + y_padding))
 
     # plot the user location, if valid
     if type(location) is LatLon:
@@ -196,7 +205,9 @@ def visualise_trilateration(ap_dict, location, error):
         ax.add_patch(error_circle)
 
 
+
     plt.show()
+
 
 
 def print_representation(ap_dict, location, error):
@@ -229,13 +240,13 @@ if __name__ == "__main__":
 
     # sample data for quick dirty test
     ap_sample = {
-        "REF_1": {"ap_name": "ref1", "longitude": -1, "latitude": 1, "distance": 31 },
-        "REF_2": {"ap_name": "ref2", "longitude": -1.0001, "latitude": 1, "distance": 30 },
-        "REF_3": {"ap_name": "ref3", "longitude": -1, "latitude": 1.0001, "distance": 30 }
+        "REF_1": {"ap_name": "ref1", "lon": -1, "lat": 1, "distance": 31 },
+        "REF_2": {"ap_name": "ref2", "lon": -1.0001, "lat": 1, "distance": 30 },
+        "REF_3": {"ap_name": "ref3", "lon": -1, "lat": 1.0001, "distance": 30 }
     }
 
     err = None
     pos = trilaterate_triplet(ap_sample)
     #err = approximate_error(ap_sample, pos)
-    visualise_trilateration(ap_sample, pos, err)
+    visualise_trilateration(ap_sample, ap_sample, ap_sample, pos, err)
     print_representation(ap_sample, pos, err)

@@ -52,7 +52,7 @@ class AP_Parser():
 
             #store the info that is in the Json
             coord = feature["geometry"]["coordinates"]
-            mac = feature["properties"]["MacAddress"]
+            mac = feature["properties"]["MacAddress"].upper()   # force upper case for consistency
             ap = feature["properties"]["AP_Name"]
             lon = coord[0]
             lat = coord[1]

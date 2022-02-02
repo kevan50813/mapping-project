@@ -10,7 +10,7 @@ PRINT_REPR = True
 
 class AP_Processor:
 
-    def __init__(self):
+    def __init__(self, path):
 
         # dict will store networks in the following dict format:
         # { MAC_ADDRESS: {quality: <>, RSSI: <>, distance: <>, SSID: <>) }
@@ -19,7 +19,7 @@ class AP_Processor:
         self.network_dict = {}
 
         # list of networks in the building from AP_parser.py
-        parser = AP_Parser(AP_DATA_PATH)
+        parser = AP_Parser(path)
         parser.parse_ap_nodes()
         self.network_reference = parser.get_ap_nodes()
 
@@ -100,7 +100,7 @@ class AP_Processor:
 
             # will give the key for this dict entry - MAC address
             if "Cell " in line:
-                cur_key = line.split(": ")[1]
+                cur_key = line.split(": ")[1].upper()  # force upper for consistency
 
             # store ssid for adding to the dict later
             elif "SSID" in line:
@@ -133,8 +133,7 @@ class AP_Processor:
                     # TODO - do we throw an error here? should we handle this?
                     pass
 
-        self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[0][2]))
-
+        self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[1]["distance"]))
 
     def load_offline_data(self, path):
         """ Loads network data from .csv file for offline testing
@@ -153,7 +152,7 @@ class AP_Processor:
 
             # line is in form MAC,Quality,RSSI,Distance,SSID
             parts = line.split(",")
-            self.network_dict[parts[0]] = {
+            self.network_dict[parts[0].upper()] = {
                 "quality": parts[1],
                 "RSSI": parts[2],
                 "distance": parts[3],
@@ -163,7 +162,7 @@ class AP_Processor:
 
 if __name__ == "__main__":
 
-    local_test = AP_Processor()
+    local_test = AP_Processor(AP_DATA_PATH)
 
     if OFFLINE:
         local_test.load_offline_data(OFFLINE_PATH)
