@@ -3,10 +3,10 @@ import math
 
 from AP_parser import AP_Parser
 
-OFFLINE = True
+OFFLINE = False
 OFFLINE_PATH = "readings/studyroom_r1.csv"
 AP_DATA_PATH = "Wifi_Nodes.json"
-PRINT_REPR = False
+PRINT_REPR = True
 
 class Localisation:
 
@@ -31,9 +31,9 @@ class Localisation:
         :return out: string representation of the network dictionary
         """
 
-        out = "MAC,Quality,RSSI,Distance,SSID\n"
+        out = "MAC,  Quality,  RSSI,  Distance,  SSID\n"
         for key, value in self.network_dict.items():
-            out += f"{key},{value['quality']},{value['RSSI']},{value['distance']},{value['SSID']}\n"
+            out += f"{key},  {value['quality']},  {value['RSSI']},  {value['distance']},  {value['SSID']}\n"
 
         return out
 
@@ -79,6 +79,7 @@ class Localisation:
 
         # communicate output from the process
         self.process_output, error = proc.communicate()
+
 
     def process_network_data(self):
         """ Processes the raw data getting frm the network scan into meaningful information
@@ -132,7 +133,7 @@ class Localisation:
                     # TODO - do we throw an error here? should we handle this?
                     pass
 
-        self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[1][2]))
+        self.network_dict = dict(sorted(self.network_dict.items(), key=lambda item: item[0][2]))
 
 
     def load_offline_data(self, path):
@@ -170,8 +171,5 @@ if __name__ == "__main__":
         local_test.run_process()
         local_test.process_network_data()
 
-    print(repr(local_test))
-
-
-    with open("readings/nearlift_r3.csv", 'w') as f:
-        f.write(repr(local_test))
+    if PRINT_REPR:
+        print(repr(local_test))

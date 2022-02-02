@@ -189,12 +189,12 @@ def visualise_trilateration(ap_dict, location, error):
     if type(location) is LatLon:
         ax.plot(location.lon, location.lat, 'x')
 
-    """
-    TODO - wait for new error calculation before plotting
+
+    # TODO - wait for new error calculation before plotting
     if error is not None and error > 0:
         error_circle = plt.Circle((location[0], location[1]), error, fill=False, color="red")
         ax.add_patch(error_circle)
-        """
+
 
     plt.show()
 
