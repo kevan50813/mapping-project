@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {Button, StyleSheet} from 'react-native';
-import { // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
-  ViroARScene,
-  ViroText,
-  ViroConstants,
-  ViroARSceneNavigator,
-  ViroBox
-} from '@viro-community/react-viro';
-
+// import {
+//   // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
+//   ViroARScene,
+//   ViroText,
+//   ViroConstants,
+//   ViroARSceneNavigator,
+//   ViroBox,
+// } from '@viro-community/react-viro';
 
 /* COMMETED OUT UNTIL WE NEED AR STUFF
 // all AR related stuff from vriomidea timeplate
@@ -22,7 +22,7 @@ const InitialScene=()=>{
       style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
           <ViroBox
-          height={2} // for creating a 3D cube that is 2 x 2 x 2 
+          height={2} // for creating a 3D cube that is 2 x 2 x 2
           length={2}
           width={2}
           position={[0,0,0]}
