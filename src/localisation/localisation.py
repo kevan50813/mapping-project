@@ -34,6 +34,12 @@ class Localisation():
         self.scanned_ap = self.ap_processor.network_dict
 
 
+    def load_offline_data(self, path):
+        self.ap_processor.load_offline_data(path)
+
+        self.scanned_ap = self.ap_processor.network_dict
+
+
     def compare_ap_data(self):
 
         # reset dict
@@ -41,8 +47,6 @@ class Localisation():
 
         # for every scanned access point
         for key in self.scanned_ap:
-
-            print(key)
 
             # we asserted earlier all keys are upper case
 
@@ -60,16 +64,19 @@ class Localisation():
     # large control function for trilaterion is general
     def perform_trilateration(self):
 
+        if len(self.ap_dict) < 3:
+            print("ERR: Not enough network data. Skipping...")
+            return
+
         # choose which 3 aps to use
         tri = Trilateration_Heuristics()
         used_dict = tri.first_three(self.ap_dict)
 
-        print(used_dict)
 
-        # visualise! temp
-
+        # visualise! temporary
         err = None
         pos = trilaterate_triplet(used_dict)
+        print(pos)
         # err = approximate_error(ap_sample, pos)
         visualise_trilateration(self.ap_reference, self.ap_dict, used_dict, pos, err)
 
@@ -96,8 +103,14 @@ class Localisation():
 
 if __name__ == "__main__":
 
+    OFFLINE = True
+    OFFLINE_PATH = "readings/studyroom_r1.csv"
+
     local = Localisation()
-    local.execute_scan()
+    if not OFFLINE:
+        local.execute_scan()
+    else:
+        local.load_offline_data(OFFLINE_PATH)
     local.compare_ap_data()
 
     local.perform_trilateration()

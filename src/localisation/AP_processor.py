@@ -155,7 +155,7 @@ class AP_Processor:
             self.network_dict[parts[0].upper()] = {
                 "quality": parts[1],
                 "RSSI": parts[2],
-                "distance": parts[3],
+                "distance": float(parts[3]),
                 "SSID": parts[4]
             }
 

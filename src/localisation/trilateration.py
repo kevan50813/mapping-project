@@ -31,9 +31,11 @@ def trilaterate_triplet(ap_dict):
         # non-intersection
         return -1
 
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as e:
         # error with values
         # TODO - handle this in a different way
+        print("ERR: Unknown exception")
+        print(repr(e))
         return -1
 
 '''
@@ -199,7 +201,7 @@ def visualise_trilateration(ap_reference, ap_dict, used_dict, location, error):
 
     # plot the user location, if valid
     if type(location) is LatLon:
-        ax.plot(location.lon, location.lat, 'x')
+        ax.plot(location.lat, location.lon, 'x')
 
 
     # TODO - wait for new error calculation before plotting
