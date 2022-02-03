@@ -1,0 +1,21 @@
+[GLOBAL]
+# Colors often work in CI, but the shell is usually not a TTY so Pants 
+# doesn't attempt to use them by default.
+colors = true
+
+[flake8]
+args = ["--output-file=reports/report.txt"]
+
+[test]
+use_coverage = true
+
+[coverage-py]
+filter = "src"
+report = ["xml"]
+global_report = true
+
+[pytest]
+args = ["-vv", "--no-header"]
+
+[docker]
+env_vars = ["DOCKER_HOST=tcp://dockerdaemon:2375/"]

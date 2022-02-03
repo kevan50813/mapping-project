@@ -46,11 +46,8 @@ type Node {
     level: Float!
     lat: Float!
     lon: Float!
-
-    # TODO
     polygon: Polygon
-
-    tags: String!
+    tags: Tags
     neighbours: [Node!]
 }
 
@@ -61,7 +58,7 @@ type Polygon {
     sw: [Float!]!
     ne: [Float!]!
     vertices: [[Float!]!]!
-    tags: String!
+    tags: Tags
 }
 
 type PoI {
@@ -70,7 +67,7 @@ type PoI {
     level: Float!
     lat: Float!
     lon: Float!
-    tags: String!
+    tags: Tags
     nearest_path_node: Node
 }
 
@@ -90,3 +87,5 @@ type Edge {
     # two node objects (so there doesn't need to be two lookups)
     adjacent_nodes: [Node!]!
 }
+
+scalar Tags
