@@ -9,11 +9,12 @@ import { // evyrhing from viro, genraly if soemthing is missing and its viro rel
 } from '@viro-community/react-viro';
 
 
-
+/* COMMETED OUT UNTIL WE NEED AR STUFF
 // all AR related stuff from vriomidea timeplate
 const InitialScene=()=>{
   //equivlent of a view in a 2d scene
   return(
+    // anything that is required to be in 3D soace gose in the <ViroARScene> tag
    <ViroARScene>
       <ViroText // exsmaple of text
       text={"Hello World"}
@@ -21,7 +22,7 @@ const InitialScene=()=>{
       style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
           <ViroBox
-          height={2} // for creating a 3D cube
+          height={2} // for creating a 3D cube that is 2 x 2 x 2 
           length={2}
           width={2}
           position={[0,0,0]}
@@ -53,3 +54,4 @@ var styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+*/
