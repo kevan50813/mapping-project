@@ -1,14 +1,10 @@
-import React, {useState} from 'react';
-import QueryTest from './TestQueries/QueryTest'
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-} from "@apollo/client";
+import React from 'react';
+import QueryTest from './TestQueries/QueryTest';
+import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
 
 const client = new ApolloClient({
   uri: 'http://192.168.0.36:8888',
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
 });
 
 export default function App() {
@@ -16,7 +12,7 @@ export default function App() {
     <ApolloProvider client={client}>
       <QueryTest />
     </ApolloProvider>
-  )
+  );
 }
 
 // import {

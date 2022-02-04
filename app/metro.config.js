@@ -6,7 +6,7 @@
  */
 
 const {getDefaultConfig} = require('metro-config');
-const { resolver: defaultResolver } = getDefaultConfig.getDefaultValues();
+const {resolver: defaultResolver} = getDefaultConfig.getDefaultValues();
 
 module.exports = (async () => {
   const {
@@ -36,10 +36,7 @@ module.exports = (async () => {
         'arobject',
         'gif',
       ],
-      sourceExts: [
-        ...defaultResolver.sourceExts,
-        "cjs",
-      ],      
+      sourceExts: [...defaultResolver.sourceExts, 'cjs'],
     },
   };
 })();
