@@ -11,8 +11,10 @@
     "lint_junit": "eslint --format junit . > ../junit.xml"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.8",
     "@viro-community/react-viro": "^2.20.2",
     "fsevents": "^2.3.2",
+    "graphql": "^16.3.0",
     "react": "17.0.2",
     "react-native": "0.65.1"
   },

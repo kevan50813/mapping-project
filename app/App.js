@@ -1,5 +1,24 @@
 import React, {useState} from 'react';
-import {Button, StyleSheet} from 'react-native';
+import QueryTest from './TestQueries/QueryTest'
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+} from "@apollo/client";
+
+const client = new ApolloClient({
+  uri: 'http://192.168.0.36:8888',
+  cache: new InMemoryCache()
+});
+
+export default function App() {
+  return (
+    <ApolloProvider client={client}>
+      <QueryTest />
+    </ApolloProvider>
+  )
+}
+
 // import {
 //   // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
 //   ViroARScene,
