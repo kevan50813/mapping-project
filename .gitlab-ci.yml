@@ -92,7 +92,8 @@ package:
     DOCKER_HOST: tcp://dockerdaemon:2375/
     DOCKER_TLS_CERTDIR: ""
   only:
-    - main
+    refs:
+      - main
     changes:
       - server/
       - Dockerfile
