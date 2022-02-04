@@ -93,6 +93,11 @@ package:
     DOCKER_TLS_CERTDIR: ""
   only:
     - main
+    changes:
+      - server/
+      - Dockerfile
+      - BUILD
+      - pants.*
   before_script:
     - ./pants --version
   script:

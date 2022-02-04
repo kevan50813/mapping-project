@@ -15,11 +15,11 @@ tag. You will have to login `docker login registry.gitlab.com` if you want to
 use the CI builds.
 
 ## Running the app for development
-running the App on your phone in devloper mode:
+Running the App on your phone in developer mode:
+1) Follow the instructions on this link: https://reactnative.dev/docs/running-on-device for install set up with phone etc..
 
-1) follow the instectuins on this link : https://reactnative.dev/docs/running-on-device for instal set up with phone etc..
-    EACH TIME YOU WISH TO RUN THE APP AFTER STEP 1 DO THE FOLLOWING
-2) open 2 sperate terminals
-3) form terminal 1. run npm start and form 2. run react-native run-android ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
-4) allow the app to install 
-5) run the app 
+EACH TIME YOU WISH TO RUN THE APP AFTER STEP 1 DO THE FOLLOWING
+2) Open 2 separate terminals
+3) From terminal 1. `run npm start` and from 2. `run react-native run-android` ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
+4) Allow the app to install 
+5) Run the app 
