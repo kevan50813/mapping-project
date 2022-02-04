@@ -16,10 +16,12 @@ use the CI builds.
 
 ## Running the app for development
 Running the App on your phone in developer mode:
-1) Follow the instructions on this link: https://reactnative.dev/docs/running-on-device for install set up with phone etc..
+1. Follow these instructions: https://reactnative.dev/docs/environment-setup
+2. Follow the instructions on this link: https://reactnative.dev/docs/running-on-device for install set up with phone etc..
+Problem I had: Java 17 isn't supported: use Java 11
 
 EACH TIME YOU WISH TO RUN THE APP AFTER STEP 1 DO THE FOLLOWING
-2) Open 2 separate terminals
-3) From terminal 1. `run npm start` and from 2. `run react-native run-android` ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
-4) Allow the app to install 
-5) Run the app 
+3. Open 2 separate terminals
+4. From terminal 1. `run npm start` and from 2. `run react-native run-android` ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
+5. Allow the app to install 
+6. Run the app 
