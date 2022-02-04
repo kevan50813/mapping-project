@@ -1,16 +1,19 @@
 import React from 'react';
+import {View} from 'react-native';
 import QueryTest from './TestQueries/QueryTest';
 import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
 
 const client = new ApolloClient({
-  uri: 'http://192.168.0.36:8888',
+  uri: 'http://192.168.0.36:80',
   cache: new InMemoryCache(),
 });
 
 export default function App() {
   return (
     <ApolloProvider client={client}>
-      <QueryTest />
+      <View style={{flex: 1}}>
+        <QueryTest />
+      </View>
     </ApolloProvider>
   );
 }
