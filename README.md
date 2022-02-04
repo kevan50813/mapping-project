@@ -21,6 +21,7 @@ Running the App on your phone in developer mode:
 Problem I had: Java 17 isn't supported: use Java 11
 
 EACH TIME YOU WISH TO RUN THE APP AFTER STEP 1 DO THE FOLLOWING
+
 3. Open 2 separate terminals
 4. From terminal 1. `run npm start` and from 2. `run react-native run-android` ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
 5. Allow the app to install 
