@@ -1,52 +1,69 @@
-import React, {useState} from 'react';
+import React, { Component } from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import {PermissionsAndroid} from 'react-native';
-import {WifiManager} from 'react-native-wifi-reborn';
-
-const getPermission = async () => {
-
-    const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-            title: 'title',
-            message: 'message',
-            buttonNegative: 'DENY',
-            buttonPositive: 'ALLOW',
-        }
-    );
-
-    console.log("granted:" + granted);
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        // not cry
-        console.log("access allowed");
+import WifiManager from 'react-native-wifi-reborn';
 
 
-        WifiManager.getCurrentWifiSSID().then(
+class Localisation extends Component {
 
-            ssid => {
-                console.log("ssid is " + ssid);
-            },
-            () => {
-                console.log("ssid doesnt exist");
+    state = {
+        debugList: []
+    };
+
+    getPermission = async () => {
+
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+                title: 'title',
+                message: 'message',
+                buttonNegative: 'DENY',
+                buttonPositive: 'ALLOW',
             }
+        );
 
-        )
+        console.log("granted:" + granted);
 
-
-
-    } else {
-        console.log("denied");
-    }
-};
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            // not cry
+            console.log("access allowed");
 
 
-export default () => {
+            WifiManager.loadWifiList().then(
 
-        let granted = "text test";
+                list => {
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].SSID)
+                    }
+                    this.setState({
+                        debugList: list
+                    })
+                },
+                () => {
+                    console.log("list couldnt be loaded");
+                }
+
+            )
+
+
+
+        } else {
+            console.log("denied");
+        }
+    };
+
+
+    render () {
+
+        const listAP = this.state.debugList.map(elem => {
+            return (
+                <Text key={elem.BSSID}>{elem.SSID} {elem.BSSID} {elem.frequency}</Text>
+            )
+        });
+
 
         return(
-            //used for rendering all AR things
+
             <View
                 style={{
                     flex: 1,
@@ -54,13 +71,14 @@ export default () => {
                     alignItems: "center",
                     fontSize: 10
                 }}>
-                <Button title="Request Permissions" onPress={getPermission} />
-                <Text>{granted}</Text>
+                <Button title="Request Permissions" onPress={this.getPermission} />
+                {listAP}
             </View>
         );
-};
+    };
+}
 
-
+export default Localisation;
 
 
 
