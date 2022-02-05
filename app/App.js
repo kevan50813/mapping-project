@@ -1,5 +1,73 @@
 import React, {useState} from 'react';
-import {Button, StyleSheet} from 'react-native';
+import {Button, StyleSheet, Text, View} from 'react-native';
+import {PermissionsAndroid} from 'react-native';
+
+
+const getPermission = async () => {
+
+    const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+            title: 'Awooga',
+            message: 'woof woof bark woof bark',
+            buttonNegative: 'DENY',
+            buttonPositive: 'ALLOW',
+        }
+    );
+
+    console.log("granted:" + granted);
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // not cry S
+        console.log("access allowed");
+    } else {
+        console.log("denied lol");
+    }
+};
+
+
+export default () => {
+
+        let granted = "awa";
+
+        async function main() {
+            granted = await getPermission();
+        }
+
+
+        return(
+            //used for rendering all AR things
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontSize: 10
+                }}>
+                <Button title="Request Permissions" onPress={getPermission} />
+                <Text>{granted}</Text>
+            </View>
+        );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // import {
 //   // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
 //   ViroARScene,
@@ -31,6 +99,8 @@ const InitialScene=()=>{
   );
 };
 
+
+
 export default () => {
     return(
       //used for rendering all AR things
@@ -42,6 +112,7 @@ export default () => {
       />
     );
 };
+
 
 //creats a style sheet that is used for styling the text etc...
 var styles = StyleSheet.create({
