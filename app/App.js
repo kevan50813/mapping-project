@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import {PermissionsAndroid} from 'react-native';
-
+import {WifiManager} from 'react-native-wifi-reborn';
 
 const getPermission = async () => {
 
     const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-            title: 'Awooga',
-            message: 'woof woof bark woof bark',
+            title: 'title',
+            message: 'message',
             buttonNegative: 'DENY',
             buttonPositive: 'ALLOW',
         }
@@ -18,22 +18,32 @@ const getPermission = async () => {
     console.log("granted:" + granted);
 
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        // not cry S
+        // not cry
         console.log("access allowed");
+
+
+        WifiManager.getCurrentWifiSSID().then(
+
+            ssid => {
+                console.log("ssid is " + ssid);
+            },
+            () => {
+                console.log("ssid doesnt exist");
+            }
+
+        )
+
+
+
     } else {
-        console.log("denied lol");
+        console.log("denied");
     }
 };
 
 
 export default () => {
 
-        let granted = "awa";
-
-        async function main() {
-            granted = await getPermission();
-        }
-
+        let granted = "text test";
 
         return(
             //used for rendering all AR things
