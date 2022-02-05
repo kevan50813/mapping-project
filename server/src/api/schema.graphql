@@ -1,0 +1,91 @@
+type Query {
+    # ------------------------------------------------------------
+    # nodes
+    # ------------------------------------------------------------
+    # node by ID
+    node (graph: String!, id: Int!): Node
+
+    # dump all nodes
+    nodes (graph: String!): [Node!]
+    # Search for node with string
+    search_nodes (graph: String!, search: String!): [Node!]
+
+    # ------------------------------------------------------------
+    # edges
+    # ------------------------------------------------------------
+    edges (graph: String!): [Edge!]
+
+    # ------------------------------------------------------------
+    # pois
+    # ------------------------------------------------------------
+    poi (graph:String!, id: Int!): PoI
+    pois (graph: String!): [PoI!]
+    search_pois (search: String!): [PoI!]
+    #TODO
+    search_pois_in_graph (graph: String!, search: String!): [PoI!]
+
+    # ------------------------------------------------------------
+    # polygons
+    # ------------------------------------------------------------
+    polygon (graph:String!, id: Int!): Polygon 
+    polygons (graph: String!): [Polygon!]
+    search_polygons (graph: String!, search: String!): [Polygon!]
+
+    # ------------------------------------------------------------
+    # utility
+    # ------------------------------------------------------------
+    # Load the graph given a lat and lon
+    graph (lat: Float!, lon: Float!): String
+    # Find a route from start to end
+    find_route (graph: String!, start_id: Int!, end_id: Int!): Path!
+}
+
+type Node {
+    id: Int!
+    graph: String!
+    level: Float!
+    lat: Float!
+    lon: Float!
+    polygon: Polygon
+    tags: Tags
+    neighbours: [Node!]
+}
+
+type Polygon {
+    id: Int!
+    graph: String!
+    level: Float!
+    sw: [Float!]!
+    ne: [Float!]!
+    vertices: [[Float!]!]!
+    tags: Tags
+}
+
+type PoI {
+    id: Int!
+    graph: String!
+    level: Float!
+    lat: Float!
+    lon: Float!
+    tags: Tags
+    nearest_path_node: Node
+}
+
+type Path {
+    ids: [Int!]!
+    nodes: [Node!]!
+    instructions: [String!]!
+    # List of floors spanned, for downloading the 
+    # graph on those floors
+    levels: [Float!]!
+}
+
+# TODO
+type Edge {
+    edge: [Int!]!
+    graph: String!
+    # two node objects (so there doesn't need to be two lookups)
+    adjacent_nodes: [Node!]!
+}
+
+scalar Tags
