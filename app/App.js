@@ -6,18 +6,23 @@ import WifiManager from 'react-native-wifi-reborn';
 
 class Localisation extends Component {
 
+    /**
+     * List of states used by this component
+     *
+     * @type {{networkList: Array}} - List of networks scanned
+     */
     state = {
         networkList: []
     };
 
+    /**
+     * Converts RSSI to distance. This calculation is not bounded.
+     * Please note parameters need substantial tuning for good results.
+     *
+     * @param {number} RSSI - Signal strength of input number
+     * @returns {number} distance - Distance of AP derived from RSSI
+     */
     static RSSItoDistance(RSSI) {
-
-        /* Converts RSSI to distance. This calculation is not bounded.
-        Please note parameters need substantial tuning for good results.
-
-            :param rssi: the RSSI of the given access point
-            :return: the predicted distance to the access point
-        */
 
         // RSSI = -10 * n * log(d) + A
         let a = -50;    // signal strength at 1m
@@ -27,20 +32,25 @@ class Localisation extends Component {
 
     }
 
-    getPermission = async () => {
+    /**
+     * Performs scans for nearby networks using WifiManager, after checking
+     * the application has permission to do so. If it does not, permission is
+     * asked for and obtained inside this function.
+     */
+    doScan = async () => {
 
-
-
+        // ask for permission
         const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
             {
-                title: 'title',
-                message: 'message',
+                title: 'title',     // TODO - update title
+                message: 'message', // TODO - update message
                 buttonNegative: 'DENY',
                 buttonPositive: 'ALLOW',
             }
         );
 
+        // only proceed if we have permission
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
 
             // reset list of detected networks
@@ -53,11 +63,13 @@ class Localisation extends Component {
             // TODO - rescan or load? overhead vs accurate data...
             WifiManager.reScanAndLoadWifiList().then(
 
+
+                // if fulfilled, we have an array of WifiEntry objects
                 list => {
 
                     console.log("scan ended");
 
-                    // set distance from each AP
+                    // set distance from each AP - added onto the WifiEntry
                     for (let i = 0; i < list.length; i++)
                         list[i].distance = Localisation.RSSItoDistance(list[i].level);
 
@@ -72,25 +84,38 @@ class Localisation extends Component {
                     });
                 },
 
+                // TODO - handle errors in the scan
                 () => {
                     console.log("scan failed");
                 }
             )
 
         } else {
+
+            // TODO - handle rejection :(
             console.log("denied permissions");
         }
     };
 
 
+    /**
+     * Render networks to screen - temporary for testing/demoing
+     */
     render () {
 
+        /**
+         * Iterates through network list object, allowing each to be printed
+         * via a react-native <Text/> entry
+         *
+         * @returns - Series of text entries, one for each network
+         */
         const listAP = this.state.networkList.map(elem => {
             return (
                 <Text style={{fontFamily: "monospace", fontSize: 9}} key={elem.BSSID}> {elem.SSID.padEnd(15, " ")} | {elem.BSSID} | {elem.level} | {('' + elem.distance.toPrecision(8)).padEnd(8)} | {elem.frequency} </Text>
             )
         });
 
+        // parent display function
         return(
 
             <View
@@ -98,7 +123,7 @@ class Localisation extends Component {
                     flex: 1,
                     justifyContent: "center",
                 }}>
-                <Button title="Request Permissions" onPress={this.getPermission} />
+                <Button title="Request Permissions" onPress={this.doScan} />
                 <Text style={{fontFamily: "monospace", fontSize: 9}} key="header"> {"SSID".padEnd(15, " ")} | {"BSSID/MAC".padEnd(17)} | dBm | Distance | Frequency</Text>
                 {listAP}
             </View>
