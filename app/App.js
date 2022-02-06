@@ -4,30 +4,33 @@
  */
 
 import * as React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Button, Separator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {View, StyleSheet, SafeAreaView, Button} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
 import QueryTest from './TestQueries/QueryTest';
- 
+
 const Stack = createStackNavigator();
 const client = new ApolloClient({
   uri: 'http://192.168.0.36:80',
   cache: new InMemoryCache(),
 });
 
-function Query({ navigation }) {
+function Query({navigation}) {
   return (
-    <ApolloProvider client={client}>
-      <Button title="HomeScreen" onPress={() => navigation.navigate("HomeScreen")} />
-      <View style={{flex: 1}}>
+    <>
+      <Button
+        title="HomeScreen"
+        onPress={() => navigation.navigate('HomeScreen')}
+      />
+      <ApolloProvider client={client}>
         <QueryTest />
-      </View>
-    </ApolloProvider>
+      </ApolloProvider>
+    </>
   );
 }
 
-function HomeScreen({ navigation }) {
+function HomeScreen({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -36,7 +39,7 @@ function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate('Query')}
         />
       </View>
-  </SafeAreaView>
+    </SafeAreaView>
   );
 }
 
@@ -52,24 +55,24 @@ function App() {
 }
 
 const styles = StyleSheet.create({
-container: {
-  flex: 1,
-  justifyContent: 'center',
-  marginHorizontal: 16,
-},
-title: {
-  textAlign: 'center',
-  marginVertical: 8,
-},
-fixToText: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-},
-separator: {
-  marginVertical: 8,
-  borderBottomColor: '#737373',
-  borderBottomWidth: StyleSheet.hairlineWidth,
-},
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: 16,
+  },
+  title: {
+    textAlign: 'center',
+    marginVertical: 8,
+  },
+  fixToText: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  separator: {
+    marginVertical: 8,
+    borderBottomColor: '#737373',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
 });
 
 export default App;

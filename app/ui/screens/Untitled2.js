@@ -1,14 +1,14 @@
-import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 
 function Untitled2(props) {
-  return <View style={styles.container}></View>;
+  return <View style={styles.container} />;
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 export default Untitled2;
