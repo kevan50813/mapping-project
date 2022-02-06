@@ -228,7 +228,7 @@ const InitialScene=()=>{
       style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
           <ViroBox
-          height={2} // for creating a 3D cube that is 2 x 2 x 2 
+          height={2} // for creating a 3D cube that is 2 x 2 x 2
           length={2}
           width={2}
           position={[0,0,0]}
