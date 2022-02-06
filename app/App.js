@@ -3,76 +3,105 @@
  * @flow strict-local
  */
 
-import * as React from 'react';
-import {View, StyleSheet, SafeAreaView, Button} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
-import QueryTest from './TestQueries/QueryTest';
+ import * as React from 'react';
+ import { View, Text, StyleSheet, SafeAreaView, Button, Separator } from 'react-native';
+ import { NavigationContainer } from '@react-navigation/native';
+ import { createStackNavigator } from '@react-navigation/stack';
+ import { HomeScreen } from './screens/HomeScreen.js';
+ import { MapScreen } from './screens/MapScreen.js';
+ import { ServerScreen } from './screens/ServerScreen.js';
+ import { LocalizationScreen } from './screens/LocalizationScreen.js';
+ 
+ const Stack = createStackNavigator();
+ 
+ function App() {
+   return (
+     <NavigationContainer>
+       <Stack.Navigator initialRouteName="Home">
+         <Stack.Screen name="Home" component={HomeScreen} />
+         <Stack.Screen name="Localization" component={LocalizationScreen} />
+         <Stack.Screen name="Mapping" component={MapScreen} />
+         <Stack.Screen name="Server" component={ServerScreen} />
+       </Stack.Navigator>
+     </NavigationContainer>
+   );
+ }
+ 
+ export default App;
+ 
 
-const Stack = createStackNavigator();
-const client = new ApolloClient({
-  uri: 'http://192.168.0.36:80',
-  cache: new InMemoryCache(),
-});
-
-function Query({navigation}) {
-  return (
-    <>
-      <Button
-        title="HomeScreen"
-        onPress={() => navigation.navigate('HomeScreen')}
+ /*
+ const Separator = () => (
+   <View style={styles.separator} />
+ );
+ 
+ const App = () => (
+   <SafeAreaView style={styles.container}>
+     <View>
+       <Button
+         title="localization"
+         onPress={() => Alert.alert('Simple Button pressed')}
+       />
+     </View>
+     <Separator />
+     <View>
+       <Button
+         title="mapping"
+         onPress={() => Alert.alert('Simple Button pressed')}
+       />
+     </View>
+     <Separator />
+     <View>
+       <Button
+         title="server"
+         onPress={() => Alert.alert('Simple Button pressed')}
+       />
+     </View>
+   </SafeAreaView>
+ );
+ 
+ const styles = StyleSheet.create({
+   container: {
+     flex: 1,
+     justifyContent: 'center',
+     marginHorizontal: 16,
+   },
+   title: {
+     textAlign: 'center',
+     marginVertical: 8,
+   },
+   fixToText: {
+     flexDirection: 'row',
+     justifyContent: 'space-between',
+   },
+   separator: {
+     marginVertical: 8,
+     borderBottomColor: '#737373',
+     borderBottomWidth: StyleSheet.hairlineWidth,
+   },
+ });
+ 
+ export default App;*/
+/* COMMETED OUT UNTIL WE NEED AR STUFF
+// all AR related stuff from vriomidea timeplate
+const InitialScene=()=>{
+  //equivlent of a view in a 2d scene
+  return(
+    // anything that is required to be in 3D soace gose in the <ViroARScene> tag
+   <ViroARScene>
+      <ViroText // exsmaple of text
+      text={"Hello World"}
+      position={[-2,-5,-1]}
+      style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
-      <ApolloProvider client={client}>
-        <QueryTest />
-      </ApolloProvider>
-    </>
-  );
-}
-
-function HomeScreen({navigation}) {
-  return (
-    <SafeAreaView style={styles.container}>
-      <View>
-        <Button
-          title="Query Test"
-          onPress={() => navigation.navigate('Query')}
+          <ViroBox
+          height={2} // for creating a 3D cube that is 2 x 2 x 2 
+          length={2}
+          width={2}
+          position={[0,0,0]}
         />
-      </View>
-    </SafeAreaView>
+     </ViroARScene>
   );
-}
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="Query" component={Query} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    marginHorizontal: 16,
-  },
-  title: {
-    textAlign: 'center',
-    marginVertical: 8,
-  },
-  fixToText: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-});
+};
 
 export default App;
