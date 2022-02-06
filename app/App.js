@@ -1,16 +1,4 @@
-//import React, {useState} from 'react';
-//import {Button, StyleSheet} from 'react-native';
-/*import { // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
-  ViroARScene,
-  ViroText,
-  ViroConstants,
-  ViroARSceneNavigator,
-  ViroBox
-} from '@viro-community/react-viro';*/
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
  * @format
  * @flow strict-local
  */
@@ -116,27 +104,4 @@ const InitialScene=()=>{
   );
 };
 
-export default () => {
-    return(
-      //used for rendering all AR things
-      <ViroARSceneNavigator
-        initialScene={{
-          scene:InitialScene
-        }}
-        styles={{flex:1}}
-      />
-    );
-};
-
-//creats a style sheet that is used for styling the text etc...
-var styles = StyleSheet.create({
-  f1: {flex: 1},
-  helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 30,
-    color: '#ffffff',
-    textAlignVertical: 'center',
-    textAlign: 'center',
-  },
-});
-*/
+export default App;

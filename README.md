@@ -13,3 +13,16 @@ currently on `git rev-parse --short HEAD`
 Use the docker-compose.yml file as a template to run this image with your own
 tag. You will have to login `docker login registry.gitlab.com` if you want to
 use the CI builds.
+
+## Running the app for development
+Running the App on your phone in developer mode:
+1. Follow these instructions: https://reactnative.dev/docs/environment-setup
+2. Follow the instructions on this link: https://reactnative.dev/docs/running-on-device for install set up with phone etc..
+Problem I had: Java 17 isn't supported: use Java 11
+
+EACH TIME YOU WISH TO RUN THE APP AFTER STEP 1 DO THE FOLLOWING
+
+3. Open 2 separate terminals
+4. From terminal 1. `run npm start` and from 2. `run react-native run-android` ENSURE YOUR PHONE IS PLUGGED INTO YOUR PC AND IS IN DEVELOPER MODE
+5. Allow the app to install 
+6. Run the app 
