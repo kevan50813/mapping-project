@@ -1,16 +1,25 @@
-import React from 'react';
-import {View} from 'react-native';
-import QueryTest from './TestQueries/QueryTest';
-import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
+/**
+ * @format
+ * @flow strict-local
+ */
 
+import * as React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, Button, Separator } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
+import QueryTest from './TestQueries/QueryTest';
+ 
+const Stack = createStackNavigator();
 const client = new ApolloClient({
   uri: 'http://192.168.0.36:80',
   cache: new InMemoryCache(),
 });
 
-export default function App() {
+function Query({ navigation }) {
   return (
     <ApolloProvider client={client}>
+      <Button title="Home" onPress={() => navigation.navigate("HomeScreen")} />
       <View style={{flex: 1}}>
         <QueryTest />
       </View>
@@ -18,58 +27,49 @@ export default function App() {
   );
 }
 
-// import {
-//   // evyrhing from viro, genraly if soemthing is missing and its viro related add it here
-//   ViroARScene,
-//   ViroText,
-//   ViroConstants,
-//   ViroARSceneNavigator,
-//   ViroBox,
-// } from '@viro-community/react-viro';
-
-/* COMMETED OUT UNTIL WE NEED AR STUFF
-// all AR related stuff from vriomidea timeplate
-const InitialScene=()=>{
-  //equivlent of a view in a 2d scene
-  return(
-    // anything that is required to be in 3D soace gose in the <ViroARScene> tag
-   <ViroARScene>
-      <ViroText // exsmaple of text
-      text={"Hello World"}
-      position={[-2,-5,-1]}
-      style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
-      />
-          <ViroBox
-          height={2} // for creating a 3D cube that is 2 x 2 x 2
-          length={2}
-          width={2}
-          position={[0,0,0]}
+function HomeScreen({ navigation }) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View>
+        <Button
+          title="Query Test"
+          onPress={() => navigation.navigate('Query')}
         />
-     </ViroARScene>
+      </View>
+  </SafeAreaView>
   );
-};
+}
 
-export default () => {
-    return(
-      //used for rendering all AR things
-      <ViroARSceneNavigator
-        initialScene={{
-          scene:InitialScene
-        }}
-        styles={{flex:1}}
-      />
-    );
-};
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Query Test" component={Query} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
-//creats a style sheet that is used for styling the text etc...
-var styles = StyleSheet.create({
-  f1: {flex: 1},
-  helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 30,
-    color: '#ffffff',
-    textAlignVertical: 'center',
-    textAlign: 'center',
-  },
+const styles = StyleSheet.create({
+container: {
+  flex: 1,
+  justifyContent: 'center',
+  marginHorizontal: 16,
+},
+title: {
+  textAlign: 'center',
+  marginVertical: 8,
+},
+fixToText: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+},
+separator: {
+  marginVertical: 8,
+  borderBottomColor: '#737373',
+  borderBottomWidth: StyleSheet.hairlineWidth,
+},
 });
-*/
+
+export default App;
