@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {useQuery, gql} from '@apollo/client';
+import { useQuery, gql } from '@apollo/client';
 
 var styles = StyleSheet.create({
   input: {
@@ -40,14 +40,16 @@ const POLYGONS = gql`
   }
 `;
 
-const Item = ({text, onPress, backgroundColor}) => (
+const Item = ({ text, onPress, backgroundColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     <Text style={styles.text}>{text}</Text>
   </TouchableOpacity>
 );
 
 function Polygons(search) {
-  const {loading, error, data} = useQuery(POLYGONS, {variables: {search}});
+  const { loading, error, data } = useQuery(POLYGONS, {
+    variables: { search },
+  });
   if (loading) {
     return ['Loading...'];
   }
@@ -82,7 +84,7 @@ export default function QueryTest() {
       <Item
         text={text}
         onPress={() => setSelectedId(obj_data.id)}
-        backgroundColor={{backgroundColor}}
+        backgroundColor={{ backgroundColor }}
       />
     );
   }

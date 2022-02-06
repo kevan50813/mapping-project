@@ -4,10 +4,10 @@
  */
 
 import * as React from 'react';
-import {View, StyleSheet, SafeAreaView, Button} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
+import { View, StyleSheet, SafeAreaView, Button } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import QueryTest from './TestQueries/QueryTest';
 
 const Stack = createStackNavigator();
@@ -16,7 +16,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-function Query({navigation}) {
+function Query({ navigation }) {
   return (
     <>
       <Button
@@ -30,7 +30,7 @@ function Query({navigation}) {
   );
 }
 
-function HomeScreen({navigation}) {
+function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View>
