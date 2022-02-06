@@ -80,6 +80,8 @@ pytest:
       junit: dist/coverage/python/coverage.xml
 
 package:
+  tags:
+    - privileged
   stage: build
   image: cimg/python:3.8
   cache:
