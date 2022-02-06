@@ -16,7 +16,7 @@
  */
 
  import * as React from 'react';
- import { View, Text } from 'react-native';
+ import { View, Text, StyleSheet, SafeAreaView, Button, Separator } from 'react-native';
  import { NavigationContainer } from '@react-navigation/native';
  import { createStackNavigator } from '@react-navigation/stack';
  
@@ -25,26 +25,30 @@
  function HomeScreen() {
    return (
       <SafeAreaView style={styles.container}>
-      <View>
-        <Button
-          title="localization"
-          onPress={() => navigation.navigate('Localization')}
-        />
-      </View>
-      <Separator />
-      <View>
-        <Button
-          title="Mapping"
-          onPress={() => navigation.navigate('Mapping')}
-        />
-      </View>
-      <Separator />
-      <View>
-        <Button
-          title="Server"
-          onPress={() => navigation.navigate('Server')}
-        />
-      </View>
+        <View>
+          <Button
+            title="localization"
+            onPress={() => navigation.navigate('Localization')}
+          />
+        </View>
+
+        {/* <Separator /> */}
+
+        <View>
+          <Button
+            title="Mapping"
+            onPress={() => navigation.navigate('Mapping')}
+          />
+        </View>
+        
+        {/* <Separator /> */}
+
+        <View>
+          <Button
+            title="Server"
+            onPress={() => navigation.navigate('Server')}
+          />
+        </View>
     </SafeAreaView>
    );
  }
