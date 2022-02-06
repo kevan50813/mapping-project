@@ -22,17 +22,15 @@
  
 /* each fuction is basicly its own screen chage which screen applied to your project directly */
 
- function HomeScreen() {
+ function HomeScreen({ navigation }) {
    return (
       <SafeAreaView style={styles.container}>
         <View>
           <Button
-            title="localization"
+            title="Localization"
             onPress={() => navigation.navigate('Localization')}
           />
         </View>
-
-        {/* <Separator /> */}
 
         <View>
           <Button
@@ -40,8 +38,6 @@
             onPress={() => navigation.navigate('Mapping')}
           />
         </View>
-        
-        {/* <Separator /> */}
 
         <View>
           <Button
@@ -53,7 +49,7 @@
    );
  }
  
- function LocalizationScreen() {
+ function LocalizationScreen({ navigation }) {
    return (
     <SafeAreaView style={styles.container}>
     <View>
@@ -62,14 +58,12 @@
         onPress={() => navigation.navigate('Home')}
       />
     </View>
-    <Separator />
     <View>
       <Button
         title="Mapping"
         onPress={() => navigation.navigate('Mapping')}
       />
     </View>
-    <Separator />
     <View>
       <Button
         title="Server"
@@ -80,7 +74,7 @@
    );
  }
 
- function MapScreen() {
+ function MapScreen({ navigation }) {
   return (
    <SafeAreaView style={styles.container}>
    <View>
@@ -89,14 +83,12 @@
        onPress={() => navigation.navigate('Home')}
      />
    </View>
-   <Separator />
    <View>
      <Button
        title="Localization"
        onPress={() => navigation.navigate('Localization')}
      />
    </View>
-   <Separator />
    <View>
      <Button
        title="Server"
@@ -107,7 +99,7 @@
   );
 }
 
-function ServerScreen() {
+function ServerScreen({ navigation }) {
   return (
    <SafeAreaView style={styles.container}>
    <View>
@@ -116,14 +108,12 @@ function ServerScreen() {
        onPress={() => navigation.navigate('Home')}
      />
    </View>
-   <Separator />
    <View>
      <Button
        title="Mapping"
        onPress={() => navigation.navigate('Mapping')}
      />
    </View>
-   <Separator />
    <View>
      <Button
        title="Localization"
