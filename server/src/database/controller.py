@@ -83,7 +83,8 @@ class Controller:
 
         return flat_dict
 
-    def __flat_dict_to_dataclass(self, dictionary: dict, target_class: Type) -> Type:
+    def __flat_dict_to_dataclass(
+            self, dictionary: dict, target_class: Type) -> Type:
         """
         Attempts to turn a dict into an instance of the given dataclass
         """
@@ -155,8 +156,9 @@ class Controller:
                     )
 
                     node_obj = Node(
-                        label=node_label, properties=node_properties, alias=node_alias
-                    )
+                        label=node_label,
+                        properties=node_properties,
+                        alias=node_alias)
 
                     node_objs.append(node_obj)
                     graph.add_node(node_obj)
@@ -267,7 +269,8 @@ class Controller:
         entry = self.redis_db.hgetall(key)
 
         # decode binary strings (utf-8) -> python string
-        entry = {k.decode("utf-8"): v.decode("utf-8") for k, v in entry.items()}
+        entry = {k.decode("utf-8"): v.decode("utf-8")
+                 for k, v in entry.items()}
 
         return self.__flat_dict_to_dataclass(entry, entry_type)
 
@@ -310,7 +313,8 @@ class Controller:
                           dataclass must have 'id' field
         """
         entry_id = f"{type(entry).__name__}:{graph_name}:{str(entry.id)}"
-        mapping = dataclasses.asdict(entry, dict_factory=self.__dataclass_to_flat_dict)
+        mapping = dataclasses.asdict(
+            entry, dict_factory=self.__dataclass_to_flat_dict)
         self.redis_db.hset(entry_id, mapping=mapping)
 
     async def search_poi_by_name(self, poi_name: str) -> List[PoI]:
@@ -348,7 +352,7 @@ class Controller:
         return [r for r in results if r.graph == graph]
 
     async def search_rooms(self, graph_name: str, search_string: str
-                          ) -> Tuple[List[Polygon]]:
+                           ) -> Tuple[List[Polygon]]:
         """
             Search for room by name
         """
