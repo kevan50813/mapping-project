@@ -15,9 +15,161 @@
  * @flow strict-local
  */
 
- import React from 'react';
- import { StyleSheet, Button, View, SafeAreaView, Text, Alert } from 'react-native';
+ import * as React from 'react';
+ import { View, Text } from 'react-native';
+ import { NavigationContainer } from '@react-navigation/native';
+ import { createStackNavigator } from '@react-navigation/stack';
  
+/* each fuction is basicly its own screen chage which screen applied to your project directly */
+
+ function HomeScreen() {
+   return (
+      <SafeAreaView style={styles.container}>
+      <View>
+        <Button
+          title="localization"
+          onPress={() => navigation.navigate('Localization')}
+        />
+      </View>
+      <Separator />
+      <View>
+        <Button
+          title="Mapping"
+          onPress={() => navigation.navigate('Mapping')}
+        />
+      </View>
+      <Separator />
+      <View>
+        <Button
+          title="Server"
+          onPress={() => navigation.navigate('Server')}
+        />
+      </View>
+    </SafeAreaView>
+   );
+ }
+ 
+ function LocalizationScreen() {
+   return (
+    <SafeAreaView style={styles.container}>
+    <View>
+      <Button
+        title="Home"
+        onPress={() => navigation.navigate('Home')}
+      />
+    </View>
+    <Separator />
+    <View>
+      <Button
+        title="Mapping"
+        onPress={() => navigation.navigate('Mapping')}
+      />
+    </View>
+    <Separator />
+    <View>
+      <Button
+        title="Server"
+        onPress={() => navigation.navigate('Server')}
+      />
+    </View>
+  </SafeAreaView>
+   );
+ }
+
+ function MapScreen() {
+  return (
+   <SafeAreaView style={styles.container}>
+   <View>
+     <Button
+       title="Home"
+       onPress={() => navigation.navigate('Home')}
+     />
+   </View>
+   <Separator />
+   <View>
+     <Button
+       title="Localization"
+       onPress={() => navigation.navigate('Localization')}
+     />
+   </View>
+   <Separator />
+   <View>
+     <Button
+       title="Server"
+       onPress={() => navigation.navigate('Server')}
+     />
+   </View>
+ </SafeAreaView>
+  );
+}
+
+function ServerScreen() {
+  return (
+   <SafeAreaView style={styles.container}>
+   <View>
+     <Button
+       title="Home"
+       onPress={() => navigation.navigate('Home')}
+     />
+   </View>
+   <Separator />
+   <View>
+     <Button
+       title="Mapping"
+       onPress={() => navigation.navigate('Mapping')}
+     />
+   </View>
+   <Separator />
+   <View>
+     <Button
+       title="Localization"
+       onPress={() => navigation.navigate('Localization')}
+     />
+   </View>
+ </SafeAreaView>
+  );
+}
+ 
+ const Stack = createStackNavigator();
+ 
+ function App() {
+   return (
+     <NavigationContainer>
+       <Stack.Navigator initialRouteName="Home">
+         <Stack.Screen name="Home" component={HomeScreen} />
+         <Stack.Screen name="Localization" component={LocalizationScreen} />
+         <Stack.Screen name="Mapping" component={MapScreen} />
+         <Stack.Screen name="Server" component={ServerScreen} />
+       </Stack.Navigator>
+     </NavigationContainer>
+   );
+ }
+
+ const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: 16,
+  },
+  title: {
+    textAlign: 'center',
+    marginVertical: 8,
+  },
+  fixToText: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  separator: {
+    marginVertical: 8,
+    borderBottomColor: '#737373',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+});
+ 
+ export default App;
+ 
+
+ /*
  const Separator = () => (
    <View style={styles.separator} />
  );
@@ -68,7 +220,7 @@
    },
  });
  
- export default App;
+ export default App;*/
 /* COMMETED OUT UNTIL WE NEED AR STUFF
 // all AR related stuff from vriomidea timeplate
 const InitialScene=()=>{
