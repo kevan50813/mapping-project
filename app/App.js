@@ -32,9 +32,6 @@ class Localisation extends Component {
             WifiManager.loadWifiList().then(
 
                 list => {
-                    for (let i = 0; i < list.length; i++) {
-                        console.log(list[i].SSID)
-                    }
                     this.setState({
                         debugList: list
                     })
@@ -52,12 +49,20 @@ class Localisation extends Component {
         }
     };
 
+    renderRow(elem) {
+        return (
+            <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
+                <Text key={elem.BSSID}>{elem.SSID}</Text>
+            </View>
+        )
+    }
+
 
     render () {
 
         const listAP = this.state.debugList.map(elem => {
             return (
-                <Text key={elem.BSSID}>{elem.SSID} {elem.BSSID} {elem.frequency}</Text>
+                <Text style={{fontFamily: "monospace", fontSize: 9}} key={elem.BSSID}> {elem.SSID.padEnd(15, " ")} | {elem.BSSID} | {('' + elem.frequency).padEnd(5)} | {elem.level} | {elem.timestamp} </Text>
             )
         });
 
@@ -68,10 +73,9 @@ class Localisation extends Component {
                 style={{
                     flex: 1,
                     justifyContent: "center",
-                    alignItems: "center",
-                    fontSize: 10
                 }}>
                 <Button title="Request Permissions" onPress={this.getPermission} />
+                <Text style={{fontFamily: "monospace", fontSize: 9}} key="header"> {"SSID".padEnd(15, " ")} | {"BSSID/MAC".padEnd(17)} | Freq. | dBm | Timestamp</Text>
                 {listAP}
             </View>
         );
