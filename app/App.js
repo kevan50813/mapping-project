@@ -7,10 +7,29 @@ import WifiManager from 'react-native-wifi-reborn';
 class Localisation extends Component {
 
     state = {
-        debugList: []
+        networkList: []
     };
 
+    static RSSItoDistance(RSSI) {
+
+        /* Converts RSSI to distance. This calculation is not bounded.
+        Please note parameters need substantial tuning for good results.
+
+            :param rssi: the RSSI of the given access point
+            :return: the predicted distance to the access point
+        */
+
+        // RSSI = -10 * n * log(d) + A
+        let a = -50;    // signal strength at 1m
+        let n = 2;      // path loss exponent
+
+        return Math.pow(10, (RSSI - a) / (-10 * n));
+
+    }
+
     getPermission = async () => {
+
+
 
         const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -22,50 +41,55 @@ class Localisation extends Component {
             }
         );
 
-        console.log("granted:" + granted);
-
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            // not cry
-            console.log("access allowed");
 
+            // reset list of detected networks
+            this.setState({
+                networkList: []
+            });
 
-            WifiManager.loadWifiList().then(
+            console.log("scan started");
+
+            // TODO - rescan or load? overhead vs accurate data...
+            WifiManager.reScanAndLoadWifiList().then(
 
                 list => {
-                    this.setState({
-                        debugList: list
-                    })
-                },
-                () => {
-                    console.log("list couldnt be loaded");
-                }
 
+                    console.log("scan ended");
+
+                    // set distance from each AP
+                    for (let i = 0; i < list.length; i++)
+                        list[i].distance = Localisation.RSSItoDistance(list[i].level);
+
+                    // save list to state
+                    this.setState({
+
+                        // sorts list based on ascending distance
+                        // needs a custom compare function as this is an array of objects
+                        networkList: list.sort((a, b) =>
+                            (a.distance > b.distance) ? 1 : ((b.distance > a.distance) ? -1 : 0)
+                        )
+                    });
+                },
+
+                () => {
+                    console.log("scan failed");
+                }
             )
 
-
-
         } else {
-            console.log("denied");
+            console.log("denied permissions");
         }
     };
-
-    renderRow(elem) {
-        return (
-            <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
-                <Text key={elem.BSSID}>{elem.SSID}</Text>
-            </View>
-        )
-    }
 
 
     render () {
 
-        const listAP = this.state.debugList.map(elem => {
+        const listAP = this.state.networkList.map(elem => {
             return (
-                <Text style={{fontFamily: "monospace", fontSize: 9}} key={elem.BSSID}> {elem.SSID.padEnd(15, " ")} | {elem.BSSID} | {('' + elem.frequency).padEnd(5)} | {elem.level} | {elem.timestamp} </Text>
+                <Text style={{fontFamily: "monospace", fontSize: 9}} key={elem.BSSID}> {elem.SSID.padEnd(15, " ")} | {elem.BSSID} | {elem.level} | {('' + elem.distance.toPrecision(8)).padEnd(8)} | {elem.frequency} </Text>
             )
         });
-
 
         return(
 
@@ -75,7 +99,7 @@ class Localisation extends Component {
                     justifyContent: "center",
                 }}>
                 <Button title="Request Permissions" onPress={this.getPermission} />
-                <Text style={{fontFamily: "monospace", fontSize: 9}} key="header"> {"SSID".padEnd(15, " ")} | {"BSSID/MAC".padEnd(17)} | Freq. | dBm | Timestamp</Text>
+                <Text style={{fontFamily: "monospace", fontSize: 9}} key="header"> {"SSID".padEnd(15, " ")} | {"BSSID/MAC".padEnd(17)} | dBm | Distance | Frequency</Text>
                 {listAP}
             </View>
         );
