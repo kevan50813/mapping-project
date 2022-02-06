@@ -1,13 +1,25 @@
 import React from 'react';
-import {Text, StyleSheet, View, SafeAreaView, FlatList} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  SafeAreaView,
+  FlatList,
+  TextInput,
+} from 'react-native';
 import {useQuery, gql} from '@apollo/client';
 
 var styles = StyleSheet.create({
+  input: {
+    backgroundColor: '#777',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
   container: {
     backgroundColor: '#333',
-    marginHorizontal: 20,
     flexGrow: 1,
-  }, 
+  },
   item: {
     backgroundColor: '#555',
     padding: 20,
@@ -20,31 +32,37 @@ var styles = StyleSheet.create({
   },
 });
 
-const NODES = gql`
-  query Nodes {
-    polygons(graph: "test_bragg") {
+const POLYGONS = gql`
+  query polygons ($search: String!) {
+    search_polygons (graph: "test_bragg", search: $search) {
       id
       tags
     }
   }
 `;
 
-const Item = ({ text }) => (
+const Item = ({text}) => (
   <View style={styles.item}>
     <Text style={styles.text}>{text}</Text>
   </View>
 );
 
-function Polygons() {
-  const {loading, error, data} = useQuery(NODES);
-  if (loading) return <Text styles={styles.text}>Loading...</Text>;
-  if (error) return <Text styles={styles.text}>Error!</Text>;
+function Polygons(search) {
+  const {loading, error, data} = useQuery(POLYGONS, {variables: {search}});
+  if (loading) {
+    return <Text styles={styles.text}>Loading...</Text>;
+  }
+  if (error) {
+    console.log(error)
+    return <Text styles={styles.text}>Error!</Text>;
+  }
 
   return data.polygons;
 }
 
 export default function QueryTest() {
-  const data = Polygons();
+  const [text, onChangeText] = React.useState();
+  const data = Polygons(text);
 
   function renderItem(item) {
     const object = item.item;
@@ -53,9 +71,15 @@ export default function QueryTest() {
   }
 
   return (
-    <SafeAreaView style={styles.container}> 
-      <FlatList 
-        data={data} 
+    <SafeAreaView style={styles.container}>
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeText}
+        value={text}
+        placeholder='Search for a room'
+      />
+      <FlatList
+        data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />

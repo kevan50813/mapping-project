@@ -23,11 +23,13 @@ class Controller:
         self.redis_db = redis.Redis(host=host, port=port)
 
         # define a search client and index fields for poi
-        self.poi_search_client = Client("points_of_interest", conn=self.redis_db)
+        self.poi_search_client = Client("points_of_interest",
+                                        conn=self.redis_db)
         poi_definition = IndexDefinition(prefix=["PoI:"])
         poi_schema = TextField("amenity")
 
-        self.room_search_client = Client("rooms", conn=self.redis_db)
+        self.room_search_client = Client("rooms",
+                                         conn=self.redis_db)
         room_definition = IndexDefinition(prefix=["Polygon:"])
         room_schema = (
             TextField("room-name"),
@@ -40,7 +42,9 @@ class Controller:
             self.room_search_client.info()
         except redis.ResponseError:
             self.log.debug("Index does not exist, creating index")
-            self.poi_search_client.create_index(poi_schema, definition=poi_definition)
+            self.poi_search_client.create_index(
+                poi_schema, definition=poi_definition
+            )
             self.room_search_client.create_index(
                 room_schema, definition=room_definition
             )
@@ -343,6 +347,26 @@ class Controller:
         results = await self.search_poi_by_name(poi_name)
         return [r for r in results if r.graph == graph]
 
+    async def search_rooms(self, graph_name: str, search_string: str
+                          ) -> Tuple[List[Polygon]]:
+        """
+            Search for room by name
+        """
+        # First search the rooms keys for the search string
+        res = self.room_search_client.search(search_string)
+        rooms = []
+
+        for doc in res.docs:
+            # transform back to the standard form
+            room = doc.__dict__
+            room.pop("payload")
+            # remove prefix from redis db
+            room["id"] = room["id"].rsplit(":", 1)[1]
+            room_object = self.__flat_dict_to_dataclass(room, Polygon)
+            rooms.append(room_object)
+
+        return rooms
+
     async def search_room_nodes(
         self, graph_name: str, search_string: str
     ) -> Tuple[List[Polygon], List[PathNode]]:  # noqa: E501
@@ -354,35 +378,25 @@ class Controller:
             search_string (str): search string
 
         Returns:
-            List of room objects and list of corresponding nodes
+            List of node objects
         """
-        # First search the rooms keys for the search string
-        res = self.room_search_client.search(search_string)
-        rooms = []
-        poly_id = None
+        rooms = self.search_rooms(graph_name, search_string)
+        if not rooms:
+            # If there are no rooms in the search don't do anything
+            return []
 
-        for doc in res.docs:
-            # transform back to the standard form
-            room = doc.__dict__
-            room.pop("payload")
-            # remove prefix from redis db
-            room["id"] = room["id"].rsplit(":", 1)[1]
-            poly_id = int(room["id"])
+        nodes = []
 
-            room_object = self.__flat_dict_to_dataclass(room, Polygon)
-            rooms.append(room_object)
+        for room in rooms:
+            poly_id = room.id
+            # Then get the node ids that have that poly_id
+            graph = Graph(graph_name, self.redis_db)
 
-        if poly_id is None:
-            return rooms, []
+            query = """MATCH (n:way {poly_id: $poly_id}) RETURN n"""
+            res = graph.query(query, {"poly_id": poly_id})
+            nodes.append(self.__redisgraph_result_to_node(res))
 
-        # Then get the node ids that have that poly_id
-        graph = Graph(graph_name, self.redis_db)
-
-        query = """MATCH (n:way {poly_id: $poly_id}) RETURN n"""
-        res = graph.query(query, {"poly_id": poly_id})
-        nodes = self.__redisgraph_result_to_node(res)
-
-        return rooms, nodes
+        return nodes
 
     async def get_node_neighbours(
         self, graph_name: str, node_id: int
