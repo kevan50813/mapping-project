@@ -19,7 +19,7 @@ const client = new ApolloClient({
 function Query({ navigation }) {
   return (
     <ApolloProvider client={client}>
-      <Button title="Home" onPress={() => navigation.navigate("HomeScreen")} />
+      <Button title="HomeScreen" onPress={() => navigation.navigate("HomeScreen")} />
       <View style={{flex: 1}}>
         <QueryTest />
       </View>
@@ -44,8 +44,8 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Query Test" component={Query} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="Query" component={Query} />
       </Stack.Navigator>
     </NavigationContainer>
   );
