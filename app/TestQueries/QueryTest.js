@@ -2,10 +2,10 @@ import React from 'react';
 import {
   Text,
   StyleSheet,
-  View,
   SafeAreaView,
   FlatList,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import {useQuery, gql} from '@apollo/client';
 
@@ -21,10 +21,9 @@ var styles = StyleSheet.create({
     flexGrow: 1,
   },
   item: {
-    backgroundColor: '#555',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: '10%',
   },
   text: {
     fontSize: 20,
@@ -33,41 +32,56 @@ var styles = StyleSheet.create({
 });
 
 const POLYGONS = gql`
-  query polygons ($search: String!) {
-    search_polygons (graph: "test_bragg", search: $search) {
+  query polygons($search: String!) {
+    search_polygons(graph: "test_bragg", search: $search) {
       id
       tags
     }
   }
 `;
 
-const Item = ({text}) => (
-  <View style={styles.item}>
+const Item = ({text, onPress, backgroundColor}) => (
+  <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
     <Text style={styles.text}>{text}</Text>
-  </View>
+  </TouchableOpacity>
 );
 
-function Polygons(search) {
+function Polygons(dirty_search) {
+  const search = escape(dirty_search);
   const {loading, error, data} = useQuery(POLYGONS, {variables: {search}});
   if (loading) {
-    return <Text styles={styles.text}>Loading...</Text>;
+    return ['Loading...'];
   }
   if (error) {
-    console.log(error)
-    return <Text styles={styles.text}>Error!</Text>;
+    console.log(error);
+    return ['Error'];
   }
 
-  return data.polygons;
+  return data.search_polygons;
 }
 
 export default function QueryTest() {
-  const [text, onChangeText] = React.useState();
+  const [text, onChangeText] = React.useState('');
+  const [selectedId, setSelectedId] = React.useState();
   const data = Polygons(text);
 
-  function renderItem(item) {
-    const object = item.item;
-    const text = `${object.id}: ${object.tags['room-name']} - ${object.tags['room-no']}`;
-    return <Item text={text} />;
+  function renderItem(data) {
+    if (typeof data.item === 'string') {
+      return (
+        <Item text={data.item} onPress={() => {}} backgroundColor={'#777'} />
+      );
+    }
+
+    const backgroundColor = data.id === selectedId ? '#555' : '#777';
+    const object = data.item;
+    const text = `${object.tags['room-name']} - ${object.tags['room-no']}`;
+    return (
+      <Item
+        text={text}
+        onPress={() => setSelectedId(data.id)}
+        backgroundColor={{backgroundColor}}
+      />
+    );
   }
 
   return (
@@ -76,12 +90,11 @@ export default function QueryTest() {
         style={styles.input}
         onChangeText={onChangeText}
         value={text}
-        placeholder='Search for a room'
+        placeholder="Search for a room"
       />
       <FlatList
         data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
       />
     </SafeAreaView>
   );

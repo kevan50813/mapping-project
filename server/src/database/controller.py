@@ -23,11 +23,13 @@ class Controller:
         self.redis_db = redis.Redis(host=host, port=port)
 
         # define a search client and index fields for poi
+        self.log.debug("Creating PoI search client")
         self.poi_search_client = Client("points_of_interest",
                                         conn=self.redis_db)
         poi_definition = IndexDefinition(prefix=["PoI:"])
         poi_schema = TextField("amenity")
 
+        self.log.debug("Creating rooms search client")
         self.room_search_client = Client("rooms",
                                          conn=self.redis_db)
         room_definition = IndexDefinition(prefix=["Polygon:"])
@@ -38,13 +40,21 @@ class Controller:
 
         # Check to see if index is already in db, otherwise create it
         try:
+            self.log.debug("Seeing if PoI search indicies exist")
             self.poi_search_client.info()
-            self.room_search_client.info()
+            self.log.debug("PoI search indicies exist")
         except redis.ResponseError:
-            self.log.debug("Index does not exist, creating index")
+            self.log.debug("PoI index does not exist, creating index")
             self.poi_search_client.create_index(
                 poi_schema, definition=poi_definition
             )
+
+        try:
+            self.log.debug("Seeing if room search indicies exist")
+            self.room_search_client.info()
+            self.log.debug("Room search indicies exist")
+        except redis.ResponseError:
+            self.log.debug("Index does not exist, creating index")
             self.room_search_client.create_index(
                 room_schema, definition=room_definition
             )
