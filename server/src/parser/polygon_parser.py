@@ -116,7 +116,9 @@ class PolygonParser:
         """
         self.log.debug("Loading poygons")
 
-        level_range = sorted({n["properties"]["levels"] for n in self.json_polygons})
+        level_range = sorted(
+            {n["properties"]["level"] for n in self.json_polygons["features"]}
+        )
 
         for feature in self.json_polygons["features"]:
             id = len(self.polygons)
