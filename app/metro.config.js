@@ -5,38 +5,20 @@
  * @format
  */
 
-const {getDefaultConfig} = require('metro-config');
-const {resolver: defaultResolver} = getDefaultConfig.getDefaultValues();
+const { getDefaultConfig } = require('metro-config');
+const { resolver: defaultResolver } = getDefaultConfig.getDefaultValues();
 
-module.exports = (async () => {
-  const {
-    resolver: {assetExts},
-  } = await getDefaultConfig();
-
-  return {
-    transformer: {
-      getTransformOptions: async () => ({
-        transform: {
-          experimentalImportSupport: false,
-          inlineRequires: true,
-        },
-      }),
-    },
-    resolver: {
-      assetExts: [
-        ...assetExts,
-        'obj',
-        'mtl',
-        'JPG',
-        'vrx',
-        'hdr',
-        'gltf',
-        'glb',
-        'bin',
-        'arobject',
-        'gif',
-      ],
-      sourceExts: [...defaultResolver.sourceExts, 'cjs'],
-    },
-  };
-})();
+module.exports = {
+  transformer: {
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
+  },
+  resolver: {
+    ...defaultResolver,
+    sourceExts: [...defaultResolver.sourceExts, 'cjs'],
+  },
+};
