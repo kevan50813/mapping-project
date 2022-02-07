@@ -39,7 +39,7 @@ async def resolve_search_nodes(*_, graph, search):
     """
     Resolver for searching for nodes within a graph
     """
-    return await db.search_rooms(graph, search)
+    return await db.search_room_nodes(graph, search)
 
 
 @query.field("search_polygons")
@@ -47,7 +47,7 @@ async def resolve_search_polys(*_, graph, search):
     """
     Resolver for searching for polygons within a graph
     """
-    return await db.search_room_nodes(graph, search)
+    return await db.search_rooms(graph, search)
 
 
 @query.field("edges")
