@@ -12,7 +12,7 @@ services:
     volumes:
       - redis:/data
   mappingserver:
-    image: registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:server
+    image: registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:main
     container_name: mapping
     ports:
       - "80:80"
