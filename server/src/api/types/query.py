@@ -26,12 +26,20 @@ async def resolve_nodes(*_, graph):
     return await db.load_nodes(graph)
 
 
+@query.field("walls")
+async def resolve_walls(*_, graph):
+    """
+    Resolver for loading all walls in graph
+    """
+    return await db.load_walls(graph)
+
+
 @query.field("search_nodes")
 async def resolve_search_nodes(*_, graph, search):
     """
     Resolver for searching for nodes within a graph
     """
-    return (await db.search_rooms(graph, search))
+    return await db.search_room_nodes(graph, search)
 
 
 @query.field("search_polygons")
@@ -39,7 +47,7 @@ async def resolve_search_polys(*_, graph, search):
     """
     Resolver for searching for polygons within a graph
     """
-    return (await db.search_room_nodes(graph, search))
+    return await db.search_rooms(graph, search)
 
 
 @query.field("edges")

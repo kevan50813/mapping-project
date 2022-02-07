@@ -10,6 +10,9 @@ type Query {
   # Search for node with string
   search_nodes(graph: String!, search: String!): [Node!]
 
+  # dump all walls
+  walls(graph: String!): [Node!]
+
   # ------------------------------------------------------------
   # edges
   # ------------------------------------------------------------
@@ -38,6 +41,12 @@ type Query {
   graph(lat: Float!, lon: Float!): String
   # Find a route from start to end
   find_route(graph: String!, start_id: Int!, end_id: Int!): Path!
+}
+
+type Mutation {
+  add_graph(graph: String!, polygons: String!, points: String!, linestring: String!): Boolean!
+  # DEBUG
+  flush_all: Boolean!
 }
 
 type Node {
