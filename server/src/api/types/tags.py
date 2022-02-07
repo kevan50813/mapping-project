@@ -10,6 +10,6 @@ tags_scalar = ScalarType("Tags")
 @tags_scalar.serializer
 def serialize_tags(value):
     """
-        Serialise tags as json string
+    Serialise tags as json string
     """
     return json.dumps(value)

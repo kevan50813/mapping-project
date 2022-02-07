@@ -24,14 +24,12 @@ class Controller:
 
         # define a search client and index fields for poi
         self.log.debug("Creating PoI search client")
-        self.poi_search_client = Client("points_of_interest",
-                                        conn=self.redis_db)
+        self.poi_search_client = Client("points_of_interest", conn=self.redis_db)
         poi_definition = IndexDefinition(prefix=["PoI:"])
         poi_schema = TextField("amenity")
 
         self.log.debug("Creating rooms search client")
-        self.room_search_client = Client("rooms",
-                                         conn=self.redis_db)
+        self.room_search_client = Client("rooms", conn=self.redis_db)
         room_definition = IndexDefinition(prefix=["Polygon:"])
         room_schema = (
             TextField("room-name"),
@@ -45,9 +43,7 @@ class Controller:
             self.log.debug("PoI search indicies exist")
         except redis.ResponseError:
             self.log.debug("PoI index does not exist, creating index")
-            self.poi_search_client.create_index(
-                poi_schema, definition=poi_definition
-            )
+            self.poi_search_client.create_index(poi_schema, definition=poi_definition)
 
         try:
             self.log.debug("Seeing if room search indicies exist")
@@ -93,8 +89,7 @@ class Controller:
 
         return flat_dict
 
-    def __flat_dict_to_dataclass(
-            self, dictionary: dict, target_class: Type) -> Type:
+    def __flat_dict_to_dataclass(self, dictionary: dict, target_class: Type) -> Type:
         """
         Attempts to turn a dict into an instance of the given dataclass
         """
@@ -166,9 +161,8 @@ class Controller:
                     )
 
                     node_obj = Node(
-                        label=node_label,
-                        properties=node_properties,
-                        alias=node_alias)
+                        label=node_label, properties=node_properties, alias=node_alias
+                    )
 
                     node_objs.append(node_obj)
                     graph.add_node(node_obj)
@@ -307,8 +301,7 @@ class Controller:
         entry.pop("ID")
 
         # decode binary strings (utf-8) -> python string
-        entry = {k.decode("utf-8"): v.decode("utf-8")
-                 for k, v in entry.items()}
+        entry = {k.decode("utf-8"): v.decode("utf-8") for k, v in entry.items()}
 
         return self.__flat_dict_to_dataclass(entry, entry_type)
 
@@ -339,8 +332,7 @@ class Controller:
             entries (List[Type]): list of dataclass objects to add to db
                                   dataclass must have 'id' field
         """
-        await asyncio.gather(*[self.add_entry(graph_name, entry)
-                               for entry in entries])
+        await asyncio.gather(*[self.add_entry(graph_name, entry) for entry in entries])
 
     async def add_entry(self, graph_name: str, entry: Type) -> None:
         """
@@ -352,8 +344,7 @@ class Controller:
                           dataclass must have 'id' field
         """
         entry_id = f"{type(entry).__name__}:{graph_name}:{str(entry.id)}"
-        mapping = dataclasses.asdict(
-            entry, dict_factory=self.__dataclass_to_flat_dict)
+        mapping = dataclasses.asdict(entry, dict_factory=self.__dataclass_to_flat_dict)
         self.redis_db.hset(entry_id, mapping=mapping)
 
     async def search_poi_by_name(self, poi_name: str) -> List[PoI]:
@@ -383,8 +374,7 @@ class Controller:
 
         return pois
 
-    async def search_poi_by_name_in_graph(self, graph: str,
-                                          poi_name: str) -> List[PoI]:
+    async def search_poi_by_name_in_graph(self, graph: str, poi_name: str) -> List[PoI]:
         """
         Search then filter for the graph you are looking for
         probably a nicer way of doing this really lol
@@ -392,10 +382,11 @@ class Controller:
         results = await self.search_poi_by_name(poi_name)
         return [r for r in results if r.graph == graph]
 
-    async def search_rooms(self, graph_name: str, search_string: str
-                           ) -> Tuple[List[Polygon]]:
+    async def search_rooms(
+        self, graph_name: str, search_string: str
+    ) -> Tuple[List[Polygon]]:
         """
-            Search for room by name
+        Search for room by name
         """
         # First search the rooms keys for the search string
         res = self.room_search_client.search(search_string)
