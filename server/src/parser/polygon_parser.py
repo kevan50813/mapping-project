@@ -21,25 +21,23 @@ class PolygonParser:
         self.__geodesy_polygons = []
 
     @staticmethod
-    def nodes_between_adj_levels(
-            nodes: List[PathNode]) -> List[Tuple[int, int]]:
+    def nodes_between_adj_levels(nodes: List[PathNode]) -> List[Tuple[int, int]]:
         """
-            Connects nodes in the list together to the nodes exactly one floor
-            above and below it. Generate a spanning list of floors for this.
+        Connects nodes in the list together to the nodes exactly one floor
+        above and below it. Generate a spanning list of floors for this.
 
-            e.g. floors in the list are 0, 0.5, 1, 2
-            Nodes on 0 will be connected to 0.5, and 0.5 to 0 and 1
+        e.g. floors in the list are 0, 0.5, 1, 2
+        Nodes on 0 will be connected to 0.5, and 0.5 to 0 and 1
 
-            Use for stairs (where pathing needs to be done to every floor)
+        Use for stairs (where pathing needs to be done to every floor)
 
-            Args:
-                nodes (List[Pathnode]): List of pathnodes to connect
-            Returns:
-                List of tuples containing the edges created between node IDs
+        Args:
+            nodes (List[Pathnode]): List of pathnodes to connect
+        Returns:
+            List of tuples containing the edges created between node IDs
         """
         # sorted list of unique levels
-        levels = list({n.level for n in nodes})
-        levels.sort()
+        levels = sorted({n.level for n in nodes})
         edges = []
 
         for node in nodes:
@@ -68,18 +66,18 @@ class PolygonParser:
     @staticmethod
     def nodes_between_levels(nodes: List[PathNode]) -> List[Tuple[int, int]]:
         """
-            Connects nodes in the list together with all nodes on all floors
-            (Generate a fully-connected graph.)
+        Connects nodes in the list together with all nodes on all floors
+        (Generate a fully-connected graph.)
 
-            e.g. floors in the list are 0, 0.5, 1, 2
-            Nodes on 0 will be connected to 0.5, 1, and 2
+        e.g. floors in the list are 0, 0.5, 1, 2
+        Nodes on 0 will be connected to 0.5, 1, and 2
 
-            Use for lifts
+        Use for lifts
 
-            Args:
-                nodes (List[Pathnode]): List of pathnodes to connect
-            Returns:
-                List of tuples containing the edges created between node IDs
+        Args:
+            nodes (List[Pathnode]): List of pathnodes to connect
+        Returns:
+            List of tuples containing the edges created between node IDs
         """
         edges = []
 
@@ -117,6 +115,9 @@ class PolygonParser:
         Loads and pre-computes properties about the rooms
         """
         self.log.debug("Loading poygons")
+
+        level_range = sorted({n["properties"]["levels"] for n in self.json_polygons})
+
         for feature in self.json_polygons["features"]:
             id = len(self.polygons)
             room = feature["geometry"]["coordinates"][0]
@@ -134,9 +135,10 @@ class PolygonParser:
 
             try:
                 levels = level.split(";")
-                # TODO this doesn't work for non-full-number levels
-                level_span = [float(level) for level
-                              in range(int(levels[0]), int(levels[1]))]
+                lower = int(levels[0])
+                upper = int(levels[1])
+
+                level_span = [float(level) for level in level_range[lower:upper]]
             except (AttributeError, IndexError):
                 level_span = [float(level)]
 
@@ -176,7 +178,7 @@ class PolygonParser:
 
     def connect_stairways(self, nodes: List[PathNode]):
         """
-            Method to call to connect staircases in a list of nodes
+        Method to call to connect staircases in a list of nodes
         """
         # TODO fix this to not work on wall edges
         self.log.debug("Generating stairway edges")
@@ -214,10 +216,8 @@ class PolygonParser:
                 continue
 
             same_room = list(
-                filter(
-                    lambda n,
-                    node=node: node.poly_id == n.poly_id,
-                    way_nodes))
+                filter(lambda n, node=node: node.poly_id == n.poly_id, way_nodes)
+            )
 
             self.log.debug("Nodes in the same room: %s", same_room)
 
