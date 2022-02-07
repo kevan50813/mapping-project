@@ -44,7 +44,9 @@ type Query {
 }
 
 type Mutation {
-  add_graph(polygons: String!, points: String!, linestring: String!): Boolean!
+  add_graph(graph_name: String!, polygons: String!, points: String!, linestring: String!): Boolean!
+  # DEBUG
+  flush_all(): Boolean!
 }
 
 type Node {

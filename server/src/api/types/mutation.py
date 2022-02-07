@@ -42,3 +42,12 @@ async def resolve_add_graph(_, graph_name, polygons, linestring, points):
 
     await asyncio.wait(tasks)
     return True
+
+
+@mutation.field("flush_all")
+async def resolve_flush_all(_):
+    """
+    DEBUG method (deletes everything in DB)
+    """
+    await db.redis_db.flushall()
+    return True

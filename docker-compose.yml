@@ -9,8 +9,10 @@ services:
     networks:
       - redisgn
     hostname: redis
+    volumes:
+      - redis:/data
   mappingserver:
-    image: registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:main
+    image: registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:server
     container_name: mapping
     ports:
       - "80:80"
@@ -19,3 +21,5 @@ services:
       - redisgn
 networks:
   redisgn:
+volumes:
+  redis:
