@@ -26,6 +26,7 @@
  
  const Stack = createStackNavigator();
  
+ //creates a stack navigotro that is used to switch netwen pages, each page is stored in the screens foulder and returns the page as requetsed
  function App() {
    return (
      <NavigationContainer>
