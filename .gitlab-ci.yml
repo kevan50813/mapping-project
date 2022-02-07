@@ -9,7 +9,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PANTS_CONFIG_FILES: "pants.ci.toml"
   GIT_COMMIT: $CI_COMMIT_SHORT_SHA
-  BUILD_TAG: "main"
+  BUILD_TAG: $CI_COMMIT_REF_NAME
 
 
 cache:
@@ -80,6 +80,8 @@ pytest:
       junit: dist/coverage/python/coverage.xml
 
 package:
+  tags:
+    - privileged
   stage: build
   image: cimg/python:3.8
   cache:
@@ -93,7 +95,7 @@ package:
     DOCKER_TLS_CERTDIR: ""
   only:
     refs:
-      - main
+      - branches
     changes:
       - server/
       - Dockerfile
