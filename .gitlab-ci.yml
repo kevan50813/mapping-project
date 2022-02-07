@@ -97,7 +97,7 @@ package:
     refs:
       - branches
     changes:
-      - server/
+      - server/**
       - Dockerfile
       - BUILD
       - pants.*
