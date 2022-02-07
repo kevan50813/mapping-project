@@ -15,39 +15,38 @@
  * @flow strict-local
  */
 
- import * as React from 'react';
- import { View, Text, StyleSheet, SafeAreaView, Button, Separator } from 'react-native';
- import { NavigationContainer } from '@react-navigation/native';
- import { createStackNavigator } from '@react-navigation/stack';
- import { HomeScreen } from './screens/HomeScreen.js';
- import { MapScreen } from './screens/MapScreen.js';
- import { ServerScreen } from './screens/ServerScreen.js';
- import { LocalizationScreen } from './screens/LocalizationScreen.js';
- 
- const Stack = createStackNavigator();
- 
- //creates a stack navigotro that is used to switch netwen pages, each page is stored in the screens foulder and returns the page as requetsed
- function App() {
-   return (
-     <NavigationContainer>
-       <Stack.Navigator initialRouteName="Home">
-         <Stack.Screen name="Home" component={HomeScreen} />
-         <Stack.Screen name="Localization" component={LocalizationScreen} />
-         <Stack.Screen name="Mapping" component={MapScreen} />
-         <Stack.Screen name="Server" component={ServerScreen} />
-       </Stack.Navigator>
-     </NavigationContainer>
-   );
- }
- 
- export default App;
- 
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {HomeScreen} from './screens/HomeScreen.js';
+import {MapScreen} from './screens/MapScreen.js';
+import {ServerScreen} from './screens/ServerScreen.js';
+import {LocalizationScreen} from './screens/LocalizationScreen.js';
 
- /*
+const Stack = createStackNavigator();
+
+//creates a stack navigotro that is used to switch netwen pages, each page is stored in the screens foulder and returns the page as requetsed
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Localization" component={LocalizationScreen} />
+        <Stack.Screen name="Mapping" component={MapScreen} />
+        <Stack.Screen name="Server" component={ServerScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+export default App;
+
+/*
+
  const Separator = () => (
    <View style={styles.separator} />
  );
- 
+
  const App = () => (
    <SafeAreaView style={styles.container}>
      <View>
@@ -72,7 +71,7 @@
      </View>
    </SafeAreaView>
  );
- 
+
  const styles = StyleSheet.create({
    container: {
      flex: 1,
@@ -93,7 +92,7 @@
      borderBottomWidth: StyleSheet.hairlineWidth,
    },
  });
- 
+
  export default App;*/
 /* COMMETED OUT UNTIL WE NEED AR STUFF
 // all AR related stuff from vriomidea timeplate
@@ -108,7 +107,7 @@ const InitialScene=()=>{
       style={{fontSize:50,fontFamily:'Arial',color:'blue'}}
       />
           <ViroBox
-          height={2} // for creating a 3D cube that is 2 x 2 x 2 
+          height={2} // for creating a 3D cube that is 2 x 2 x 2
           length={2}
           width={2}
           position={[0,0,0]}
@@ -140,4 +139,5 @@ var styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
 */
