@@ -226,6 +226,33 @@ class Controller:
 
         return node_objects
 
+    async def load_walls(self, graph_name: str) -> List[PathNode]:
+        """
+        Return all walls in a given graph
+
+        Args:
+            graph_name: graph of which to return nodes from
+
+        Returns:
+            List of nodes (see graph_parser for definition of their format)
+
+
+        This way of doing things could probably just be return every node?
+        """
+        graph = Graph(graph_name, self.redis_db)
+        query = """MATCH (n:wall) RETURN n"""
+        result = graph.query(query)
+
+        nodes = []
+        for res in result.result_set:
+            nodes.append(res[0].properties)
+
+        node_objects = []
+        for node in nodes:
+            node_objects.append(self.__flat_dict_to_dataclass(node, PathNode))
+
+        return node_objects
+
     async def load_edges(self, graph_name: str) -> List[tuple]:
         """
         Returns all edges in a given graph

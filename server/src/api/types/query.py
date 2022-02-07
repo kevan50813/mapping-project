@@ -26,6 +26,14 @@ async def resolve_nodes(*_, graph):
     return await db.load_nodes(graph)
 
 
+@query.field("walls")
+async def resolve_walls(*_, graph):
+    """
+    Resolver for loading all walls in graph
+    """
+    return await db.load_walls(graph)
+
+
 @query.field("search_nodes")
 async def resolve_search_nodes(*_, graph, search):
     """

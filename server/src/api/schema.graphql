@@ -10,6 +10,9 @@ type Query {
   # Search for node with string
   search_nodes(graph: String!, search: String!): [Node!]
 
+  # dump all walls
+  walls(graph: String!): [Node!]
+
   # ------------------------------------------------------------
   # edges
   # ------------------------------------------------------------
