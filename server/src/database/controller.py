@@ -312,7 +312,8 @@ class Controller:
             entries (List[Type]): list of dataclass objects to add to db
                                   dataclass must have 'id' field
         """
-        await asyncio.gather(*[self.add_entry(graph_name, entry) for entry in entries])
+        await asyncio.gather(*[self.add_entry(graph_name, entry)
+                               for entry in entries])
 
     async def add_entry(self, graph_name: str, entry: Type) -> None:
         """
@@ -355,7 +356,8 @@ class Controller:
 
         return pois
 
-    async def search_poi_by_name_in_graph(self, graph: str, poi_name: str) -> List[PoI]:
+    async def search_poi_by_name_in_graph(self, graph: str,
+                                          poi_name: str) -> List[PoI]:
         """
         Search then filter for the graph you are looking for
         probably a nicer way of doing this really lol
