@@ -277,6 +277,7 @@ class Controller:
             dataclass object of entry
         """
         entry = self.redis_db.hgetall(key)
+        entry.pop("ID")
 
         # decode binary strings (utf-8) -> python string
         entry = {k.decode("utf-8"): v.decode("utf-8")
@@ -345,6 +346,7 @@ class Controller:
             poi = doc.__dict__
             # remove payload object that search returns
             poi.pop("payload")
+            poi.pop("ID")
             # remove prefix from redis db
             poi["id"] = poi["id"].rsplit(":", 1)[1]
 
@@ -374,12 +376,13 @@ class Controller:
             # transform back to the standard form
             room = doc.__dict__
             room.pop("payload")
+            room.pop("ID")
             # remove prefix from redis db
             room["id"] = room["id"].rsplit(":", 1)[1]
             room_object = self.__flat_dict_to_dataclass(room, Polygon)
             rooms.append(room_object)
 
-        return rooms
+        return [r for r in rooms if r.graph == graph_name]
 
     async def search_room_nodes(
         self, graph_name: str, search_string: str
