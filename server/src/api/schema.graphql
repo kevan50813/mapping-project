@@ -43,6 +43,10 @@ type Query {
   find_route(graph: String!, start_id: Int!, end_id: Int!): Path!
 }
 
+type Mutation {
+  add_graph(polygons: String!, points: String!, linestring: String!): Boolean!
+}
+
 type Node {
   id: Int!
   graph: String!
