@@ -31,8 +31,8 @@ const Home = ({ navigation }) => (
       onPress={() => navigation.navigate('RoomSearch')}
     />
     <Button
-        title="Perform Localisation"
-        onPress={() => navigation.navigate('Localisation')}
+      title="Perform Localisation"
+      onPress={() => navigation.navigate('Localisation')}
     />
   </View>
 );
