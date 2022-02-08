@@ -114,10 +114,12 @@ class PolygonParser:
         """
         Loads and pre-computes properties about the rooms
         """
-        self.log.debug("Loading poygons")
+        self.log.debug("Loading polygons")
 
         level_range = sorted(
-            {n["properties"]["level"] for n in self.json_polygons["features"]}
+            list(
+                {str(n["properties"]["level"]) for n in self.json_polygons["features"]}
+            )
         )
         level_range = [level for level in level_range if ";" not in level]
 
