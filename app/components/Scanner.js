@@ -67,7 +67,8 @@ export const Scanner = () => {
     setScanning(false);
   };
 
-
+  const [NValue, setSliderValueN] = useState(3);
+  const [AValue, setSliderValueA] = useState(-50);
   return (
     <View style={styles.background}>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
@@ -77,22 +78,35 @@ export const Scanner = () => {
         <Text style={styles.info}>
           Took {(time.end.getTime() - time.start.getTime()) / 1000}s
         </Text>
-        <Text>N</Text>
+        <Text style={{color: 'black'}}>
+           Value of N is : {NValue}
+        </Text>
         <Slider
+        //Slider that will hold the value of N
           style={{width: 200, height: 40}}
           minimumValue={1}
           maximumValue={3}
           minimumTrackTintColor="#FFFFFF"
           maximumTrackTintColor="#000000"
+          value={NValue}
+          onValueChange={
+            (NValue) => setSliderValueN(NValue)
+          }
         />
-        <Text>A</Text>
-          <Slider
+        <Text style={{color: 'black'}}>
+           Value of A is : {AValue}
+        </Text>
+        <Slider
+          //Slider that will hold the value of A
           style={{width: 200, height: 40}}
-          default={-50}
           minimumValue={-100}
           maximumValue={0}
           minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#000000"
+          maximumTrackTintColor="#3333cc"
+          value={AValue}
+          onValueChange={
+            (AValue) => setSliderValueA(AValue)
+          }
         />
 
         {networks.map(({ SSID, BSSID, level }) => (
