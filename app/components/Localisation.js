@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View, PermissionsAndroid } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
 import { Scan } from './Scanner';
@@ -9,13 +9,12 @@ export const Localisation = () => {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
   const [time, setTime] = useState({ start: new Date(), end: new Date() });
-  let networkData = null;
+  const [networkData, setNetworkData] = useState(null);
 
   const startScan = async () => {
     setScanning(true);
 
     let scan = new Scan();
-
     await scan.startScan();
 
     setNetworks(scan.getNetworks());
@@ -25,11 +24,13 @@ export const Localisation = () => {
   };
 
   const loadData = async () => {
-    networkData = require('./Wifi_Nodes.json').features;
-    for (let feat in networkData) {
-      console.log(networkData[feat]);
-    }
-    //console.log(networkData);
+    setNetworkData(
+      require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
+        coordinates: geometry.coordinates,
+        SSID: properties.AP_Name,
+        BSSID: properties.MacAddress,
+      })),
+    );
   };
 
   return (
@@ -40,7 +41,7 @@ export const Localisation = () => {
           title="Load JSON Data"
           onPress={loadData}
         />
-        {networkData ? (
+        {networkData !== null ? (
           <Button style={styles.button} title="Scan" onPress={startScan} />
         ) : null}
       </ScrollView>

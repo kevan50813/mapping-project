@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  Text,
-  View,
-  PermissionsAndroid,
-} from 'react-native';
+import { ScrollView, Text, View, PermissionsAndroid } from 'react-native';
 import Slider from 'react-native-sliders';
 import WifiManager from 'react-native-wifi-reborn';
 import { Button } from './Button';
