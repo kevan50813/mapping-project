@@ -34,9 +34,9 @@ flake8:
   stage: lint
   cache:
     key: shared-cache
-  only:
-    changes:
-      - server
+  rules:
+    - changes:
+      - server/**/*
       - Dockerfile
       - BUILD
       - pants.*
@@ -55,9 +55,9 @@ flake8:
 eslint:
   stage: lint
   image: node:latest
-  only:
-    changes:
-      - app
+  rules:
+    - changes:
+      - app/**/*
   cache:
     key: shared-cache
   before_script:
@@ -74,9 +74,9 @@ pytest:
     - name: redislabs/redismod:latest
       alias: redis
   stage: test
-  only:
-    changes:
-      - server
+  rules:
+    - changes:
+      - server/**/*
       - Dockerfile
       - BUILD
       - pants.*
@@ -106,11 +106,9 @@ package:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://dockerdaemon:2375/
     DOCKER_TLS_CERTDIR: ""
-  only:
-    refs:
-      - branches
-    changes:
-      - server
+  rules:
+    - changes:
+      - server/**/*
       - Dockerfile
       - BUILD
       - pants.*
