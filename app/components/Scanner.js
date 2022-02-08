@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View, PermissionsAndroid } from 'react-native';
+import Slider from "react-native-sliders";
 import WifiManager from 'react-native-wifi-reborn';
 import { Button } from './Button';
 import { styles } from './styles';
@@ -66,6 +67,7 @@ export const Scanner = () => {
     setScanning(false);
   };
 
+
   return (
     <View style={styles.background}>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
@@ -75,6 +77,24 @@ export const Scanner = () => {
         <Text style={styles.info}>
           Took {(time.end.getTime() - time.start.getTime()) / 1000}s
         </Text>
+        <Text>N</Text>
+        <Slider
+          style={{width: 200, height: 40}}
+          minimumValue={1}
+          maximumValue={3}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#000000"
+        />
+        <Text>A</Text>
+          <Slider
+          style={{width: 200, height: 40}}
+          default={-50}
+          minimumValue={-100}
+          maximumValue={0}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#000000"
+        />
+
         {networks.map(({ SSID, BSSID, level }) => (
           <View key={BSSID} style={styles.box}>
             <Text style={styles.big}>
