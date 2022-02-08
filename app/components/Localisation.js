@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
 import { Scan } from './Scanner';
@@ -42,8 +42,9 @@ export const Localisation = () => {
           onPress={loadData}
         />
         {networkData !== null ? (
-          <Button style={styles.button} title="Scan" onPress={startScan} />
+          <Text style={styles.info}>Loaded network data from JSON.</Text>
         ) : null}
+        <Button style={styles.button} title="Scan" onPress={startScan} />
       </ScrollView>
     </View>
   );
