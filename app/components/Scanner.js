@@ -81,12 +81,12 @@ export const Scanner = () => {
         <Text style={styles.info}>
           Took {(time.end.getTime() - time.start.getTime()) / 1000}s
         </Text>
-        <Text style={{color: 'black'}}>
+        <Text style={{color: 'black', marginHorizontal:20}}>
            Value of N is : {NValue}
         </Text>
         <Slider
         //Slider that will hold the value of N
-          style={{width: 200, height: 40}}
+          style={{flex:1, marginHorizontal:20}}
           minimumValue={1}
           maximumValue={3}
           minimumTrackTintColor="#FFFFFF"
@@ -96,19 +96,12 @@ export const Scanner = () => {
             (NValue) => setSliderValueN(NValue)
           }
         />
-        <TextInput
-          style={styles.input}
-          onChangeText={(NValue) => setSliderValueN(NValue)}
-          value={NValue}
-          keyboardType="numeric"
-          inputProps={{ maxLength: 3}}
-        />
-        <Text style={{color: 'black'}}>
+        <Text style={{color: 'black', marginHorizontal:20}}>
            Value of A is : {AValue}
         </Text>
         <Slider
           //Slider that will hold the value of A
-          style={{width: 200, height: 40}}
+          style={{flex:1, marginHorizontal:20}}
           minimumValue={-100}
           maximumValue={0}
           minimumTrackTintColor="#FFFFFF"
@@ -117,12 +110,6 @@ export const Scanner = () => {
           onValueChange={
             (AValue) => setSliderValueA(AValue)
           }
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={(AValue) => setSliderValueA(AValue)}
-          value={AValue}
-          keyboardType="numeric"
         />
 
         {networks.map(({ SSID, BSSID, level }) => (
