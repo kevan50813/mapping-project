@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View, PermissionsAndroid } from 'react-native';
+import { ScrollView, Text, View, PermissionsAndroid,TextInput } from 'react-native';
 import Slider from "react-native-sliders";
 import WifiManager from 'react-native-wifi-reborn';
 import { Button } from './Button';
@@ -12,13 +12,16 @@ export const Scanner = () => {
 
   const [time, setTime] = useState({ start: new Date(), end: new Date() });
 
+  const [NValue, setSliderValueN] = useState(3);
+  const [AValue, setSliderValueA] = useState(-50);
+
   const rssiToDistance = rssi => {
     const A = -50; // Signal strength at 1 meter
     const N = 2; // Path exponent
 
     // rssi = -10 * N * log(D) + A
     // D = 10^((rssi - A) / (-10 * N))
-    return Math.pow(10, (rssi - A) / (-10 * N));
+    return Math.pow(10, (rssi - AValue) / (-10 * NValue));
   };
 
   const startScan = async () => {
@@ -67,8 +70,8 @@ export const Scanner = () => {
     setScanning(false);
   };
 
-  const [NValue, setSliderValueN] = useState(3);
-  const [AValue, setSliderValueA] = useState(-50);
+
+
   return (
     <View style={styles.background}>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
@@ -93,6 +96,13 @@ export const Scanner = () => {
             (NValue) => setSliderValueN(NValue)
           }
         />
+        <TextInput
+          style={styles.input}
+          onChangeText={(NValue) => setSliderValueN(NValue)}
+          value={NValue}
+          keyboardType="numeric"
+          inputProps={{ maxLength: 3}}
+        />
         <Text style={{color: 'black'}}>
            Value of A is : {AValue}
         </Text>
@@ -107,6 +117,12 @@ export const Scanner = () => {
           onValueChange={
             (AValue) => setSliderValueA(AValue)
           }
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={(AValue) => setSliderValueA(AValue)}
+          value={AValue}
+          keyboardType="numeric"
         />
 
         {networks.map(({ SSID, BSSID, level }) => (
