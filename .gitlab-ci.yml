@@ -34,6 +34,12 @@ flake8:
   stage: lint
   cache:
     key: shared-cache
+  only:
+    changes:
+      - server
+      - Dockerfile
+      - BUILD
+      - pants.*
   before_script:
     # bootstrap pants
     - ./pants --version
@@ -49,6 +55,9 @@ flake8:
 eslint:
   stage: lint
   image: node:latest
+  only:
+    changes:
+      - app
   cache:
     key: shared-cache
   before_script:
@@ -65,6 +74,12 @@ pytest:
     - name: redislabs/redismod:latest
       alias: redis
   stage: test
+  only:
+    changes:
+      - server
+      - Dockerfile
+      - BUILD
+      - pants.*
   cache:
     key: shared-cache
   needs: []
@@ -95,7 +110,7 @@ package:
     refs:
       - branches
     changes:
-      - server/**
+      - server
       - Dockerfile
       - BUILD
       - pants.*
