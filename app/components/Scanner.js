@@ -4,6 +4,77 @@ import WifiManager from 'react-native-wifi-reborn';
 import { Button } from './Button';
 import { styles } from './styles';
 
+export class Scan {
+
+  constructor() {
+
+    this.networks = [];
+    this.error = '';
+    this.timeStart = new Date();
+    this.timeEnd = new Date();
+
+  }
+
+  getNetworks() {
+    return this.networks;
+  }
+
+  getError() {
+    return this.error;
+  }
+
+  getTime() {
+    return {start: this.timeStart, end: this.timeEnd};
+  }
+
+  async startScan() {
+    console.log('Starting scan at', new Date());
+
+    this.networks = [];
+    this.error = '';
+    this.timeStart = new Date();
+    this.timeEnd = new Date();
+
+    const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location permission is required for WiFi connections',
+          message:
+              'This app needs location permission as this is required to scan for wifi networks.',
+          buttonNegative: 'DENY',
+          buttonPositive: 'ALLOW',
+        },
+    );
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      try {
+        const wifiNetworks = await WifiManager.reScanAndLoadWifiList();
+        console.log('Scan complete!');
+
+        this.timeEnd = new Date();
+
+        const list = wifiNetworks
+            .map(({ SSID, BSSID, level }) => ({
+              SSID,
+              BSSID,
+              level
+            }))
+            // Highest to lowest
+            .sort((n1, n2) => n2.level - n1.level);
+
+
+        this.networks = list;
+
+      } catch (e) {
+        console.error(e);
+        this.networks = [{ SSID: 'Problem while scanning', BSSID: 'n/a', level: 0 }];
+      }
+    } else {
+      this.networks = [{ SSID: 'Permission denied', BSSID: 'n/a', level: 0 }];
+    }
+  }
+}
+
 export const Scanner = () => {
   const [networks, setNetworks] = useState([]);
   const [scanning, setScanning] = useState(false);
@@ -21,49 +92,18 @@ export const Scanner = () => {
   };
 
   const startScan = async () => {
-    console.log('Starting scan at', new Date());
-    setTime({ start: new Date(), end: new Date() });
+
     setScanning(true);
-    setError('');
 
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location permission is required for WiFi connections',
-        message:
-          'This app needs location permission as this is required to scan for wifi networks.',
-        buttonNegative: 'DENY',
-        buttonPositive: 'ALLOW',
-      },
-    );
+    let scan = new Scan();
 
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      try {
-        const wifiNetworks = await WifiManager.reScanAndLoadWifiList();
-        console.log('Scan complete!');
-        setTime(s => ({ ...s, end: new Date() }));
+    await scan.startScan();
 
-        const list = wifiNetworks
-          .map(({ SSID, BSSID, level }) => ({
-            SSID,
-            BSSID,
-            level,
-          }))
-          // Highest to lowest
-          .sort((n1, n2) => n2.level - n1.level);
-
-        setNetworks(list);
-      } catch (e) {
-        console.error(e);
-        setNetworks([
-          { SSID: 'Problem while scanning', BSSID: 'n/a', level: 0 },
-        ]);
-      }
-    } else {
-      setNetworks([{ SSID: 'Permission denied', BSSID: 'n/a', level: 0 }]);
-    }
-
+    setNetworks(scan.getNetworks());
+    setError(scan.getError());
+    setTime(scan.getTime());
     setScanning(false);
+
   };
 
   return (
@@ -81,7 +121,7 @@ export const Scanner = () => {
               {SSID} ({BSSID})
             </Text>
             <Text style={styles.small}>
-              {level} = {rssiToDistance(level).toFixed(2)}m
+              {level}dBm = {rssiToDistance(level).toFixed(2)}m
             </Text>
           </View>
         ))}
