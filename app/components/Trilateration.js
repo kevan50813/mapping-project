@@ -1,33 +1,40 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { styles } from './styles';
-import Plot from 'react-native-plotly';
+import Plotly from 'react-native-plotly';
 
 export const Trilateration = () => {
-  const data = {
-    x: [1, 2, 3, 4, 5],
-    y: [1, 2, 3, 4, 8],
-    type: 'scatter',
-  };
-  const layout = { width: 500, height: 500, title: 'Trilateration scatter plot' ,
-    xaxis: {
-      title: 'LAT',
-    },
-    yaxis: {
-      title: 'LON',
-    }
-  };
+  var trace1 = {
 
-  return (
-    <View style={styles.background}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Plot
-          data={data}
-          layout={layout}
-          onLoad={() => console.log('graph loaded')}
-        />
-      </ScrollView>
-    </View>
-  );
+    y: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  
+    mode: 'markers',
+  
+    marker: {
+  
+      size: 40,
+  
+      color: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+  
+    }
+  
+  };
+  
+  
+  var data = [trace1];
+  
+  
+  var layout = {
+  
+    title: 'Scatter Plot with a Color Dimension'
+  
+  };
+  
+    return (
+      <Plotly
+        data={data}
+        layout={layout}
+      />
+    )
   
 };
