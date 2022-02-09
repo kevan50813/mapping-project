@@ -23,8 +23,35 @@ export const Trilateration = () => {
   
   var layout = {
   
-    title: 'Scatter Plot with a Color Dimension'
+    title: 'Scatter Plot with a Color Dimension',
+    xaxis: {
+
+      automargin: true,
+
+      tickangle: 90,
+
+      title: {
+
+        text: "Latitude",
+
+        standoff: 20
+
+      }},
   
+    yaxis: {
+
+        automargin: true,
+  
+        tickangle: 90,
+  
+        title: {
+  
+          text: "Longitude",
+  
+          standoff: 20
+  
+        }}
+
   };
   
     return (
