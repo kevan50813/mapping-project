@@ -5,18 +5,27 @@ import Plotly from 'react-native-plotly';
 
 export const Trilateration = () => {
   var data = [{
-    x: [5, 10, 15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-    y: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  
-    mode: 'markers',
-  
-    marker: {
-  
-      size: 40,
-  
-      color: [0]
-  
-    }
+    x: [1, 2, 3, 4, 5],
+
+  y: [1, 6, 3, 6, 1],
+
+  mode: 'markers+text',
+
+  type: 'scatter',
+
+  name: 'Team A',
+
+  text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+
+  textposition: 'top center',
+
+  textfont: {
+
+    family:  'Raleway, sans-serif'
+
+  },
+
+  marker: { size: 12 }
   
   }];
    
