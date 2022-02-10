@@ -9,26 +9,26 @@ export const Trilateration = () => {
 
   const loadData = async () => {
     await setNetworkData(
-        require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
-          x_data: geometry.coordinates[0],
-          y_data: geometry.coordinates[1],
-          SSID: properties.AP_Name,
-          BSSID: properties.MacAddress,
-        })),
+      require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
+        x_data: geometry.coordinates[0],
+        y_data: geometry.coordinates[1],
+        SSID: properties.AP_Name,
+        BSSID: properties.MacAddress,
+      })),
     );
   };
 
   let data = [
     {
-      x: [0, 1, 2, 3],
+      x: networkData.map(element => element.x_data),
 
-      y: [0, 1, 2, 3],
+      y: networkData.map(element => element.y_data),
 
-      mode: 'markers+text',
+      mode: 'markers',
 
       type: 'scatter',
 
-      text: [0, 1, 2, 3],
+      text: networkData.map(element => element.BSSID),
 
       textposition: 'top center',
 
@@ -65,6 +65,28 @@ export const Trilateration = () => {
         standoff: 20,
       },
     },
+
+    shapes: [
+      {
+        type: 'circle',
+
+        xref: 'x',
+
+        yref: 'y',
+
+        x0: -1.5542,
+
+        y0: 53.8087,
+
+        x1: -1.554,
+
+        y1: 53.8088,
+
+        line: {
+          color: 'blue',
+        },
+      },
+    ],
   };
 
   return (
