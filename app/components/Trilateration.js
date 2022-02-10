@@ -3,7 +3,21 @@ import { ScrollView, View } from 'react-native';
 import { styles } from './styles';
 import Plotly from 'react-native-plotly';
 
+
+
 export const Trilateration = () => {
+
+  const loadData = async () => {
+    setNetworkData(
+      require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
+        coordinates: geometry.coordinates,
+        SSID: properties.AP_Name,
+        BSSID: properties.MacAddress,
+      })),
+    );
+  };
+
+  
   var data = [{
     x: [1, 2, 3, 4, 5],
 
