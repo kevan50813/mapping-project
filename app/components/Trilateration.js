@@ -12,13 +12,14 @@ export const Trilateration = () => {
       setNetworkData(
         require('./Wifi_Nodes.json').features.map(
           ({ geometry, properties }) => ({
-            x_data: geometry.coordinates,
+            x_data: geometry.coordinates[0],
+            y_data: geometry.coordinates[1],
             SSID: properties.AP_Name,
             BSSID: properties.MacAddress,
           }),
         ),
       );
-      console.log(x_data);
+      console.log(setNetworkData.x_data);
     } catch (error) {
       console.error(error);
     }
