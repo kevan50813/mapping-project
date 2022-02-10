@@ -4,7 +4,6 @@ import { styles } from './styles';
 import Plotly from 'react-native-plotly';
 
 export const Trilateration = () => {
-  
   const loadData = async () => {
     setNetworkData(
       require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
@@ -15,72 +14,56 @@ export const Trilateration = () => {
     );
   };
 
-  let data = [{
+  let data = [
+    {
+      x: [1, 2, 9, 4, 5],
 
-  
-  x: [1, 2, 9, 4, 5],
+      y: [1, 6, 3, 6, 1],
 
-  y: [1, 6, 3, 6, 1],
+      mode: 'markers+text',
 
-  mode: 'markers+text',
+      type: 'scatter',
 
-  type: 'scatter',
+      name: 'Team A',
 
-  name: 'Team A',
+      text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
 
-  text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+      textposition: 'top center',
 
-  textposition: 'top center',
+      textfont: {
+        family: 'Raleway, sans-serif',
+      },
 
-  textfont: {
+      marker: { size: 12 },
+    },
+  ];
 
-    family:  'Raleway, sans-serif'
-
-  },
-
-  marker: { size: 12 }
-  
-  }];
-   
-  
   let layout = {
-  
     title: 'Scatter Plot with a Color Dimension',
     xaxis: {
-
       automargin: true,
 
       tickangle: 90,
 
       title: {
+        text: 'Latitude',
 
-        text: "Latitude",
+        standoff: 20,
+      },
+    },
 
-        standoff: 20
-
-      }},
-  
     yaxis: {
+      automargin: true,
 
-        automargin: true,
-  
-        tickangle: 90,
-  
-        title: {
-  
-          text: "Longitude",
-  
-          standoff: 20
-  
-        }},
+      tickangle: 90,
 
+      title: {
+        text: 'Longitude',
+
+        standoff: 20,
+      },
+    },
   };
-  
-    return (
-      <Plotly
-        data={data}
-        layout={layout}
-      />
-    )
-  
+
+  return <Plotly data={data} layout={layout} />;
 };
