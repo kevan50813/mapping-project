@@ -1,25 +1,18 @@
 version: '3.7'
 services:
-  redisgraph:
+  redis:
     image: redislabs/redismod
-    container_name: redisg
     ports:
       - "6379:6379"
     restart: unless-stopped
-    networks:
-      - redisgn
-    hostname: redis
     volumes:
       - redis:/data
-  mappingserver:
+  mapping:
+    depends_on: 
+      - redis
     image: registry.gitlab.com/comp5530m-mapping-project/comp5530m_mapping_project/mapping-app:main
-    container_name: mapping
     ports:
       - "80:80"
     restart: unless-stopped
-    networks:
-      - redisgn
-networks:
-  redisgn:
 volumes:
   redis:
