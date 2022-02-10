@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { styles } from './styles';
 import Plotly from 'react-native-plotly';
 import { Button } from './Button';
 
 export const Trilateration = () => {
+  /* loads in the data from wifi_Nodes.json */
   const [networkData, setNetworkData] = useState([]);
 
   const loadData = async () => {
@@ -18,6 +19,11 @@ export const Trilateration = () => {
     );
   };
 
+  /*
+   *  stores the data inside an object in an array (plotly needs this format)
+   *  with formatting of the markers set inside too so that the data can be
+   *  plotted onto the graph
+   */
   let data = [
     {
       x: networkData.map(element => element.x_data),
@@ -39,6 +45,10 @@ export const Trilateration = () => {
       marker: { size: 12 },
     },
   ];
+  /*
+   *  sets how the graph will be laid out and also where the circles for
+   *  trilateration are set up
+   */
 
   let layout = {
     title: 'Basic scatter plot',
@@ -89,6 +99,10 @@ export const Trilateration = () => {
     ],
   };
 
+  /*
+   *  returns a button for getting and storing the json data
+   *  as well as the graph that is being plotted
+   */
   return (
     <View style={styles.background}>
       <Button style={styles.button} title="Load JSON Data" onPress={loadData} />

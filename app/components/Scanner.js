@@ -59,7 +59,6 @@ export class Scan {
           }))
           // Highest to lowest
           .sort((n1, n2) => n2.level - n1.level);
-
       } catch (e) {
         console.error(e);
         this.networks = [
