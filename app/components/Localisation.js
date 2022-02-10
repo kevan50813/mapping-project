@@ -9,7 +9,7 @@ export const Localisation = () => {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
   const [time, setTime] = useState({ start: new Date(), end: new Date() });
-  const [networkData, setNetworkData] = useState(null);
+  const [networkData, setNetworkData] = useState([]);
 
   const startScan = async () => {
     setScanning(true);

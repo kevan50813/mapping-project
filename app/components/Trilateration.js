@@ -5,24 +5,17 @@ import Plotly from 'react-native-plotly';
 import { Button } from './Button';
 
 export const Trilateration = () => {
-  let [setNetworkData] = useState(null);
+  const [networkData, setNetworkData] = useState([]);
 
   const loadData = async () => {
-    try {
-      setNetworkData(
-        require('./Wifi_Nodes.json').features.map(
-          ({ geometry, properties }) => ({
-            x_data: geometry.coordinates[0],
-            y_data: geometry.coordinates[1],
-            SSID: properties.AP_Name,
-            BSSID: properties.MacAddress,
-          }),
-        ),
-      );
-      console.log(setNetworkData.x_data);
-    } catch (error) {
-      console.error(error);
-    }
+    await setNetworkData(
+        require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
+          x_data: geometry.coordinates[0],
+          y_data: geometry.coordinates[1],
+          SSID: properties.AP_Name,
+          BSSID: properties.MacAddress,
+        })),
+    );
   };
 
   let data = [

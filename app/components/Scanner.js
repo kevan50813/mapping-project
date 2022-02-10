@@ -51,7 +51,7 @@ export class Scan {
 
         this.timeEnd = new Date();
 
-        const list = wifiNetworks
+        this.networks = wifiNetworks
           .map(({ SSID, BSSID, level }) => ({
             SSID,
             BSSID,
@@ -60,7 +60,6 @@ export class Scan {
           // Highest to lowest
           .sort((n1, n2) => n2.level - n1.level);
 
-        this.networks = list;
       } catch (e) {
         console.error(e);
         this.networks = [
