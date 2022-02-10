@@ -15,10 +15,10 @@ export const Trilateration = () => {
     );
   };
 
-  var data = [{
+  let data = [{
 
   
-  x: [1, 2, 3, 4, 5],
+  x: [1, 2, 9, 4, 5],
 
   y: [1, 6, 3, 6, 1],
 
@@ -43,7 +43,7 @@ export const Trilateration = () => {
   }];
    
   
-  var layout = {
+  let layout = {
   
     title: 'Scatter Plot with a Color Dimension',
     xaxis: {
@@ -72,7 +72,7 @@ export const Trilateration = () => {
   
           standoff: 20
   
-        }}
+        }},
 
   };
   
