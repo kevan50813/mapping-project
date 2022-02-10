@@ -1,32 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { styles } from './styles';
 import Plotly from 'react-native-plotly';
+import { Button } from './Button';
 
 export const Trilateration = () => {
+  let [setNetworkData] = useState(null);
+
   const loadData = async () => {
-    setNetworkData(
-      require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
-        coordinates: geometry.coordinates,
-        SSID: properties.AP_Name,
-        BSSID: properties.MacAddress,
-      })),
-    );
+    try {
+      setNetworkData(
+        require('./Wifi_Nodes.json').features.map(
+          ({ geometry, properties }) => ({
+            x_data: geometry.coordinates,
+            SSID: properties.AP_Name,
+            BSSID: properties.MacAddress,
+          }),
+        ),
+      );
+      console.log(x_data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   let data = [
     {
-      x: [1, 2, 9, 4, 5],
+      x: [0, 1, 2, 3],
 
-      y: [1, 6, 3, 6, 1],
+      y: [0, 1, 2, 3],
 
       mode: 'markers+text',
 
       type: 'scatter',
 
-      name: 'Team A',
-
-      text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+      text: [0, 1, 2, 3],
 
       textposition: 'top center',
 
@@ -39,7 +47,7 @@ export const Trilateration = () => {
   ];
 
   let layout = {
-    title: 'Scatter Plot with a Color Dimension',
+    title: 'Basic scatter plot',
     xaxis: {
       automargin: true,
 
@@ -65,5 +73,10 @@ export const Trilateration = () => {
     },
   };
 
-  return <Plotly data={data} layout={layout} />;
+  return (
+    <View style={styles.background}>
+      <Button style={styles.button} title="Load JSON Data" onPress={loadData} />
+      <Plotly data={data} layout={layout} />
+    </View>
+  );
 };
