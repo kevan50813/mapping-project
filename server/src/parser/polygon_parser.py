@@ -116,16 +116,17 @@ class PolygonParser:
         """
         self.log.debug("Loading polygons")
 
-        level_range = sorted(
-            list(
-                {str(n["properties"]["level"]) for n in self.json_polygons["features"]}
-            )
-        )
-        level_range = [level for level in level_range if ";" not in level]
+        level_range = {str(n["properties"]["level"])
+                       for n in self.json_polygons["features"]}
+        level_range = sorted([level for level in level_range
+                              if ";" not in level])
 
         for feature in self.json_polygons["features"]:
             id = len(self.polygons)
             room = feature["geometry"]["coordinates"][0]
+            # Important note: this means that the API returns the range
+            # and the server expands it below, this might be quite confusing
+            # when returning nodes vs polygons...
             level = feature["properties"]["level"]
             properties = feature["properties"]
 
@@ -147,13 +148,13 @@ class PolygonParser:
             except (AttributeError, IndexError):
                 level_span = [float(level)]
 
-            for level in level_span:
+            for span in level_span:
                 self.__geodesy_polygons.append(
-                    {"id": id, "level": level, "polygon": geo_poly, "tags": properties}
+                    {"id": id, "level": span, "polygon": geo_poly, "tags": properties}
                 )
 
                 self.polygons.append(
-                    Polygon(id, self.graph_name, level, vertices, NE, SW, properties)
+                    Polygon(id, self.graph_name, span, vertices, NE, SW, properties)
                 )
 
     def parse_rooms(self, nodes: List[PathNode]):

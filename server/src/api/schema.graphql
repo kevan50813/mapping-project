@@ -52,7 +52,7 @@ type Mutation {
 type Node {
   id: Int!
   graph: String!
-  level: Float!
+  level: String!
   lat: Float!
   lon: Float!
   polygon: Polygon
@@ -63,7 +63,7 @@ type Node {
 type Polygon {
   id: Int!
   graph: String!
-  level: Float!
+  level: String!
   sw: [Float!]!
   ne: [Float!]!
   vertices: [[Float!]!]!
@@ -73,7 +73,7 @@ type Polygon {
 type PoI {
   id: Int!
   graph: String!
-  level: Float!
+  level: String!
   lat: Float!
   lon: Float!
   tags: Tags
