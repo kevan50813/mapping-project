@@ -17,7 +17,6 @@ import { RoomSearch } from './RoomSearch';
 import { Localisation } from './Localisation';
 import { styles } from './styles';
 import { Button } from './Button';
-import { Trilateration } from './Trilateration';
 
 export const IPContext = createContext({ ip: '', setIP: () => {} });
 
@@ -34,10 +33,6 @@ const Home = ({ navigation }) => (
     <Button
       title="Perform Localisation"
       onPress={() => navigation.navigate('Localisation')}
-    />
-    <Button
-      title="Do Trilateration"
-      onPress={() => navigation.navigate('Trilateration')}
     />
   </View>
 );
@@ -73,7 +68,6 @@ const App = () => {
             <Stack.Screen name="RoomSearch" component={RoomSearch} />
             <Stack.Screen name="Scanner" component={Scanner} />
             <Stack.Screen name="Localisation" component={Localisation} />
-            <Stack.Screen name="Trilateration" component={Trilateration} />
           </Stack.Navigator>
         </NavigationContainer>
       </ApolloProvider>

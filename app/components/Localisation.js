@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
 import { Scan } from './Scanner';
+import { APVisualisation } from "./APVisualisation";
 
 export const Localisation = () => {
   const [networkScanned, setNetworkScanned] = useState([]);
@@ -10,11 +11,15 @@ export const Localisation = () => {
   const [networkWithDist, setNetworkWithDist] = useState([]);
 
   const execute = async () => {
+
+  setNetworkData([]);
+  setNetworkScanned([]);
+
+  await loadData();
+
     let scan = new Scan();
     await scan.startScan();
     setNetworkScanned(scan.getNetworks());
-
-    await loadData();
 
     // any further execution now is in useEffect when both arrays have been populated
   };
@@ -76,6 +81,7 @@ export const Localisation = () => {
           <Text style={styles.info}>Network scan successful.</Text>
         ) : null}
       </ScrollView>
+        <APVisualisation networks={networkWithDist}/>
     </View>
   );
 };
