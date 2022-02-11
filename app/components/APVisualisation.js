@@ -1,22 +1,20 @@
 import React from 'react';
 import Plotly from 'react-native-plotly';
-import { ScrollView, Text, View } from 'react-native';
-import { styles } from './styles';
+import { Network } from './Scan';
 
-export const APVisualisation = (props) => {
-  /* loads in the data from wifi_Nodes.json */
+const networkColourMapping = {
+  [Network.UNSCANNED]: 'gray',
+  [Network.SCANNED]: 'lightblue',
+  [Network.USED]: 'blue',
+};
 
-  let networkData = props.networks;
-
-  networkData.forEach((element, index) => {
-
-    if (element.type === "unscanned")
-      element.type = "gray";
-    else if (element.type === "scanned")
-      element.type = "green";
-    else if (element.type === "used")
-      element.type = "red";
-  });
+export const APVisualisation = ({ networks }) => {
+  const networkData = {
+    xs: networks.map(n => n.coordinates[0]),
+    ys: networks.map(n => n.coordinates[1]),
+    names: networks.map(n => n.BSSID),
+    colours: networks.map(n => networkColourMapping[n.type]),
+  };
 
   /*
    *  stores the data inside an object in an array (plotly needs this format)
@@ -25,23 +23,15 @@ export const APVisualisation = (props) => {
    */
   let data = [
     {
-      x: networkData.map(element => element.coordinates[0]),
-
-      y: networkData.map(element => element.coordinates[1]),
-
-      mode: 'markers',
-
-      type: 'scatter',
-
-      text: networkData.map(element => element.BSSID),
-
-      textposition: 'top center',
-
-      textfont: {
-        family: 'Raleway, sans-serif',
+      x: networkData.xs,
+      y: networkData.ys,
+      text: networkData.names,
+      marker: {
+        size: 12,
+        color: networkData.colours,
       },
-
-      marker: { size: 12, color: networkData.map(element => element.type) },
+      mode: 'markers',
+      type: 'scatter',
     },
   ];
   /*
@@ -50,47 +40,33 @@ export const APVisualisation = (props) => {
    */
 
   let layout = {
-    title: 'Basic scatter plot',
+    title: 'Access Points',
     xaxis: {
-      automargin: true,
-
-      tickangle: 90,
-
       title: {
         text: 'Latitude',
-
-        standoff: 20,
       },
     },
-
     yaxis: {
-      automargin: true,
-
-      tickangle: 90,
-
       title: {
         text: 'Longitude',
-
-        standoff: 20,
       },
+      tickangle: 60,
     },
-
+    margin: {
+      b: 80,
+      t: 60,
+      l: 60,
+      r: 20,
+    },
     shapes: [
       {
         type: 'circle',
-
         xref: 'x',
-
         yref: 'y',
-
         x0: -1.5542,
-
         y0: 53.8087,
-
         x1: -1.554,
-
         y1: 53.8088,
-
         line: {
           color: 'blue',
         },
@@ -98,13 +74,5 @@ export const APVisualisation = (props) => {
     ],
   };
 
-  /*
-   *  returns a button for getting and storing the json data
-   *  as well as the graph that is being plotted
-   */
-  return (
-      <View style={{flex: 6}}>
-      <Plotly data={data} layout={layout} />
-      </View>
-  );
+  return <Plotly data={data} layout={layout} />;
 };

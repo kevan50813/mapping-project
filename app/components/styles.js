@@ -41,6 +41,10 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ccc',
   },
+  spacedBox: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
   big: {
     fontSize: 18,
     fontWeight: '600',
@@ -69,10 +73,10 @@ export const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
+  // input: {
+  //   height: 40,
+  //   margin: 12,
+  //   borderWidth: 1,
+  //   padding: 10,
+  // },
 });

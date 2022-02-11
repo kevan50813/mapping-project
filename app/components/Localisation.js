@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
-import { Scan } from './Scan';
-import { APVisualisation } from "./APVisualisation";
+import { Network, Scan } from './Scan';
+import { APVisualisation } from './APVisualisation';
 
 export const Localisation = () => {
   const [networkScanned, setNetworkScanned] = useState([]);
@@ -11,11 +11,10 @@ export const Localisation = () => {
   const [networkWithDist, setNetworkWithDist] = useState([]);
 
   const execute = async () => {
+    setNetworkData([]);
+    setNetworkScanned([]);
 
-  setNetworkData([]);
-  setNetworkScanned([]);
-
-  await loadData();
+    await loadData();
 
     let scan = new Scan();
     await scan.startScan();
@@ -37,38 +36,34 @@ export const Localisation = () => {
   // only fire when networkData/networkScanned update
   useEffect(() => {
     if (networkData.length > 0 && networkScanned.length > 0) {
+      // for every network
+      for (let index = 0; index < networkData.length; index++) {
+        let key = networkData[index].BSSID;
 
-        // for every network
-        for (let index = 0; index < networkData.length; index++) {
+        // pre set some new data we want to record
+        networkData[index].distance = -1;
+        networkData[index].type = Network.UNSCANNED;
+        networkData[index].SSID = 'n/a';
 
-            let key = networkData[index].BSSID;
-
-            // pre set some new data we want to record
-            networkData[index].distance = -1;
-            networkData[index].type = "unscanned";
-            networkData[index].SSID = "n/a";
-
-            // inefficient to nest array for loops, but necessary as partial keys being used
-            // i'd like to use a dict as faster, but the key would be an issue...
-            for (let scan = 0; scan < networkScanned.length; scan++) {
-
-                // check for partial key - i.e. skim off very last digit
-                if (networkScanned[scan]["BSSID"].includes(key.slice(0, -1))) {
-
-                    networkData[index].distance = networkScanned[scan].distance;
-                    networkData[index].SSID = networkScanned[scan].SSID;
-                    networkData[index].type = "scanned";
-                }
-            }
+        // inefficient to nest array for loops, but necessary as partial keys being used
+        // i'd like to use a dict as faster, but the key would be an issue...
+        for (let scan = 0; scan < networkScanned.length; scan++) {
+          // check for partial key - i.e. skim off very last digit
+          if (networkScanned[scan].BSSID.includes(key.slice(0, -1))) {
+            networkData[index].distance = networkScanned[scan].distance;
+            networkData[index].SSID = networkScanned[scan].SSID;
+            networkData[index].type = Network.SCANNED;
+          }
         }
+      }
 
-        setNetworkWithDist(networkData);
+      setNetworkWithDist(networkData);
     }
   }, [networkData, networkScanned]);
 
   return (
     <View style={styles.background}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <View style={styles.background}>
         <Button
           style={styles.button}
           title="Execute Process"
@@ -80,8 +75,10 @@ export const Localisation = () => {
         {networkScanned.length > 0 ? (
           <Text style={styles.info}>Network scan successful.</Text>
         ) : null}
-      </ScrollView>
-        <APVisualisation networks={networkWithDist}/>
+      </View>
+      <View style={{ height: '70%' }}>
+        <APVisualisation networks={networkWithDist} />
+      </View>
     </View>
   );
 };
