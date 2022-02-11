@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
-import { Scan } from './Scanner';
+import { Scan } from './Scan';
 import { APVisualisation } from "./APVisualisation";
 
 export const Localisation = () => {
