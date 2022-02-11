@@ -23,7 +23,7 @@ export const Localisation = () => {
     setNetworkData(
       require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
         coordinates: geometry.coordinates,
-        SSID: properties.AP_Name,
+        name: properties.AP_Name,
         BSSID: properties.MacAddress,
       })),
     );
@@ -33,25 +33,31 @@ export const Localisation = () => {
   useEffect(() => {
     if (networkData.length > 0 && networkScanned.length > 0) {
 
-        console.log(networkData.map(element => element.BSSID).sort());
-        console.log(networkScanned.map(element => element.BSSID).sort());
-
-        // hash using the BSSID. allows O(1) direct access via the key
-        let scannedDict = Object.assign({}, ...networkScanned.map((networkScanned) => ({[networkScanned.BSSID]: networkScanned.distance})));
-
+        // for every network
         for (let index = 0; index < networkData.length; index++) {
+
             let key = networkData[index].BSSID;
-            console.log(key);
-            if (key in scannedDict) {
-                console.log("woo");
-                networkData[index].distance = networkScanned.distance;
-            } else {
-               networkData[index].distance = -1;
+
+            // pre set some new data we want to record
+            networkData[index].distance = -1;
+            networkData[index].type = "unscanned";
+            networkData[index].SSID = "n/a";
+
+            // inefficient to nest array for loops, but necessary as partial keys being used
+            // i'd like to use a dict as faster, but the key would be an issue...
+            for (let scan = 0; scan < networkScanned.length; scan++) {
+
+                // check for partial key - i.e. skim off very last digit
+                if (networkScanned[scan]["BSSID"].includes(key.slice(0, -1))) {
+
+                    networkData[index].distance = networkScanned[scan].distance;
+                    networkData[index].SSID = networkScanned[scan].SSID;
+                    networkData[index].type = "scanned";
+                }
             }
         }
 
-        console.log(networkData);
-
+        setNetworkWithDist(networkData);
     }
   }, [networkData, networkScanned]);
 
