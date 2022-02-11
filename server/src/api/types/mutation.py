@@ -32,8 +32,8 @@ async def resolve_add_graph(*_, graph, polygons, linestring, points):
 
     try:
         parsed = Parser(graph, json_polygons, json_linestring, json_points)
-    except (ValueError, KeyError):
-        print("PARSER FAIL")
+    except (ValueError, KeyError) as e:
+        print(f"PARSER FAIL {e:}")
         return False
 
     log.info("Graph parsed for %s", graph)

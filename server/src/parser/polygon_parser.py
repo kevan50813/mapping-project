@@ -153,7 +153,7 @@ class PolygonParser:
                 )
 
                 self.polygons.append(
-                    Polygon(id, level, self.graph_name, vertices, NE, SW, properties)
+                    Polygon(id, self.graph_name, level, vertices, NE, SW, properties)
                 )
 
     def parse_rooms(self, nodes: List[PathNode]):
