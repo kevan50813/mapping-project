@@ -11,6 +11,16 @@ export class Scan {
     this.error = '';
     this.timeStart = new Date();
     this.timeEnd = new Date();
+
+    this.A = -50; // signal strength at 1 meter
+    this.N = 2;   // path exponent loss
+  }
+
+  rssiToDistance(rssi) {
+
+    // rssi = -10 * N * log(D) + A
+    // D = 10^((rssi - A) / (-10 * N))
+    return Math.pow(10, (rssi - this.A) / (-10 * this.N));
   }
 
   getNetworks() {
@@ -56,6 +66,7 @@ export class Scan {
             SSID,
             BSSID,
             level,
+            distance: this.rssiToDistance(level),
           }))
           // Highest to lowest
           .sort((n1, n2) => n2.level - n1.level);
