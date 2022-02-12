@@ -1,11 +1,11 @@
 import React from 'react';
 import Plotly from 'react-native-plotly';
-import { Network } from './Scan';
+import { NetworkType } from './NetworkProvider';
 
 const networkColours = {
-  [Network.UNSCANNED]: 'lightgray',
-  [Network.SCANNED]: 'lightblue',
-  [Network.USED]: 'blue',
+  [NetworkType.UNSCANNED]: 'lightgray',
+  [NetworkType.SCANNED]: 'lightblue',
+  [NetworkType.USED]: 'blue',
 };
 
 export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
@@ -15,12 +15,12 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
 
   const getColour = network => {
     if (usedBSSIDs.has(network.BSSID)) {
-      return networkColours[Network.USED];
+      return networkColours[NetworkType.USED];
     }
     if (scannedBSSIDs.has(network.BSSID)) {
-      return networkColours[Network.SCANNED];
+      return networkColours[NetworkType.SCANNED];
     }
-    return networkColours[Network.UNSCANNED];
+    return networkColours[NetworkType.UNSCANNED];
   };
 
   const networkData = {

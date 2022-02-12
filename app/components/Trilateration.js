@@ -1,4 +1,4 @@
-import { Network } from './Scan';
+import { NetworkType } from './NetworkProvider';
 
 export class TrilaterationHeuristics {
   static firstThree(networks) {
@@ -12,7 +12,7 @@ export class TrilaterationHeuristics {
     );
 
     for (let i in index) {
-      networks[i].type = Network.USED;
+      networks[i].type = NetworkType.USED;
     }
 
     return {

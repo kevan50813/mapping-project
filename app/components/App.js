@@ -17,6 +17,7 @@ import { RoomSearch } from './RoomSearch';
 import { Localisation } from './Localisation';
 import { styles } from './styles';
 import { Button } from './Button';
+import { NetworkProvider } from './NetworkProvider';
 
 // Replace with local IP for development
 export const server = 'mappingapp.azurewebsites.net';
@@ -47,21 +48,23 @@ const App = () => {
   });
 
   return (
-    <ApolloProvider client={client}>
-      <NavigationContainer>
-        <StatusBar
-          barStyle={'dark-content'}
-          backgroundColor={'#ffffff00'}
-          translucent={true}
-        />
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="RoomSearch" component={RoomSearch} />
-          <Stack.Screen name="Scanner" component={Scanner} />
-          <Stack.Screen name="Localisation" component={Localisation} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ApolloProvider>
+    <NetworkProvider>
+      <ApolloProvider client={client}>
+        <NavigationContainer>
+          <StatusBar
+            barStyle={'dark-content'}
+            backgroundColor={'#ffffff00'}
+            translucent={true}
+          />
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="RoomSearch" component={RoomSearch} />
+            <Stack.Screen name="Scanner" component={Scanner} />
+            <Stack.Screen name="Localisation" component={Localisation} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ApolloProvider>
+    </NetworkProvider>
   );
 };
 

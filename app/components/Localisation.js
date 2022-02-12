@@ -1,43 +1,35 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
-import { Scan } from './Scan';
 import { APVisualisation } from './APVisualisation';
+import { NetworkContext } from './NetworkProvider';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
-  const [visibleNetworks, setVisibleNetworks] = useState([]);
+  const { networks: visibleNetworks, startScan } = useContext(NetworkContext);
 
-  const execute = async () => {
-    setKnownNetworks([]);
-    setVisibleNetworks([]);
-
-    await loadData();
-
-    let scan = new Scan();
-    await scan.startScan();
-    setVisibleNetworks(scan.getNetworks());
-  };
-
-  const loadData = async () => {
-    setKnownNetworks(
-      require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
+  const loadKnownNetworks = async () => {
+    return require('./Wifi_Nodes.json').features.map(
+      ({ geometry, properties }) => ({
         coordinates: geometry.coordinates,
         name: properties.AP_Name,
         BSSID: properties.MacAddress,
-      })),
+      }),
     );
+  };
+
+  const scan = async () => {
+    const data = await loadKnownNetworks();
+    setKnownNetworks(data);
+
+    startScan();
   };
 
   return (
     <View style={styles.background}>
       <View style={styles.background}>
-        <Button
-          style={styles.button}
-          title="Execute Process"
-          onPress={execute}
-        />
+        <Button style={styles.button} title="Scan Networks" onPress={scan} />
         {knownNetworks.length > 0 ? (
           <Text style={styles.info}>Loaded network data from JSON.</Text>
         ) : null}

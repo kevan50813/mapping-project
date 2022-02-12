@@ -1,72 +1,49 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Slider } from '@miblanchard/react-native-slider';
 import { Button } from './Button';
-import { Scan } from './Scan';
 import { styles } from './styles';
+import { NetworkContext } from './NetworkProvider';
 
 export const Scanner = () => {
-  const [networks, setNetworks] = useState([]);
+  const { networks, startScan, state, info } = useContext(NetworkContext);
 
-  const [scanning, setScanning] = useState(false);
-  const [error, setError] = useState('');
-  const [time, setTime] = useState({ start: new Date(), end: new Date() });
+  let [a, setA] = useState(-50);
+  let [n, setN] = useState(3);
 
-  const [nValue, setN] = useState(3);
-  const [aValue, setA] = useState(-50);
-
-  const rssiToDistance = rssi => {
-    // rssi = -10 * N * log(D) + A
-    // D = 10^((rssi - A) / (-10 * N))
-    return Math.pow(10, (rssi - aValue) / (-10 * nValue));
-  };
-
-  const startScan = async () => {
-    setScanning(true);
-
-    let scan = new Scan();
-
-    await scan.startScan();
-
-    setNetworks(scan.getNetworks());
-    setError(scan.getError());
-    setTime(scan.getTime());
-    setScanning(false);
-  };
+  const rssiToDistance = rssi => Math.pow(10, (rssi - a) / (-10 * n));
 
   return (
     <View style={styles.background}>
       <View style={styles.spacedBox}>
-        <Text style={styles.small}>N = {nValue.toFixed(2)}</Text>
+        <Text style={styles.small}>N = {n.toFixed(2)}</Text>
         <Slider
           minimumValue={1}
           maximumValue={3}
-          value={nValue}
+          value={n}
           onValueChange={v => setN(v[0])}
         />
-        <Text style={styles.small}>A = {aValue.toFixed(2)}</Text>
+        <Text style={styles.small}>A = {a.toFixed(2)}</Text>
         <Slider
           minimumValue={-100}
           maximumValue={0}
-          value={aValue}
+          value={a}
           onValueChange={v => setA(v[0])}
         />
       </View>
       <Button style={styles.button} title="Scan" onPress={startScan} />
-      {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Text style={styles.info}>
-        Took {(time.end.getTime() - time.start.getTime()) / 1000}s
-      </Text>
+      {state.scanning ? <Text style={styles.info}>Scanning...</Text> : null}
+      {state.error ? <Text style={styles.error}>{state.error}</Text> : null}
+      <Text style={styles.info}>Took {info.duration / 1000}s</Text>
 
       <ScrollView>
-        {networks.map(({ SSID, BSSID, level }) => (
+        {networks.map(({ SSID, BSSID, RSSI }) => (
           <View key={BSSID} style={styles.box}>
             <Text style={styles.big}>
               {SSID} ({BSSID})
             </Text>
             <Text style={styles.small}>
-              {level}dBm = {rssiToDistance(level).toFixed(2)}m
+              {RSSI}dBm = {rssiToDistance(RSSI)}m
             </Text>
           </View>
         ))}

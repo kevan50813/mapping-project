@@ -1,12 +1,6 @@
 import { PermissionsAndroid } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
 
-export const Network = {
-  UNSCANNED: 1,
-  SCANNED: 2,
-  USED: 3,
-};
-
 export class Scan {
   constructor() {
     this.networks = [];
