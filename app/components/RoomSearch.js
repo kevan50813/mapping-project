@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, Text, View, TextInput } from 'react-native';
 import { useLazyQuery, gql } from '@apollo/client';
 import { styles } from './styles';
 import { Button } from './Button';
-import { IPContext } from './App';
+import { server } from './App';
 
 const RoomList = ({ loading, error, polygons = [] }) => {
   if (error) {
@@ -11,7 +11,9 @@ const RoomList = ({ loading, error, polygons = [] }) => {
   }
   return (
     <>
-      {loading ? <Text style={styles.info}>Loading...</Text> : null}
+      {loading ? (
+        <Text style={styles.info}>Loading from {server}...</Text>
+      ) : null}
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
       <Text style={styles.info}>Results: {polygons.length}</Text>
       {polygons.map(p => (
@@ -27,8 +29,6 @@ const RoomList = ({ loading, error, polygons = [] }) => {
 
 export const RoomSearch = ({ navigation }) => {
   const [search, setSearch] = useState('');
-
-  const { ip, setIP } = useContext(IPContext);
 
   const qPolygons = gql`
     query polygons($search: String!) {
@@ -52,15 +52,6 @@ export const RoomSearch = ({ navigation }) => {
 
   return (
     <View style={styles.background}>
-      <View style={styles.inputRow}>
-        <Text style={styles.label}>Server IP:</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={ip}
-          onChangeText={setIP}
-        />
-      </View>
       <View style={styles.inputRow}>
         <Text style={styles.label}>Search:</Text>
         <TextInput
