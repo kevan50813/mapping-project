@@ -2,18 +2,32 @@ import React from 'react';
 import Plotly from 'react-native-plotly';
 import { Network } from './Scan';
 
-const networkColourMapping = {
-  [Network.UNSCANNED]: 'gray',
+const networkColours = {
+  [Network.UNSCANNED]: 'lightgray',
   [Network.SCANNED]: 'lightblue',
   [Network.USED]: 'blue',
 };
 
-export const APVisualisation = ({ networks }) => {
+export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
+  const scannedBSSIDs = new Set(visibleNetworks.map(n => n.BSSID));
+  // Currently using no networks for trilateration
+  const usedBSSIDs = new Set();
+
+  const getColour = network => {
+    if (usedBSSIDs.has(network.BSSID)) {
+      return networkColours[Network.USED];
+    }
+    if (scannedBSSIDs.has(network.BSSID)) {
+      return networkColours[Network.SCANNED];
+    }
+    return networkColours[Network.UNSCANNED];
+  };
+
   const networkData = {
-    xs: networks.map(n => n.coordinates[0]),
-    ys: networks.map(n => n.coordinates[1]),
-    names: networks.map(n => n.BSSID),
-    colours: networks.map(n => networkColourMapping[n.type]),
+    xs: knownNetworks.map(n => n.coordinates[0]),
+    ys: knownNetworks.map(n => n.coordinates[1]),
+    names: knownNetworks.map(n => n.BSSID),
+    colours: knownNetworks.map(getColour),
   };
 
   /*

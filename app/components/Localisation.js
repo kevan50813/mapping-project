@@ -1,30 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
-import { Network, Scan } from './Scan';
+import { Scan } from './Scan';
 import { APVisualisation } from './APVisualisation';
 
 export const Localisation = () => {
-  const [networkScanned, setNetworkScanned] = useState([]);
-  const [networkData, setNetworkData] = useState([]);
-  const [networkWithDist, setNetworkWithDist] = useState([]);
+  const [knownNetworks, setKnownNetworks] = useState([]);
+  const [visibleNetworks, setVisibleNetworks] = useState([]);
 
   const execute = async () => {
-    setNetworkData([]);
-    setNetworkScanned([]);
+    setKnownNetworks([]);
+    setVisibleNetworks([]);
 
     await loadData();
 
     let scan = new Scan();
     await scan.startScan();
-    setNetworkScanned(scan.getNetworks());
-
-    // any further execution now is in useEffect when both arrays have been populated
+    setVisibleNetworks(scan.getNetworks());
   };
 
   const loadData = async () => {
-    setNetworkData(
+    setKnownNetworks(
       require('./Wifi_Nodes.json').features.map(({ geometry, properties }) => ({
         coordinates: geometry.coordinates,
         name: properties.AP_Name,
@@ -32,34 +29,6 @@ export const Localisation = () => {
       })),
     );
   };
-
-  // only fire when networkData/networkScanned update
-  useEffect(() => {
-    if (networkData.length > 0 && networkScanned.length > 0) {
-      // for every network
-      for (let index = 0; index < networkData.length; index++) {
-        let key = networkData[index].BSSID;
-
-        // pre set some new data we want to record
-        networkData[index].distance = -1;
-        networkData[index].type = Network.UNSCANNED;
-        networkData[index].SSID = 'n/a';
-
-        // inefficient to nest array for loops, but necessary as partial keys being used
-        // i'd like to use a dict as faster, but the key would be an issue...
-        for (let scan = 0; scan < networkScanned.length; scan++) {
-          // check for partial key - i.e. skim off very last digit
-          if (networkScanned[scan].BSSID.includes(key.slice(0, -1))) {
-            networkData[index].distance = networkScanned[scan].distance;
-            networkData[index].SSID = networkScanned[scan].SSID;
-            networkData[index].type = Network.SCANNED;
-          }
-        }
-      }
-
-      setNetworkWithDist(networkData);
-    }
-  }, [networkData, networkScanned]);
 
   return (
     <View style={styles.background}>
@@ -69,15 +38,18 @@ export const Localisation = () => {
           title="Execute Process"
           onPress={execute}
         />
-        {networkData.length > 0 ? (
+        {knownNetworks.length > 0 ? (
           <Text style={styles.info}>Loaded network data from JSON.</Text>
         ) : null}
-        {networkScanned.length > 0 ? (
+        {visibleNetworks.length > 0 ? (
           <Text style={styles.info}>Network scan successful.</Text>
         ) : null}
       </View>
       <View style={{ height: '70%' }}>
-        <APVisualisation networks={networkWithDist} />
+        <APVisualisation
+          knownNetworks={knownNetworks}
+          visibleNetworks={visibleNetworks}
+        />
       </View>
     </View>
   );
