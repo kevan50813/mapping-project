@@ -7,7 +7,11 @@ import { NetworkContext } from './NetworkProvider';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
-  const { networks: visibleNetworks, startScan } = useContext(NetworkContext);
+  const {
+    networks: visibleNetworks,
+    state: { scanning },
+    startScan,
+  } = useContext(NetworkContext);
 
   const loadKnownNetworks = async () => {
     return require('./Wifi_Nodes.json').features.map(
@@ -36,6 +40,7 @@ export const Localisation = () => {
         {visibleNetworks.length > 0 ? (
           <Text style={styles.info}>Network scan successful.</Text>
         ) : null}
+        {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
       </View>
       <View style={{ height: '70%' }}>
         <APVisualisation

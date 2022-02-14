@@ -17,8 +17,8 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
     visibleNetworks
       .filter(n => n.SSID === 'eduroam')
       .sort((a, b) => a.level - b.level)
-      .slice(0, 3)
-      .map(getNetworkKey),
+      .map(getNetworkKey)
+      .slice(0, 3),
   );
 
   const getColour = network => {
