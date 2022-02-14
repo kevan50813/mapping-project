@@ -32,7 +32,6 @@ export const NetworkProvider = ({ children }) => {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
 
-  const [start, setStart] = useState(new Date().getTime());
   const [duration, setDuration] = useState(0);
 
   const startScan = async () => {
@@ -40,7 +39,8 @@ export const NetworkProvider = ({ children }) => {
 
     setScanning(true);
     setError('');
-    setStart(new Date().getTime());
+
+    const start = new Date().getTime();
 
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -89,7 +89,6 @@ export const NetworkProvider = ({ children }) => {
       error,
     },
     info: {
-      start,
       duration,
     },
   };
