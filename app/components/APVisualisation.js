@@ -8,16 +8,25 @@ const networkColours = {
   [NetworkType.USED]: 'blue',
 };
 
+const getNetworkKey = n => n.BSSID.slice(0, -1);
+
 export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
-  const scannedBSSIDs = new Set(visibleNetworks.map(n => n.BSSID));
+  const scannedBSSIDs = new Set(visibleNetworks.map(getNetworkKey));
   // Currently using no networks for trilateration
-  const usedBSSIDs = new Set();
+  const usedBSSIDs = new Set(
+    visibleNetworks
+      .filter(n => n.SSID === 'eduroam')
+      .sort((a, b) => a.level - b.level)
+      .slice(0, 3)
+      .map(getNetworkKey),
+  );
 
   const getColour = network => {
-    if (usedBSSIDs.has(network.BSSID)) {
+    const key = getNetworkKey(network);
+    if (usedBSSIDs.has(key)) {
       return networkColours[NetworkType.USED];
     }
-    if (scannedBSSIDs.has(network.BSSID)) {
+    if (scannedBSSIDs.has(key)) {
       return networkColours[NetworkType.SCANNED];
     }
     return networkColours[NetworkType.UNSCANNED];
