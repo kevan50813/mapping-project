@@ -62,6 +62,34 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
    *  trilateration are set up
    */
 
+  const shapes = [];
+  if (usedBSSIDs.size > 0) {
+    const points = knownNetworks.filter(n => usedBSSIDs.has(getNetworkKey(n)));
+    const avgLat =
+      points.reduce((average, n) => average + n.coordinates[0], 0) /
+      usedBSSIDs.size;
+    const avgLon =
+      points.reduce((average, n) => average + n.coordinates[1], 0) /
+      usedBSSIDs.size;
+
+    const radius = 0.000025;
+
+    shapes.push({
+      type: 'circle',
+      xref: 'x',
+      yref: 'y',
+      x0: avgLat - radius,
+      y0: avgLon - radius,
+      x1: avgLat + radius,
+      y1: avgLon + radius,
+      line: {
+        color: 'green',
+      },
+      fillcolor: 'lightgreen',
+      opacity: 0.5,
+    });
+  }
+
   let layout = {
     title: 'Access Points',
     xaxis: {
@@ -81,20 +109,7 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
       l: 60,
       r: 20,
     },
-    shapes: [
-      {
-        type: 'circle',
-        xref: 'x',
-        yref: 'y',
-        x0: -1.5542,
-        y0: 53.8087,
-        x1: -1.554,
-        y1: 53.8088,
-        line: {
-          color: 'blue',
-        },
-      },
-    ],
+    shapes,
   };
 
   return <Plotly data={data} layout={layout} />;
