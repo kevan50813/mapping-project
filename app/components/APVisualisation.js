@@ -4,25 +4,25 @@ import { NetworkType } from './NetworkProvider';
 
 const networkColours = {
   [NetworkType.UNSCANNED]: 'lightgray',
-  [NetworkType.SCANNED]: 'lightblue',
-  [NetworkType.USED]: 'blue',
+  [NetworkType.SCANNED]: 'blue',
+  [NetworkType.USED]: 'red',
 };
 
 const getNetworkKey = n => n.BSSID.slice(0, -1);
 
-export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
+export const APVisualisation = ({
+  knownNetworks,
+  visibleNetworks,
+  usedNetworks,
+  predictedLocation,
+}) => {
   const scannedBSSIDs = new Set(visibleNetworks.map(getNetworkKey));
-  // Currently using no networks for trilateration
-  const usedBSSIDs = new Set(
-    visibleNetworks
-      .filter(n => n.SSID === 'eduroam')
-      .sort((a, b) => a.level - b.level)
-      .map(getNetworkKey)
-      .slice(0, 3),
-  );
+  const usedBSSIDs = new Set(usedNetworks.map(getNetworkKey));
 
+  console.log(usedBSSIDs);
   const getColour = network => {
     const key = getNetworkKey(network);
+    console.log(key);
     if (usedBSSIDs.has(key)) {
       return networkColours[NetworkType.USED];
     }
@@ -57,38 +57,32 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
       type: 'scatter',
     },
   ];
+
+  console.log(data);
   /*
    *  sets how the graph will be laid out and also where the circles for
    *  trilateration are set up
    */
 
   const shapes = [];
-  if (usedBSSIDs.size > 0) {
-    const points = knownNetworks.filter(n => usedBSSIDs.has(getNetworkKey(n)));
-    const avgLat =
-      points.reduce((average, n) => average + n.coordinates[0], 0) /
-      usedBSSIDs.size;
-    const avgLon =
-      points.reduce((average, n) => average + n.coordinates[1], 0) /
-      usedBSSIDs.size;
-
-    const radius = 0.000025;
-
+  usedNetworks.forEach(network => {
+    const radius = 0.000075;
     shapes.push({
       type: 'circle',
       xref: 'x',
       yref: 'y',
-      x0: avgLat - radius,
-      y0: avgLon - radius,
-      x1: avgLat + radius,
-      y1: avgLon + radius,
+      x0: network.coordinates[0] - radius,
+      y0: network.coordinates[1] - radius,
+      x1: network.coordinates[0] + radius,
+      y1: network.coordinates[1] + radius,
       line: {
-        color: 'green',
+        color: 'red',
       },
-      fillcolor: 'lightgreen',
-      opacity: 0.5,
+      fillcolor: 'red',
+      opacity: 0.2,
+      layer: 'below',
     });
-  }
+  });
 
   let layout = {
     title: 'Access Points',
@@ -96,18 +90,14 @@ export const APVisualisation = ({ knownNetworks, visibleNetworks }) => {
       title: {
         text: 'Latitude',
       },
+      automargin: true,
     },
     yaxis: {
       title: {
         text: 'Longitude',
       },
       tickangle: 60,
-    },
-    margin: {
-      b: 80,
-      t: 60,
-      l: 60,
-      r: 20,
+      automargin: true,
     },
     shapes,
   };

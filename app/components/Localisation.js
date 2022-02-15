@@ -1,12 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
 import { APVisualisation } from './APVisualisation';
 import { NetworkContext } from './NetworkProvider';
+import { Trilateration } from './Trilateration';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
+  const [usedNetworks, setUsedNetworks] = useState([]);
+  const [predictedLocation, setPredictedLocation] = useState([]);
   const {
     networks: visibleNetworks,
     state: { scanning },
@@ -27,8 +30,17 @@ export const Localisation = () => {
     const data = await loadKnownNetworks();
     setKnownNetworks(data);
 
-    startScan();
+    await startScan();
   };
+
+  // only fire when visibleNetworks updates
+  useEffect(() => {
+    let tri = new Trilateration(visibleNetworks, knownNetworks);
+    tri.startTrilateration();
+
+    setUsedNetworks(tri.getUsedNetworks());
+    setPredictedLocation(tri.getPredictedLocation());
+  }, [visibleNetworks]);
 
   return (
     <View style={styles.background}>
@@ -46,6 +58,8 @@ export const Localisation = () => {
         <APVisualisation
           knownNetworks={knownNetworks}
           visibleNetworks={visibleNetworks}
+          usedNetworks={usedNetworks}
+          predictedLocation={predictedLocation}
         />
       </View>
     </View>
