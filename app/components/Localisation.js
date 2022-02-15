@@ -9,8 +9,7 @@ import { trilateration } from './Trilateration';
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
   let usedNetworks = [];
-  let predictedLocation = [];
-  //let error = -1;
+  let predictedLocation = {};
 
   const {
     networks: visibleNetworks,
@@ -42,7 +41,6 @@ export const Localisation = () => {
 
     predictedLocation = data.predictedLocation;
     usedNetworks = data.usedNetworks;
-    //error = data.error;
   }
 
   return (
@@ -63,7 +61,6 @@ export const Localisation = () => {
           visibleNetworks={visibleNetworks}
           usedNetworks={usedNetworks}
           predictedLocation={predictedLocation}
-          //error={error}
         />
       </View>
     </View>
