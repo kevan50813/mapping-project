@@ -4,12 +4,14 @@ import { Button } from './Button';
 import { styles } from './styles';
 import { APVisualisation } from './APVisualisation';
 import { NetworkContext } from './NetworkProvider';
-import { Trilateration } from './Trilateration';
+import { trilateration } from './Trilateration';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
-  const [usedNetworks, setUsedNetworks] = useState([]);
-  const [predictedLocation, setPredictedLocation] = useState([]);
+  let usedNetworks = [];
+  let predictedLocation = [];
+  //let error = -1;
+
   const {
     networks: visibleNetworks,
     state: { scanning },
@@ -30,20 +32,18 @@ export const Localisation = () => {
     const data = await loadKnownNetworks();
     setKnownNetworks(data);
 
-    await startScan();
-
-    if (visibleNetworks.length === 0 || knownNetworks.length === 0) {
-      return;
-    }
-
-    let tri = new Trilateration(visibleNetworks, knownNetworks);
-    tri.startTrilateration();
-
-    setUsedNetworks(tri.getUsedNetworks());
-    setPredictedLocation(tri.getPredictedLocation());
-
-    console.log(usedNetworks);
+    startScan();
   };
+
+  if (visibleNetworks.length > 0) {
+    let data = trilateration(visibleNetworks, knownNetworks);
+
+    console.log(data);
+
+    predictedLocation = data.predictedLocation;
+    usedNetworks = data.usedNetworks;
+    //error = data.error;
+  }
 
   return (
     <View style={styles.background}>
@@ -63,6 +63,7 @@ export const Localisation = () => {
           visibleNetworks={visibleNetworks}
           usedNetworks={usedNetworks}
           predictedLocation={predictedLocation}
+          //error={error}
         />
       </View>
     </View>
