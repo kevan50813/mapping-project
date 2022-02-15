@@ -73,6 +73,9 @@ export const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  plotly: {
+    height: '70%',
+  },
   // input: {
   //   height: 40,
   //   margin: 12,
