@@ -1,6 +1,7 @@
 import React from 'react';
-import * as d3 from 'https://cdn.skypack.dev/d3';
+import * as d3 from 'd3';
 import polygons from './Polygons.json'; // assert { type: 'json' }
+import { Svg, G, Path } from 'react-native-svg';
 
 const features = polygons.features;
 const rooms = features.map(f => f.geometry.coordinates[0]);
@@ -51,22 +52,24 @@ map
 // Needs a floor filter
 var floor = 2.0;
 
-return (
-  <Svg width="100%" height="100%">
-    <G>
-      {features.map((feature, index) => {
-        if (feature.properties.level === floor) {
-          return (
-            <Path
-              d={path(feature)}
-              key={index}
-              opacity={0.5}
-              fill={feature.properties.type === 'Room' ? 'lightblue' : 'none'}
-              stroke={feature.properties.type === 'Room' ? 'blue' : 'black'}
-            />
-          );
-        }
-      })}
-    </G>
-  </Svg>
-);
+export const Floorplan = () => {
+  return (
+    <Svg width="100%" height="100%">
+      <G>
+        {features.map((feature, index) => {
+          //if (feature.properties.level === floor) {
+            return (
+              <Path
+                d={path(feature)}
+                key={index}
+                opacity={0.5}
+                fill={feature.properties.type === 'Room' ? 'lightblue' : 'none'}
+                stroke={feature.properties.type === 'Room' ? 'blue' : 'black'}
+              />
+            );
+          //}
+        })}
+      </G>
+    </Svg>
+  );
+}
