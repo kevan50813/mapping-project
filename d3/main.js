@@ -2,6 +2,8 @@ import * as d3 from 'https://cdn.skypack.dev/d3'
 import polygons from './Polygons.json' assert { type: 'json' }
 
 const features = polygons.features
+console.log(JSON.stringify(features));
+console.log(features);
 const rooms = features.map((f) => f.geometry.coordinates[0])
 
 const minX = rooms.reduce(
