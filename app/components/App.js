@@ -15,6 +15,7 @@ import { StatusBar, View } from 'react-native';
 import { Scanner } from './Scanner';
 import { RoomSearch } from './RoomSearch';
 import { Localisation } from './Localisation';
+import { Floorplan } from './Floorplan';
 import { styles } from './styles';
 import { Button } from './Button';
 import { NetworkProvider } from './NetworkProvider';
@@ -35,6 +36,10 @@ const Home = ({ navigation }) => (
     <Button
       title="Perform Localisation"
       onPress={() => navigation.navigate('Localisation')}
+    />
+    <Button
+      title="Map"
+      onPress={() => navigation.navigate('Floorplan')}
     />
   </View>
 );
@@ -61,6 +66,7 @@ const App = () => {
             <Stack.Screen name="RoomSearch" component={RoomSearch} />
             <Stack.Screen name="Scanner" component={Scanner} />
             <Stack.Screen name="Localisation" component={Localisation} />
+            <Stack.Screen name="Floorplan" component={Floorplan} />
           </Stack.Navigator>
         </NavigationContainer>
       </ApolloProvider>

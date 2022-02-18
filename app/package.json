@@ -21,6 +21,7 @@
     "react-native-plotly": "^6.0.0",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.10.2",
+    "react-native-svg": "^12.1.1",
     "react-native-webview": "^11.17.1",
     "react-native-wifi-reborn": "^4.5.0"
   },
