@@ -24,15 +24,11 @@ const maxY = rooms.reduce(
 const W = 640
 const H = 480
 
-const map = d3
-  .select('#d3')
-  .append('svg')
-  .attr('width', W)
-  .attr('height', H)
+const map = d3.select('#d3').append('svg').attr('width', W).attr('height', H)
 
 const scaleX = d3.scaleLinear([minX, maxX], [20, 620])
 const scaleY = d3.scaleLinear([minY, maxY], [460, 20])
-const projection = d3.geoMercator().fitSize([W, H], polygons)
+const projection = d3.geoEquirectangular().fitSize([W, H], polygons)
 const path = d3.geoPath().projection(projection)
 
 map
@@ -42,5 +38,9 @@ map
   .append('path')
   .attr('d', path)
   .attr('opacity', '0.5')
-  .attr('fill', (room) =>  room.properties.type === "Room" ? 'lightblue': 'none')
-  .attr('stroke', (room) =>  room.properties.type === "Room" ? 'blue': 'black')
+  .attr('fill', (room) =>
+    room.properties.type === 'Room' ? 'lightblue' : 'none'
+  )
+  .attr('stroke', (room) =>
+    room.properties.type === 'Room' ? 'blue' : 'black'
+  )
