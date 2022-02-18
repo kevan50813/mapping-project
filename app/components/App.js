@@ -37,7 +37,7 @@ const Home = ({ navigation }) => (
       title="Perform Localisation"
       onPress={() => navigation.navigate('Localisation')}
     />
-    <Button title="Map" onPress={() => navigation.navigate('Floorplan')} />
+    <Button title="Floorplan" onPress={() => navigation.navigate('Floorplan')} />
   </View>
 );
 
