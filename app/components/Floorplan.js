@@ -1,35 +1,35 @@
-import * as d3 from 'https://cdn.skypack.dev/d3'
-import polygons from './Polygons.json'// assert { type: 'json' }
+import * as d3 from 'https://cdn.skypack.dev/d3';
+import polygons from './Polygons.json'; // assert { type: 'json' }
 
-const features = polygons.features
-const rooms = features.map((f) => f.geometry.coordinates[0])
+const features = polygons.features;
+const rooms = features.map(f => f.geometry.coordinates[0]);
 
 const minX = rooms.reduce(
-  (m, room) => Math.min(m, ...room.map((r) => r[0])),
-  Infinity
-)
+  (m, room) => Math.min(m, ...room.map(r => r[0])),
+  Infinity,
+);
 const maxX = rooms.reduce(
-  (m, room) => Math.max(m, ...room.map((r) => r[0])),
-  -Infinity
-)
+  (m, room) => Math.max(m, ...room.map(r => r[0])),
+  -Infinity,
+);
 const minY = rooms.reduce(
-  (m, room) => Math.min(m, ...room.map((r) => r[1])),
-  Infinity
-)
+  (m, room) => Math.min(m, ...room.map(r => r[1])),
+  Infinity,
+);
 const maxY = rooms.reduce(
-  (m, room) => Math.max(m, ...room.map((r) => r[1])),
-  -Infinity
-)
+  (m, room) => Math.max(m, ...room.map(r => r[1])),
+  -Infinity,
+);
 
-const W = 640
-const H = 480
+const W = 640;
+const H = 480;
 
 //const map = d3.select('#d3').append('svg').attr('width', W).attr('height', H)
 
-const scaleX = d3.scaleLinear([minX, maxX], [20, 620])
-const scaleY = d3.scaleLinear([minY, maxY], [460, 20])
-const projection = d3.geoEquirectangular().fitSize([W, H], polygons)
-const path = d3.geoPath().projection(projection)
+const scaleX = d3.scaleLinear([minX, maxX], [20, 620]);
+const scaleY = d3.scaleLinear([minY, maxY], [460, 20]);
+const projection = d3.geoEquirectangular().fitSize([W, H], polygons);
+const path = d3.geoPath().projection(projection);
 /*
 map
   .selectAll('path')
@@ -47,8 +47,7 @@ map
 */
 
 return (
-  <Svg width='100%' height='100%'>
-    <G>
-    </G>
-  </Svg>)
-
+  <Svg width="100%" height="100%">
+    <G />
+  </Svg>
+);
