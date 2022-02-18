@@ -1,14 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { Text, Button, View } from 'react-native';
 import * as d3 from 'd3';
+import { Path, Text as SvgText } from 'react-native-svg';
+import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { useLazyQuery, gql } from '@apollo/client';
 import { styles } from './styles';
 import { server } from './App';
-import { Path } from 'react-native-svg';
-import { Text, Button, View } from 'react-native';
-import SvgPanZoom from 'react-native-svg-pan-zoom';
 
 const W = 1000;
 const H = 1000;
+
+function buildGeoJson(polygons, nodes, walls) {
+  // Create a GeoJson object
+  var geoJson = {
+    type: 'FeatureCollection',
+    name: 'Polygons',
+    crs: {
+      type: 'name',
+      properties: { name: 'urn:ogc:def:crs:OGC:1.3:CRS84' },
+    },
+    features: [],
+  };
+
+  for (var i = 0; i < polygons.length; i++) {
+    const feature = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [],
+      },
+    };
+
+    const vertices = polygons[i].vertices.map(v => [v[1], v[0]]);
+    feature.geometry.coordinates = [vertices];
+    feature.properties.level = polygons[i].level;
+    feature.properties.indoor = polygons[i].tags.indoor;
+    geoJson.features.push(feature);
+  }
+
+  //TODO add nodes & walls 
+
+  return geoJson;
+}
 
 const DrawMap = ({ loading, error, geoJson, level = [] }) => {
   if (error) {
@@ -29,12 +63,14 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         canvasWidth={1920}
         minScale={0.1}
         maxScale={1}
-        initialZoom={0.7}>
+        initialZoom={0.7}
+      >
         {geoJson.features.map((feature, index) => {
           if (feature.properties.level == level) {
+            const featurePath = path(feature);
             return (
               <Path
-                d={path(feature)}
+                d={featurePath}
                 key={index}
                 fill={
                   feature.properties.indoor === 'room'
@@ -73,53 +109,58 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
 export const Floorplan = () => {
   const [floorId, setFloorId] = useState(2);
 
-  const qPolygons = gql`
-    query get_polygons {
-      polygons(graph: "test_bragg") {
+  const qMap = gql`
+    query get_map ($graph: String!) {
+      polygons(graph: $graph) {
         id
         vertices
         level
+        tags
+      }
+
+      edges (graph: $graph) {
+        edge
+      }
+
+      nodes (graph: $graph) {
+        id
+        level
+        lat
+        lon
+        tags
+      }
+
+      walls (graph: $graph) {
+        id
+        level
+        lat
+        lon
         tags
       }
     }
   `;
 
   const [
-    getPolygons,
-    { loading, error, data: { polygons: polygons } = { polygons: [] } },
-  ] = useLazyQuery(qPolygons);
+    getMap,
+    { loading, 
+      error, 
+      data: { polygons: polygons, 
+              edges: edges, 
+              nodes: nodes, 
+              walls: walls 
+            } = { polygons: [], 
+                  edges: [], 
+                  nodes: [], 
+                  walls: [] 
+                } 
+    },
+  ] = useLazyQuery(qMap);
 
   useEffect(() => {
-    getPolygons();
-  }, [getPolygons]);
+    getMap({variables = {graph: "test_bragg"}});
+  }, [getMap]);
 
-  // Create a GeoJson object
-  var geoJson = {
-    type: 'FeatureCollection',
-    name: 'Polygons',
-    crs: {
-      type: 'name',
-      properties: { name: 'urn:ogc:def:crs:OGC:1.3:CRS84' },
-    },
-    features: [],
-  };
-
-  for (var i = 0; i < polygons.length; i++) {
-    const feature = {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
-    };
-
-    const vertices = polygons[i].vertices.map(v => [v[1], v[0]]);
-    feature.geometry.coordinates = [vertices];
-    feature.properties.level = polygons[i].level;
-    feature.properties.indoor = polygons[i].tags.indoor;
-    geoJson.features.push(feature);
-  }
+  const geoJson = buildGeoJson(polygons, nodes, walls);
 
   // const features = polygons.features;
   const floor_set = new Set(polygons.map(f => f.level));
