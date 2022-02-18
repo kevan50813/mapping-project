@@ -41,5 +41,6 @@ map
   .enter()
   .append('path')
   .attr('d', path)
-  .attr('stroke', 'black')
-  .attr('fill', 'none')
+  .attr('opacity', '0.5')
+  .attr('fill', (room) =>  room.properties.type === "Room" ? 'lightblue': 'none')
+  .attr('stroke', (room) =>  room.properties.type === "Room" ? 'blue': 'black')
