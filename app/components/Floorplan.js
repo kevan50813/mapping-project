@@ -1,10 +1,9 @@
-import React, { useState, Component } from 'react';
+import React, { useState } from 'react';
 import * as d3 from 'd3';
-import polygons from './Polygons.json'; // assert { type: 'json' }
-import { Svg, G, Path } from 'react-native-svg';
-import { Button, View } from 'react-native';
-import { Circle } from 'react-native-svg';
-import SvgPanZoom, { SvgPanZoomElement } from 'react-native-svg-pan-zoom';
+import polygons from './Polygons.json';
+import { Path } from 'react-native-svg';
+import { Text, Button, View } from 'react-native';
+import SvgPanZoom from 'react-native-svg-pan-zoom';
 
 const features = polygons.features;
 const rooms = features.map(f => f.geometry.coordinates[0]);
@@ -57,27 +56,24 @@ export const Floorplan = () => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
-  const W = 640;
-  const H = 480;
+  const W = 1000;
+  const H = 1000;
   const scaleX = d3.scaleLinear([minX, maxX], [20, 620]);
   const scaleY = d3.scaleLinear([minY, maxY], [460, 20]);
-  const projection = d3.geoEquirectangular().fitSize([W / 2, H / 2], polygons);
+  const projection = d3.geoEquirectangular().fitSize([W, H], polygons);
   const path = d3.geoPath().projection(projection);
 
   return (
     <>
       <SvgPanZoom
-        canvasHeight  = {500}
-        canvasWidth   = {500}
-        minScale      = {0.1}
-        maxScale      = {2}
-        initialZoom   = {0.7}
-      >
-        <SvgPanZoomElement>
-          <G>
-          {features.map((feature, index) => {
-            if (feature.properties.level == floor_list[floorId]) {
-              return (
+        canvasHeight={1500}
+        canvasWidth={1920}
+        minScale={0.1}
+        maxScale={1}
+        initialZoom={0.7}>
+        {features.map((feature, index) => {
+          if (feature.properties.level == floor_list[floorId]) {
+            return (
                 <Path
                   d={path(feature)}
                   key={index}
@@ -85,14 +81,16 @@ export const Floorplan = () => {
                   fill={
                     feature.properties.type === 'Room' ? 'lightblue' : 'none'
                   }
-                  stroke={feature.properties.type === 'Room' ? 'blue' : 'black'}
+                  stroke={
+                    feature.properties.type === 'Room' ? 'blue' : 'black'
+                  }
                 />
-              );
-            }
-          })}
-        </G>
-      </SvgPanZoomElement>
-    </SvgPanZoom>
+            );
+          }
+        })}
+      </SvgPanZoom>
+
+      <Text style={{'color': 'black'}}>{floor_list[floorId]}</Text>
       <View style={{ flexDirection: 'row' }}>
         <View style={{ width: '50%', paddingLeft: '5%', paddingRight: '2.5%' }}>
           <Button onPress={prevFloor} title="Previous floor" />
