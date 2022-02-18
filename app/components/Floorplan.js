@@ -30,6 +30,7 @@ const scaleX = d3.scaleLinear([minX, maxX], [20, 620]);
 const scaleY = d3.scaleLinear([minY, maxY], [460, 20]);
 const projection = d3.geoEquirectangular().fitSize([W, H], polygons);
 const path = d3.geoPath().projection(projection);
+
 /*
 map
   .selectAll('path')
@@ -46,8 +47,25 @@ map
   )
 */
 
+// Needs a floor filter
+var floor = 2.0;
+
 return (
   <Svg width="100%" height="100%">
-    <G />
+    <G>
+      {features.map((feature, index) => {
+        if (feature.properties.level === floor) {
+          return (
+            <Path
+              d={path(feature)}
+              key={index}
+              opacity={0.5}
+              fill={feature.properties.type === 'Room' ? 'lightblue' : 'none'}
+              stroke={feature.properties.type === 'Room' ? 'blue' : 'black'}
+            />
+          );
+        }
+      })}
+    </G>
   </Svg>
 );
