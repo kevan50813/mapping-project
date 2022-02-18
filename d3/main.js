@@ -32,7 +32,7 @@ const map = d3
 
 const scaleX = d3.scaleLinear([minX, maxX], [20, 620])
 const scaleY = d3.scaleLinear([minY, maxY], [460, 20])
-const projection = d3.geoMercator().fitSize([maxX - minX, maxY - minY], features[0])
+const projection = d3.geoMercator().fitSize([W, H], polygons)
 const path = d3.geoPath().projection(projection)
 
 map
