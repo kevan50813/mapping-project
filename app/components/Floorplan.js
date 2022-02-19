@@ -30,8 +30,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         canvasWidth={1920}
         minScale={0.1}
         maxScale={1}
-        initialZoom={0.7}
-      >
+        initialZoom={0.7}>
         {geoJson.features.map((feature, index) => {
           if (feature.properties.level == level) {
             const featurePath = path(feature);
@@ -58,7 +57,7 @@ export const Floorplan = () => {
   const [floorId, setFloorId] = useState(2);
 
   const qMap = gql`
-    query get_map ($graph: String!) {
+    query get_map($graph: String!) {
       polygons(graph: $graph) {
         id
         vertices
@@ -66,11 +65,11 @@ export const Floorplan = () => {
         tags
       }
 
-      edges (graph: $graph) {
+      edges(graph: $graph) {
         edge
       }
 
-      nodes (graph: $graph) {
+      nodes(graph: $graph) {
         id
         level
         lat
@@ -78,7 +77,7 @@ export const Floorplan = () => {
         tags
       }
 
-      walls (graph: $graph) {
+      walls(graph: $graph) {
         id
         level
         lat
@@ -90,22 +89,20 @@ export const Floorplan = () => {
 
   const [
     getMap,
-    { loading, 
-      error, 
-      data: { polygons: polygons, 
-              edges: edges, 
-              nodes: nodes, 
-              walls: walls 
-            } = { polygons: [], 
-                  edges: [], 
-                  nodes: [], 
-                  walls: [] 
-                } 
+    {
+      loading,
+      error,
+      data: { polygons: polygons, edges: edges, nodes: nodes, walls: walls } = {
+        polygons: [],
+        edges: [],
+        nodes: [],
+        walls: [],
+      },
     },
   ] = useLazyQuery(qMap);
 
   useEffect(() => {
-    getMap({variables: {graph: "test_bragg"}});
+    getMap({ variables: { graph: 'test_bragg' } });
   }, [getMap]);
 
   const geoJson = buildGeoJson(polygons, nodes, walls, edges);

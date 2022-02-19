@@ -1,5 +1,5 @@
 export function polyFeatures(polygons) {
-  var features = []
+  var features = [];
 
   for (var i = 0; i < polygons.length; i++) {
     var feature = {
@@ -13,15 +13,18 @@ export function polyFeatures(polygons) {
 
     const vertices = polygons[i].vertices.map(v => [v[1], v[0]]);
     feature.geometry.coordinates = [vertices];
-    feature.properties = {...polygons[i].tags, ...{level: polygons[i].level}};
+    feature.properties = {
+      ...polygons[i].tags,
+      ...{ level: polygons[i].level },
+    };
     features.push(feature);
   }
 
-  return features
+  return features;
 }
 
 export function nodeFeatures(nodes) {
-  var features = []
+  var features = [];
   for (var i = 0; i < nodes.length; i++) {
     const feature = {
       type: 'Feature',
@@ -33,10 +36,10 @@ export function nodeFeatures(nodes) {
     };
     const vertices = [nodes[i].lon, nodes[i].lat];
     feature.geometry.coordinates = [vertices];
-    feature.properties = {...nodes[i].tags, ...{level: nodes[i].level}};
+    feature.properties = { ...nodes[i].tags, ...{ level: nodes[i].level } };
     features.push(feature);
   }
-  
+
   return features;
 }
 
