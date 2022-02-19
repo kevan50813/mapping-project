@@ -6,43 +6,10 @@ import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { useLazyQuery, gql } from '@apollo/client';
 import { styles } from './styles';
 import { server } from './App';
+import { buildGeoJson } from './buildGeoJson';
 
 const W = 1000;
 const H = 1000;
-
-function buildGeoJson(polygons, nodes, walls) {
-  // Create a GeoJson object
-  var geoJson = {
-    type: 'FeatureCollection',
-    name: 'Polygons',
-    crs: {
-      type: 'name',
-      properties: { name: 'urn:ogc:def:crs:OGC:1.3:CRS84' },
-    },
-    features: [],
-  };
-
-  for (var i = 0; i < polygons.length; i++) {
-    const feature = {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
-    };
-
-    const vertices = polygons[i].vertices.map(v => [v[1], v[0]]);
-    feature.geometry.coordinates = [vertices];
-    feature.properties.level = polygons[i].level;
-    feature.properties.indoor = polygons[i].tags.indoor;
-    geoJson.features.push(feature);
-  }
-
-  //TODO add nodes & walls 
-
-  return geoJson;
-}
 
 const DrawMap = ({ loading, error, geoJson, level = [] }) => {
   if (error) {
@@ -86,25 +53,6 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
     </>
   );
 };
-
-// const rooms = features.map(f => f.geometry.coordinates[0]);
-
-// const minX = rooms.reduce(
-//   (m, room) => Math.min(m, ...room.map(r => r[0])),
-//   Infinity,
-// );
-// const maxX = rooms.reduce(
-//   (m, room) => Math.max(m, ...room.map(r => r[0])),
-//   -Infinity,
-// );
-// const minY = rooms.reduce(
-//   (m, room) => Math.min(m, ...room.map(r => r[1])),
-//   Infinity,
-// );
-// const maxY = rooms.reduce(
-//   (m, room) => Math.max(m, ...room.map(r => r[1])),
-//   -Infinity,
-// );
 
 export const Floorplan = () => {
   const [floorId, setFloorId] = useState(2);
@@ -157,12 +105,10 @@ export const Floorplan = () => {
   ] = useLazyQuery(qMap);
 
   useEffect(() => {
-    getMap({variables = {graph: "test_bragg"}});
+    getMap({variables: {graph: "test_bragg"}});
   }, [getMap]);
 
-  const geoJson = buildGeoJson(polygons, nodes, walls);
-
-  // const features = polygons.features;
+  const geoJson = buildGeoJson(polygons, nodes, walls, edges);
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
@@ -173,9 +119,6 @@ export const Floorplan = () => {
   const nextFloor = () => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
-
-  // const scaleX = d3.scaleLinear([minX, maxX], [20, 620]);
-  // const scaleY = d3.scaleLinear([minY, maxY], [460, 20]);
 
   return (
     <>
