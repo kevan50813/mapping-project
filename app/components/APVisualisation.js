@@ -56,6 +56,20 @@ export const APVisualisation = ({
     },
   ];
 
+  // only plot predicted location if we get one!
+  try {
+    if (predictedLocation.point[0] !== -1) {
+      data[0].x.push(predictedLocation.point[0]);
+      data[0].y.push(predictedLocation.point[1]);
+      data[0].text.push('point');
+      data[0].marker.color.push('purple');
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  console.log(data);
+
   /*
    *  sets how the graph will be laid out and also where the circles for
    *  trilateration are set up
@@ -63,7 +77,8 @@ export const APVisualisation = ({
 
   const shapes = [];
   usedNetworks.forEach(network => {
-    const radius = 0.000075;
+    // TODO - actual conversion for metres -> lat/lon distance
+    const radius = network.distance / 20000;
     shapes.push({
       type: 'circle',
       xref: 'x',
