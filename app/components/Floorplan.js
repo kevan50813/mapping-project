@@ -21,10 +21,9 @@ function DrawMapElement(feature, index, path, projection) {
       <Path
         d={featurePath}
         key={index}
-        fill={feature.properties.indoor === 'room'
-          ? 'lightblue'
-          : 'lightgrey'}
-        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'} />
+        fill={feature.properties.indoor === 'room' ? 'lightblue' : 'lightgrey'}
+        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
+      />
     );
   } else if (feature.geometry.type === 'Point') {
     const point = projection(feature.geometry.coordinates[0]);
@@ -36,7 +35,8 @@ function DrawMapElement(feature, index, path, projection) {
         key={index}
         fill="red"
         stroke="black"
-        strokeWidth="1" />
+        strokeWidth="1"
+      />
     );
   } else if (feature.geometry.type === 'LineString') {
     return (
@@ -45,7 +45,8 @@ function DrawMapElement(feature, index, path, projection) {
         key={index}
         stroke="black"
         strokeWidth="5"
-        fill="none" />
+        fill="none"
+      />
     );
   }
 }
@@ -77,14 +78,17 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         maxScale={1}
         initialZoom={0.7}>
         {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
-        {geoJson ? geoJson.features.map((feature, index) => {
-          if (parseFloat(feature.properties.level) === parseFloat(level)) {
-            // There could be more flexibility with this but
-            // Only call this if the filters match the element?
-            return DrawMapElement(feature, index, path, projection);
-          }
-        }) : <></>}
-
+        {geoJson ? (
+          geoJson.features.map((feature, index) => {
+            if (parseFloat(feature.properties.level) === parseFloat(level)) {
+              // There could be more flexibility with this but
+              // Only call this if the filters match the element?
+              return DrawMapElement(feature, index, path, projection);
+            }
+          })
+        ) : (
+          <></>
+        )}
       </SvgPanZoom>
     </>
   );
@@ -161,7 +165,6 @@ export const Floorplan = () => {
   useEffect(() => {
     setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
   }, [loading]);
-
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
