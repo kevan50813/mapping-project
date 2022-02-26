@@ -16,6 +16,10 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
     console.error(error);
   }
 
+  if (!geoJson) {
+    return (<Text style={styles.info}>Processing GeoJson...</Text>);
+  }
+
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
   const path = d3.geoPath().projection(projection);
 
@@ -24,7 +28,13 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
       {loading ? (
         <Text style={styles.info}>Loading from {server}...</Text>
       ) : null}
+
+      { !geoJson ? (
+        <Text style={styles.info}>Loading from {server}...</Text>
+      ) : null}
+
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
+
       <SvgPanZoom
         canvasHeight={1500}
         canvasWidth={1920}
@@ -32,20 +42,27 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         maxScale={1}
         initialZoom={0.7}>
         {geoJson.features.map((feature, index) => {
-          if (feature.properties.level == level) {
+          if (parseFloat(feature.properties.level) === parseFloat(level)) {
             const featurePath = path(feature);
-            return (
-              <Path
-                d={featurePath}
-                key={index}
-                fill={
-                  feature.properties.indoor === 'room'
-                    ? 'lightblue'
-                    : 'lightgrey'
-                }
-                stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
-              />
-            );
+
+            if (feature.geometry.type === "Polygon") {
+              return (
+                <Path
+                  d={featurePath}
+                  key={index}
+                  fill={
+                    feature.properties.indoor === 'room'
+                      ? 'lightblue'
+                      : 'lightgrey'
+                  }
+                  stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
+                />
+              );
+            } else if (feature.geometry.type === "Point") {
+              // TODO point render
+            } else if (feature.geometry.type === "LineString") {
+              // TODO LineString render
+            }
           }
         })}
       </SvgPanZoom>
@@ -55,6 +72,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
 
 export const Floorplan = () => {
   const [floorId, setFloorId] = useState(2);
+  const [geoJson, setGeoJson] = useState(null);
 
   const qMap = gql`
     query get_map($graph: String!) {
@@ -103,9 +121,9 @@ export const Floorplan = () => {
 
   useEffect(() => {
     getMap({ variables: { graph: 'test_bragg' } });
+    setGeoJson(buildGeoJson(polygons, nodes, walls, edges));
   }, [getMap]);
 
-  const geoJson = buildGeoJson(polygons, nodes, walls, edges);
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 

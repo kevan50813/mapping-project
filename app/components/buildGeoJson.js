@@ -1,7 +1,7 @@
 function polyFeatures(polygons) {
   var features = [];
 
-  for (var i = 0; i < polygons.length; i++) {
+  polygons.forEach(polygon => {
     var feature = {
       type: 'Feature',
       properties: {},
@@ -11,21 +11,21 @@ function polyFeatures(polygons) {
       },
     };
 
-    const vertices = polygons[i].vertices.map(v => [v[1], v[0]]);
+    const vertices = polygon.vertices.map(v => [v[1], v[0]]);
     feature.geometry.coordinates = [vertices];
     feature.properties = {
-      ...polygons[i].tags,
-      ...{ level: polygons[i].level },
+      ...polygon.tags,
+      ...{ level: polygon.level },
     };
     features.push(feature);
-  }
+  })
 
   return features;
 }
 
 function nodeFeatures(nodes) {
   var features = [];
-  for (var i = 0; i < nodes.length; i++) {
+  nodes.forEach(node => {
     const feature = {
       type: 'Feature',
       properties: {},
@@ -34,11 +34,12 @@ function nodeFeatures(nodes) {
         coordinates: [],
       },
     };
-    const vertices = [nodes[i].lon, nodes[i].lat];
+
+    const vertices = [node.lon, node.lat];
     feature.geometry.coordinates = [vertices];
-    feature.properties = { ...nodes[i].tags, ...{ level: nodes[i].level } };
+    feature.properties = { ...node.tags, ...{ level: node.level } };
     features.push(feature);
-  }
+  })
 
   return features;
 }
@@ -58,18 +59,24 @@ function buildLineString(nodes, edges) {
       type: 'Feature',
       properties: {},
       geometry: {
-        type: 'LineString', // TODO check
+        type: 'LineString',
         coordinates: [],
       },
     };
-    const node1 = nodeLookup[edge[0]];
-    const node2 = nodeLookup[edge[1]];
-    // TODO if node1 or node 2 are null / failed, do not push a feature.
-    feature.geometry.coordinates = [
-      [node1.lon, node1.lat],
-      [node2.lon, node2.lat],
-    ];
-    features.push(feature);
+
+    const node1 = nodeLookup[edge.edge[0].toString()];
+    const node2 = nodeLookup[edge.edge[1].toString()];
+    
+    if (node1 !== undefined && node2 !== undefined) {
+      feature.properties = {...node1.tags, 
+                            ...{level: node1.level}};
+      feature.geometry.coordinates = [
+        [node1.lon, node1.lat],
+        [node2.lon, node2.lat],
+      ];
+      features.push(feature);
+    }
+
   });
 
   return features;
