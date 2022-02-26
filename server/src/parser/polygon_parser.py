@@ -116,10 +116,10 @@ class PolygonParser:
         """
         self.log.debug("Loading polygons")
 
-        level_range = {str(n["properties"]["level"])
-                       for n in self.json_polygons["features"]}
-        level_range = sorted([level for level in level_range
-                              if ";" not in level])
+        level_range = {
+            str(n["properties"]["level"]) for n in self.json_polygons["features"]
+        }
+        level_range = sorted([level for level in level_range if ";" not in level])
 
         for feature in self.json_polygons["features"]:
             id = len(self.polygons)
