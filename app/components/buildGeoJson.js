@@ -96,8 +96,7 @@ export function buildGeoJson(polygons, nodes, walls, edges) {
   geoJson.features = geoJson.features.concat(polyFeatures(polygons));
   geoJson.features = geoJson.features.concat(nodeFeatures(nodes));
   geoJson.features = geoJson.features.concat(nodeFeatures(walls));
-  geoJson.features = geoJson.features.concat(buildLineString(nodes, edges));
-  geoJson.features = geoJson.features.concat(buildLineString(walls, edges));
+  geoJson.features = geoJson.features.concat(buildLineString(nodes.concat(walls), edges));
 
   return geoJson;
 }

@@ -7,6 +7,7 @@ import { useLazyQuery, gql } from '@apollo/client';
 import { styles } from './styles';
 import { server } from './App';
 import { buildGeoJson } from './buildGeoJson';
+import { Circle } from 'react-native-svg';
 
 const W = 1000;
 const H = 1000;
@@ -62,8 +63,11 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
               );
             } else if (feature.geometry.type === 'Point') {
               // TODO point render
+              <Circle/>
             } else if (feature.geometry.type === 'LineString') {
-              // TODO LineString render
+              return (
+                <Path d={featurePath} key={index} stroke='black' strokeWidth='5' fill='none'/>
+              );
             }
           }
         })}
