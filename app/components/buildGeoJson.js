@@ -49,7 +49,7 @@ function buildLineString(nodes, edges) {
   // create a lookup table of nodes
   // id should be unique here so it's really a 'hash map'
   var nodeLookup = {};
-  nodes.map(n => nodeLookup[n.id] = n);
+  nodes.map(n => (nodeLookup[n.id] = n));
 
   // then use edges to find all links between them
   // for now these are just pairs
@@ -63,9 +63,12 @@ function buildLineString(nodes, edges) {
       },
     };
     const node1 = nodeLookup[edge[0]];
-    const node2 = nodeLookup[edge[1]]; 
+    const node2 = nodeLookup[edge[1]];
     // TODO if node1 or node 2 are null / failed, do not push a feature.
-    feature.geometry.coordinates = [[node1.lon, node1.lat], [node2.lon, node2.lat]];
+    feature.geometry.coordinates = [
+      [node1.lon, node1.lat],
+      [node2.lon, node2.lat],
+    ];
     features.push(feature);
   });
 
