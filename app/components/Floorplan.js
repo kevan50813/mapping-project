@@ -12,13 +12,47 @@ import { Circle } from 'react-native-svg';
 const W = 1000;
 const H = 1000;
 
+function DrawMapElement(feature, index, path, projection) {
+  // TODO make this work with level ranges
+  const featurePath = path(feature);
+
+  if (feature.geometry.type === 'Polygon') {
+    return (
+      <Path
+        d={featurePath}
+        key={index}
+        fill={feature.properties.indoor === 'room'
+          ? 'lightblue'
+          : 'lightgrey'}
+        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'} />
+    );
+  } else if (feature.geometry.type === 'Point') {
+    const point = projection(feature.geometry.coordinates[0]);
+    return (
+      <Circle
+        cx={point[0]}
+        cy={point[1]}
+        r="5"
+        key={index}
+        fill="red"
+        stroke="black"
+        strokeWidth="1" />
+    );
+  } else if (feature.geometry.type === 'LineString') {
+    return (
+      <Path
+        d={featurePath}
+        key={index}
+        stroke="black"
+        strokeWidth="5"
+        fill="none" />
+    );
+  }
+}
+
 const DrawMap = ({ loading, error, geoJson, level = [] }) => {
   if (error) {
     console.error(error);
-  }
-
-  if (!geoJson) {
-    return <Text style={styles.info}>Processing GeoJson...</Text>;
   }
 
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
@@ -31,7 +65,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
       ) : null}
 
       {!geoJson ? (
-        <Text style={styles.info}>Loading from {server}...</Text>
+        <Text style={styles.info}>Processing map data...</Text>
       ) : null}
 
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
@@ -42,52 +76,15 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         minScale={0.1}
         maxScale={1}
         initialZoom={0.7}>
-        {geoJson.features.map((feature, index) => {
-          // TODO make this work with level ranges
+        {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
+        {geoJson ? geoJson.features.map((feature, index) => {
           if (parseFloat(feature.properties.level) === parseFloat(level)) {
-            const featurePath = path(feature);
-
-            if (feature.geometry.type === 'Polygon') {
-              return (
-                <Path
-                  d={featurePath}
-                  key={index}
-                  fill={
-                    feature.properties.indoor === 'room'
-                      ? 'lightblue'
-                      : 'lightgrey'
-                  }
-                  stroke={
-                    feature.properties.indoor === 'room' ? 'blue' : 'black'
-                  }
-                />
-              );
-            } else if (feature.geometry.type === 'Point') {
-              const point = projection(feature.geometry.coordinates[0]);
-              return (
-                <Circle
-                  cx={point[0]}
-                  cy={point[1]}
-                  r="5"
-                  key={index}
-                  fill="red"
-                  stroke="black"
-                  strokeWidth="1"
-                />
-              );
-            } else if (feature.geometry.type === 'LineString') {
-              return (
-                <Path
-                  d={featurePath}
-                  key={index}
-                  stroke="black"
-                  strokeWidth="5"
-                  fill="none"
-                />
-              );
-            }
+            // There could be more flexibility with this but
+            // Only call this if the filters match the element?
+            return DrawMapElement(feature, index, path, projection);
           }
-        })}
+        }) : <></>}
+
       </SvgPanZoom>
     </>
   );
@@ -159,8 +156,12 @@ export const Floorplan = () => {
 
   useEffect(() => {
     getMap({ variables: { graph: 'test_bragg' } });
-    setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
   }, [getMap]);
+
+  useEffect(() => {
+    setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
+  }, [loading]);
+
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
