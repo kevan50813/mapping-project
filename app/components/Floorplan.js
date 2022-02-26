@@ -63,10 +63,16 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
               );
             } else if (feature.geometry.type === 'Point') {
               // TODO point render
-              <Circle/>
+              <Circle />;
             } else if (feature.geometry.type === 'LineString') {
               return (
-                <Path d={featurePath} key={index} stroke='black' strokeWidth='5' fill='none'/>
+                <Path
+                  d={featurePath}
+                  key={index}
+                  stroke="black"
+                  strokeWidth="5"
+                  fill="none"
+                />
               );
             }
           }
