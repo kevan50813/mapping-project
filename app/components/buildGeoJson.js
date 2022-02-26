@@ -80,7 +80,7 @@ function buildLineString(nodes, edges) {
   return features;
 }
 
-export function buildGeoJson(polygons, nodes, walls, edges) {
+export function buildGeoJson(polygons, nodes, walls, pois, edges) {
   // Create a GeoJson object
   var geoJson = {
     type: 'FeatureCollection',
@@ -94,11 +94,13 @@ export function buildGeoJson(polygons, nodes, walls, edges) {
 
   // would be nice if there was a way of doing this in place
   geoJson.features = geoJson.features.concat(polyFeatures(polygons));
-  geoJson.features = geoJson.features.concat(nodeFeatures(nodes));
-  geoJson.features = geoJson.features.concat(nodeFeatures(walls));
-  geoJson.features = geoJson.features.concat(
-    buildLineString(nodes.concat(walls), edges),
-  );
+  geoJson.features = geoJson.features.concat(nodeFeatures(pois));
+  // geoJson.features = geoJson.features.concat(nodeFeatures(nodes));
+  // geoJson.features = geoJson.features.concat(nodeFeatures(walls));
+  geoJson.features = geoJson.features.concat(buildLineString(walls, edges));
+  // geoJson.features = geoJson.features.concat(
+  //   buildLineString(nodes.concat(walls), edges),
+  // );
 
   return geoJson;
 }

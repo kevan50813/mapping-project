@@ -43,6 +43,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         maxScale={1}
         initialZoom={0.7}>
         {geoJson.features.map((feature, index) => {
+          // TODO make this work with level ranges
           if (parseFloat(feature.properties.level) === parseFloat(level)) {
             const featurePath = path(feature);
 
@@ -62,8 +63,8 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
                 />
               );
             } else if (feature.geometry.type === 'Point') {
-              // TODO point render
-              <Circle />;
+              const point = projection(feature.geometry.coordinates[0]);
+              return <Circle cx={point[0]} cy={point[1]} r="5" key={index} fill="red" stroke="black" strokeWidth="1"/>;
             } else if (feature.geometry.type === 'LineString') {
               return (
                 <Path
@@ -99,6 +100,14 @@ export const Floorplan = () => {
         edge
       }
 
+      pois(graph: $graph) {
+        id
+        level
+        lat
+        lon
+        tags
+      }
+
       nodes(graph: $graph) {
         id
         level
@@ -122,18 +131,19 @@ export const Floorplan = () => {
     {
       loading,
       error,
-      data: { polygons: polygons, edges: edges, nodes: nodes, walls: walls } = {
+      data: { polygons: polygons, edges: edges, nodes: nodes, walls: walls, pois: pois } = {
         polygons: [],
         edges: [],
         nodes: [],
         walls: [],
+        pois: [],
       },
     },
   ] = useLazyQuery(qMap);
 
   useEffect(() => {
     getMap({ variables: { graph: 'test_bragg' } });
-    setGeoJson(buildGeoJson(polygons, nodes, walls, edges));
+    setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
   }, [getMap]);
 
   const floor_set = new Set(polygons.map(f => f.level));
