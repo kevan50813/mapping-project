@@ -17,7 +17,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
   }
 
   if (!geoJson) {
-    return (<Text style={styles.info}>Processing GeoJson...</Text>);
+    return <Text style={styles.info}>Processing GeoJson...</Text>;
   }
 
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
@@ -29,7 +29,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
         <Text style={styles.info}>Loading from {server}...</Text>
       ) : null}
 
-      { !geoJson ? (
+      {!geoJson ? (
         <Text style={styles.info}>Loading from {server}...</Text>
       ) : null}
 
@@ -45,7 +45,7 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
           if (parseFloat(feature.properties.level) === parseFloat(level)) {
             const featurePath = path(feature);
 
-            if (feature.geometry.type === "Polygon") {
+            if (feature.geometry.type === 'Polygon') {
               return (
                 <Path
                   d={featurePath}
@@ -55,12 +55,14 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
                       ? 'lightblue'
                       : 'lightgrey'
                   }
-                  stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
+                  stroke={
+                    feature.properties.indoor === 'room' ? 'blue' : 'black'
+                  }
                 />
               );
-            } else if (feature.geometry.type === "Point") {
+            } else if (feature.geometry.type === 'Point') {
               // TODO point render
-            } else if (feature.geometry.type === "LineString") {
+            } else if (feature.geometry.type === 'LineString') {
               // TODO LineString render
             }
           }

@@ -18,7 +18,7 @@ function polyFeatures(polygons) {
       ...{ level: polygon.level },
     };
     features.push(feature);
-  })
+  });
 
   return features;
 }
@@ -39,7 +39,7 @@ function nodeFeatures(nodes) {
     feature.geometry.coordinates = [vertices];
     feature.properties = { ...node.tags, ...{ level: node.level } };
     features.push(feature);
-  })
+  });
 
   return features;
 }
@@ -66,17 +66,15 @@ function buildLineString(nodes, edges) {
 
     const node1 = nodeLookup[edge.edge[0].toString()];
     const node2 = nodeLookup[edge.edge[1].toString()];
-    
+
     if (node1 !== undefined && node2 !== undefined) {
-      feature.properties = {...node1.tags, 
-                            ...{level: node1.level}};
+      feature.properties = { ...node1.tags, ...{ level: node1.level } };
       feature.geometry.coordinates = [
         [node1.lon, node1.lat],
         [node2.lon, node2.lat],
       ];
       features.push(feature);
     }
-
   });
 
   return features;
