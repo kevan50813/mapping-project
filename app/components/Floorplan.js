@@ -64,7 +64,17 @@ const DrawMap = ({ loading, error, geoJson, level = [] }) => {
               );
             } else if (feature.geometry.type === 'Point') {
               const point = projection(feature.geometry.coordinates[0]);
-              return <Circle cx={point[0]} cy={point[1]} r="5" key={index} fill="red" stroke="black" strokeWidth="1"/>;
+              return (
+                <Circle
+                  cx={point[0]}
+                  cy={point[1]}
+                  r="5"
+                  key={index}
+                  fill="red"
+                  stroke="black"
+                  strokeWidth="1"
+                />
+              );
             } else if (feature.geometry.type === 'LineString') {
               return (
                 <Path
@@ -131,7 +141,13 @@ export const Floorplan = () => {
     {
       loading,
       error,
-      data: { polygons: polygons, edges: edges, nodes: nodes, walls: walls, pois: pois } = {
+      data: {
+        polygons: polygons,
+        edges: edges,
+        nodes: nodes,
+        walls: walls,
+        pois: pois,
+      } = {
         polygons: [],
         edges: [],
         nodes: [],
