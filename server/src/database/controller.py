@@ -258,7 +258,7 @@ class Controller:
             list of tuples that contain two node ids that are connected
         """
         graph = Graph(graph_name, self.redis_db)
-        query = """MATCH (n:way)-->(m:way) RETURN n.id, m.id"""
+        query = """MATCH (n)-->(m) RETURN n.id, m.id"""
         result = graph.query(query)
 
         edges = []
