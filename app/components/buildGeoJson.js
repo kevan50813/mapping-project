@@ -1,4 +1,4 @@
-export function polyFeatures(polygons) {
+function polyFeatures(polygons) {
   var features = [];
 
   for (var i = 0; i < polygons.length; i++) {
@@ -23,7 +23,7 @@ export function polyFeatures(polygons) {
   return features;
 }
 
-export function nodeFeatures(nodes) {
+function nodeFeatures(nodes) {
   var features = [];
   for (var i = 0; i < nodes.length; i++) {
     const feature = {
@@ -39,6 +39,35 @@ export function nodeFeatures(nodes) {
     feature.properties = { ...nodes[i].tags, ...{ level: nodes[i].level } };
     features.push(feature);
   }
+
+  return features;
+}
+
+function buildLineString(nodes, edges) {
+  var features = [];
+
+  // create a lookup table of nodes
+  // id should be unique here so it's really a 'hash map'
+  var nodeLookup = {};
+  nodes.map(n => nodeLookup[n.id] = n);
+
+  // then use edges to find all links between them
+  // for now these are just pairs
+  edges.forEach(edge => {
+    const feature = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString', // TODO check
+        coordinates: [],
+      },
+    };
+    const node1 = nodeLookup[edge[0]];
+    const node2 = nodeLookup[edge[1]]; 
+    // TODO if node1 or node 2 are null / failed, do not push a feature.
+    feature.geometry.coordinates = [[node1.lon, node1.lat], [node2.lon, node2.lat]];
+    features.push(feature);
+  });
 
   return features;
 }
@@ -59,6 +88,8 @@ export function buildGeoJson(polygons, nodes, walls, edges) {
   geoJson.features = geoJson.features.concat(polyFeatures(polygons));
   geoJson.features = geoJson.features.concat(nodeFeatures(nodes));
   geoJson.features = geoJson.features.concat(nodeFeatures(walls));
+  geoJson.features = geoJson.features.concat(buildLineString(nodes, edges));
+  geoJson.features = geoJson.features.concat(buildLineString(walls, edges));
 
   return geoJson;
 }
