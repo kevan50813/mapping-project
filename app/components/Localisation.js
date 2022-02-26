@@ -4,9 +4,13 @@ import { Button } from './Button';
 import { styles } from './styles';
 import { APVisualisation } from './APVisualisation';
 import { NetworkContext } from './NetworkProvider';
+import { trilateration } from './Trilateration';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
+  let usedNetworks = [];
+  let predictedLocation = {};
+
   const {
     networks: visibleNetworks,
     state: { scanning },
@@ -30,6 +34,15 @@ export const Localisation = () => {
     startScan();
   };
 
+  if (visibleNetworks.length > 0) {
+    let data = trilateration(visibleNetworks, knownNetworks);
+
+    console.log(data);
+
+    predictedLocation = data.predictedLocation;
+    usedNetworks = data.usedNetworks;
+  }
+
   return (
     <View style={styles.background}>
       <View style={styles.background}>
@@ -42,10 +55,12 @@ export const Localisation = () => {
         ) : null}
         {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
       </View>
-      <View style={{ height: '70%' }}>
+      <View style={styles.plotly}>
         <APVisualisation
           knownNetworks={knownNetworks}
           visibleNetworks={visibleNetworks}
+          usedNetworks={usedNetworks}
+          predictedLocation={predictedLocation}
         />
       </View>
     </View>
