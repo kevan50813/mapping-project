@@ -1,102 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Button, View } from 'react-native';
-import * as d3 from 'd3';
-import { Path, Text as SvgText } from 'react-native-svg';
-import SvgPanZoom from 'react-native-svg-pan-zoom';
+import { Text as SvgText } from 'react-native-svg';
 import { useLazyQuery, gql } from '@apollo/client';
-import { styles } from './styles';
-import { server } from './App';
 import { buildGeoJson } from './buildGeoJson';
-import { Circle } from 'react-native-svg';
+import { DrawMap } from './DrawMap';
 
-const W = 1000;
-const H = 1000;
-
-function DrawMapElement(feature, index, path, projection) {
-  // TODO make this work with level ranges
-  const featurePath = path(feature);
-
-  if (feature.geometry.type === 'Polygon') {
-    return (
-      <Path
-        d={featurePath}
-        key={index}
-        fill={feature.properties.indoor === 'room' ? 'lightblue' : 'lightgrey'}
-        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
-      />
-    );
-  } else if (feature.geometry.type === 'Point') {
-    const point = projection(feature.geometry.coordinates[0]);
-    return (
-      <Circle
-        cx={point[0]}
-        cy={point[1]}
-        r="5"
-        key={index}
-        fill="red"
-        stroke="black"
-        strokeWidth="1"
-      />
-    );
-  } else if (feature.geometry.type === 'LineString') {
-    return (
-      <Path
-        d={featurePath}
-        key={index}
-        stroke="black"
-        strokeWidth="5"
-        fill="none"
-      />
-    );
-  }
-}
-
-const DrawMap = ({ loading, error, geoJson, level = [] }) => {
-  if (error) {
-    console.error(error);
-  }
-
-  const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
-  const path = d3.geoPath().projection(projection);
-
-  return (
-    <>
-      {loading ? (
-        <Text style={styles.info}>Loading from {server}...</Text>
-      ) : null}
-
-      {!geoJson ? (
-        <Text style={styles.info}>Processing map data...</Text>
-      ) : null}
-
-      {error ? <Text style={styles.error}>{error.message}</Text> : null}
-
-      <SvgPanZoom
-        canvasHeight={1500}
-        canvasWidth={1920}
-        minScale={0.1}
-        maxScale={1}
-        initialZoom={0.7}>
-        {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
-        {geoJson ? (
-          geoJson.features.map((feature, index) => {
-            if (parseFloat(feature.properties.level) === parseFloat(level)) {
-              // There could be more flexibility with this but
-              // Only call this if the filters match the element?
-              return DrawMapElement(feature, index, path, projection);
-            }
-          })
-        ) : (
-          <></>
-        )}
-      </SvgPanZoom>
-    </>
-  );
-};
-
-export const Floorplan = () => {
+export const Floorplan = ({
+    predictedLocation,
+}) => {
   const [floorId, setFloorId] = useState(2);
   const [geoJson, setGeoJson] = useState(null);
+  const [knownNetworks, setKnownNetworks] = useState([]);
+  let predictedLocation = {};
+
+  const {
+    networks: visibleNetworks,
+    state: { scanning },
+    startScan,
+  } = useContext(NetworkContext);
+
+  const loadKnownNetworks = async () => {
+    return require('./Wifi_Nodes.json').features.map(
+      ({ geometry, properties }) => ({
+        coordinates: geometry.coordinates,
+        name: properties.AP_Name,
+        BSSID: properties.MacAddress,
+      }),
+    );
+  };
+
+  const scan = async () => {
+    const data = await loadKnownNetworks();
+    setKnownNetworks(data);
+
+    startScan();
+  };
+
+  if (visibleNetworks.length > 0) {
+    let data = trilateration(visibleNetworks, knownNetworks);
+
+    predictedLocation = data.predictedLocation;
+  }
 
   const qMap = gql`
     query get_map($graph: String!) {
@@ -179,10 +123,22 @@ export const Floorplan = () => {
 
   return (
     <>
+      <View style={styles.background}>
+        <Button style={styles.button} title="Scan Networks" onPress={scan} />
+        {knownNetworks.length > 0 ? (
+          <Text style={styles.info}>Loaded network data from JSON.</Text>
+        ) : null}
+        {visibleNetworks.length > 0 ? (
+          <Text style={styles.info}>Network scan successful.</Text>
+        ) : null}
+        {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
+      </View>
+      
       <DrawMap
         loading={loading}
         error={error}
         geoJson={geoJson}
+        location={predictedLocation}
         level={floor_list[floorId]}
       />
 
