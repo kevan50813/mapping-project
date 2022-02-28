@@ -8,7 +8,7 @@ import { server } from './App';
 import { Circle } from 'react-native-svg';
 
 function DrawMapLocation(location) {
-  const point = projection(location.point)
+  const point = projection(location.point);
   // TODO
   // const radius = projection(location.error);
   const radius = 10;
@@ -16,11 +16,17 @@ function DrawMapLocation(location) {
   // Hopefully, a stacked set of 3 circles that represent the location and the error.
   return (
     <>
-      <Circle cx={point[0]} cy={point[1]} r={radius} stroke="lightblue"/>
-      <Circle cx={point[0]} cy={point[1]} r={radius} fill="lightblue" opacity={0.5}/>
+      <Circle cx={point[0]} cy={point[1]} r={radius} stroke="lightblue" />
+      <Circle
+        cx={point[0]}
+        cy={point[1]}
+        r={radius}
+        fill="lightblue"
+        opacity={0.5}
+      />
       <Circle cx={point[0]} cy={point[1]} r="5" fill="blue" />
     </>
-  )
+  );
 }
 
 function DrawMapElement(feature, index, path, projection) {
@@ -33,7 +39,8 @@ function DrawMapElement(feature, index, path, projection) {
         d={featurePath}
         key={index}
         fill={feature.properties.indoor === 'room' ? 'lightblue' : 'lightgrey'}
-        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'} />
+        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
+      />
     );
   } else if (feature.geometry.type === 'Point') {
     const point = projection(feature.geometry.coordinates[0]);
@@ -45,7 +52,8 @@ function DrawMapElement(feature, index, path, projection) {
         key={index}
         fill="red"
         stroke="black"
-        strokeWidth="1" />
+        strokeWidth="1"
+      />
     );
   } else if (feature.geometry.type === 'LineString') {
     return (
@@ -54,7 +62,8 @@ function DrawMapElement(feature, index, path, projection) {
         key={index}
         stroke="black"
         strokeWidth="5"
-        fill="none" />
+        fill="none"
+      />
     );
   }
 }
