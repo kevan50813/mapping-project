@@ -37,8 +37,6 @@ export const Localisation = () => {
   if (visibleNetworks.length > 0) {
     let data = trilateration(visibleNetworks, knownNetworks);
 
-    console.log(data);
-
     predictedLocation = data.predictedLocation;
     usedNetworks = data.usedNetworks;
   }

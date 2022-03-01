@@ -25,11 +25,15 @@ export function trilateration(visibleNetworks, knownNetworks) {
       if (findKnown.length > 0) {
         network.coordinates = findKnown[0].coordinates;
         network.distance = rssiToDistance(network.RSSI);
-        console.log(network);
         commonNetworks.push(network);
       }
     }
   });
+
+  // sort in order of ascending distance from user
+  commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
+
+  console.log("COMMON NETWORK #: " + commonNetworks.length + "\n");
 
   return startTrilateration(commonNetworks);
 }
@@ -41,10 +45,31 @@ function startTrilateration(networks) {
   // wrapping this in a parent function so we can potentially do more stuff with this
   // i.e. run multiple methods and take smallest error etc
 
-  // maybe turn every coordinates [] into LatLon first as going to be interating all of them many a time?
+  // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
+
+  if (networks.length < 3) {
+    console.log("TRILAT ERR: not enough networks to trilaterate")
+    return {
+      usedNetworks: [],
+      predictedLocation: {
+        point: [-1, -1],
+        error: -1,
+      }
+    }
+  }
 
   // data in form { point, error, networks }
+  console.log();
+  let data1 = lastThree(networks);
+  console.log("LAST THREE: ");
+  console.log(data1);
+
   let data = firstThree(networks);
+  console.log("FIRST THREE: ");
+  console.log(data);
+  console.log();
+
+  iterateAll(networks);
 
   // do more processing maybe
 
@@ -60,31 +85,28 @@ function startTrilateration(networks) {
 }
 
 function trilaterate(networks) {
+
   let error = -1;
+  let pointArr = [-1, -1];
 
   let points = networks.map(
     network => new LatLon(network.coordinates[0], network.coordinates[1]),
   );
   let distances = networks.map(network => network.distance);
 
-  let point = LatLon.trilaterate(
-    points[0],
-    distances[0],
-    points[1],
-    distances[1],
-    points[2],
-    distances[2],
-  );
-  let pointArr = [-1, -1];
-
-  console.log();
-  console.log('TRILATERATING');
   try {
+    let point = LatLon.trilaterate(
+        points[0],
+        distances[0],
+        points[1],
+        distances[1],
+        points[2],
+        distances[2],
+    );
     pointArr = [point.lat, point.lon];
   } catch (e) {
-    console.log(e);
+    console.log("TRILAT ERR: " + e);
   }
-  console.log(point);
 
   return { pointArr, error, networks };
 }
@@ -93,14 +115,43 @@ function trilaterate(networks) {
 
 function firstThree(networks) {
   return trilaterate(
-    networks.sort((n1, n2) => n1.level - n2.level).slice(0, 3),
+    networks.slice(0, 3),
   );
 }
 
-/*
+
 function lastThree(networks) {
-  return trilaterate(networks.sort((a, b) => b.level - a.level).slice(0, 3));
+  return trilaterate(
+      networks.slice(0, -3),
+  );
 }
 
-function iterateAll(networks) {}
-*/
+
+
+function iterateAll(networks) {
+
+  let combinations = 0;
+  let predictedSum = [0, 0];
+
+  for (let i = 0; i < networks.length - 2; i++) {
+    for (let j = i + 1; j < networks.length - 1; j++) {
+      for (let k = j + 1; k < networks.length; k++) {
+        let triplet = [networks[i], networks[j], networks[k]];
+
+        let data = trilaterate(triplet);
+        if (data.pointArr[0] !== -1) {
+          predictedSum[0] += data.pointArr[0];
+          predictedSum[1] += data.pointArr[1];
+          combinations++;
+        }
+
+      }
+    }
+  }
+
+  console.log("----------------");
+  console.log(predictedSum);
+  console.log(combinations);
+
+}
+
