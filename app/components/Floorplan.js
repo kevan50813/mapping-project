@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Text, Button, View } from 'react-native';
-import { Text as SvgText } from 'react-native-svg';
 import { useLazyQuery, gql } from '@apollo/client';
+import { styles } from './styles';
+import { NetworkContext } from './NetworkProvider';
 import { buildGeoJson } from './buildGeoJson';
 import { DrawMap } from './DrawMap';
+import { trilateration } from './Trilateration';
 
-export const Floorplan = ({
-    predictedLocation,
-}) => {
+export const Floorplan = () => {
   const [floorId, setFloorId] = useState(2);
   const [geoJson, setGeoJson] = useState(null);
   const [knownNetworks, setKnownNetworks] = useState([]);
@@ -19,26 +19,30 @@ export const Floorplan = ({
     startScan,
   } = useContext(NetworkContext);
 
-  const loadKnownNetworks = async () => {
-    return require('./Wifi_Nodes.json').features.map(
-      ({ geometry, properties }) => ({
-        coordinates: geometry.coordinates,
-        name: properties.AP_Name,
-        BSSID: properties.MacAddress,
-      }),
+  const loadKnownNetworks = geoJson => {
+    if (!geoJson) {
+      return [];
+    }
+
+    // get the filter from the queries PoI data here
+    const nodes = geoJson.features.filter(
+      feature => feature.properties.internet === 'yes',
     );
+    return nodes.map(({ geometry, properties }) => ({
+      coordinates: geometry.coordinates[0],
+      name: properties.ssid,
+      BSSID: properties.mac_addres, // NB: not a typo, problem with char limits in shapefiles
+    }));
   };
 
   const scan = async () => {
-    const data = await loadKnownNetworks();
-    setKnownNetworks(data);
-
     startScan();
   };
 
-  if (visibleNetworks.length > 0) {
+  if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
     let data = trilateration(visibleNetworks, knownNetworks);
-
+    console.log(data);
+    // console.log(data.predictedLocation);
     predictedLocation = data.predictedLocation;
   }
 
@@ -108,6 +112,8 @@ export const Floorplan = ({
 
   useEffect(() => {
     setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
+    const networks = loadKnownNetworks(geoJson);
+    setKnownNetworks(networks);
   }, [loading]);
 
   const floor_set = new Set(polygons.map(f => f.level));
@@ -133,7 +139,7 @@ export const Floorplan = ({
         ) : null}
         {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
       </View>
-      
+
       <DrawMap
         loading={loading}
         error={error}

@@ -7,8 +7,16 @@ import { styles } from './styles';
 import { server } from './App';
 import { Circle } from 'react-native-svg';
 
-function DrawMapLocation(location) {
-  const point = projection(location.point);
+const DrawMapLocation = (location, proj) => {
+  console.log('PROJECTION');
+  console.log(proj);
+  console.log('---');
+
+  if (Object.keys(location).length === 0) {
+    return <></>;
+  }
+
+  const point = proj(location.point);
   // TODO
   // const radius = projection(location.error);
   const radius = 10;
@@ -16,7 +24,7 @@ function DrawMapLocation(location) {
   // Hopefully, a stacked set of 3 circles that represent the location and the error.
   return (
     <>
-      <Circle cx={point[0]} cy={point[1]} r={radius} stroke="lightblue" />
+      <Circle cx={point[0]} cy={point[1]} r={radius} stroke="lightblue" />,
       <Circle
         cx={point[0]}
         cy={point[1]}
@@ -24,10 +32,11 @@ function DrawMapLocation(location) {
         fill="lightblue"
         opacity={0.5}
       />
-      <Circle cx={point[0]} cy={point[1]} r="5" fill="blue" />
+      ,
+      <Circle cx={point[0]} cy={point[1]} r="5" fill="blue" />,
     </>
   );
-}
+};
 
 function DrawMapElement(feature, index, path, projection) {
   // TODO make this work with level ranges
@@ -67,6 +76,7 @@ function DrawMapElement(feature, index, path, projection) {
     );
   }
 }
+
 export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
   if (error) {
     console.error(error);
@@ -110,7 +120,7 @@ export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
         )}
 
         {/* TODO some other option for no location found */}
-        {location ? <DrawMapLocation location={location} /> : <></>}
+        {/* {location ? <DrawMapLocation location={location} proj={projection} /> : <></>} */}
       </SvgPanZoom>
     </>
   );
