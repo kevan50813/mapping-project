@@ -68,7 +68,6 @@ export const APVisualisation = ({
     console.log(e);
   }
 
-
   /*
    *  sets how the graph will be laid out and also where the circles for
    *  trilateration are set up

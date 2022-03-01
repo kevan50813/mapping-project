@@ -33,7 +33,7 @@ export function trilateration(visibleNetworks, knownNetworks) {
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
-  console.log("COMMON NETWORK #: " + commonNetworks.length + "\n");
+  console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
 
   return startTrilateration(commonNetworks);
 }
@@ -48,24 +48,24 @@ function startTrilateration(networks) {
   // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
 
   if (networks.length < 3) {
-    console.log("TRILAT ERR: not enough networks to trilaterate")
+    console.log('TRILAT ERR: not enough networks to trilaterate');
     return {
       usedNetworks: [],
       predictedLocation: {
         point: [-1, -1],
         error: -1,
-      }
-    }
+      },
+    };
   }
 
   // data in form { point, error, networks }
   console.log();
   let data1 = lastThree(networks);
-  console.log("LAST THREE: ");
+  console.log('LAST THREE: ');
   console.log(data1);
 
   let data = firstThree(networks);
-  console.log("FIRST THREE: ");
+  console.log('FIRST THREE: ');
   console.log(data);
   console.log();
 
@@ -85,7 +85,6 @@ function startTrilateration(networks) {
 }
 
 function trilaterate(networks) {
-
   let error = -1;
   let pointArr = [-1, -1];
 
@@ -96,16 +95,16 @@ function trilaterate(networks) {
 
   try {
     let point = LatLon.trilaterate(
-        points[0],
-        distances[0],
-        points[1],
-        distances[1],
-        points[2],
-        distances[2],
+      points[0],
+      distances[0],
+      points[1],
+      distances[1],
+      points[2],
+      distances[2],
     );
     pointArr = [point.lat, point.lon];
   } catch (e) {
-    console.log("TRILAT ERR: " + e);
+    console.log('TRILAT ERR: ' + e);
   }
 
   return { pointArr, error, networks };
@@ -114,22 +113,14 @@ function trilaterate(networks) {
 // --------- HEURISTICS ------------------------
 
 function firstThree(networks) {
-  return trilaterate(
-    networks.slice(0, 3),
-  );
+  return trilaterate(networks.slice(0, 3));
 }
-
 
 function lastThree(networks) {
-  return trilaterate(
-      networks.slice(0, -3),
-  );
+  return trilaterate(networks.slice(0, -3));
 }
 
-
-
 function iterateAll(networks) {
-
   let combinations = 0;
   let predictedSum = [0, 0];
 
@@ -144,14 +135,11 @@ function iterateAll(networks) {
           predictedSum[1] += data.pointArr[1];
           combinations++;
         }
-
       }
     }
   }
 
-  console.log("----------------");
+  console.log('----------------');
   console.log(predictedSum);
   console.log(combinations);
-
 }
-
