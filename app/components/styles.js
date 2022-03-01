@@ -76,6 +76,27 @@ export const styles = StyleSheet.create({
   plotly: {
     height: '70%',
   },
+  poi: {
+    fill: '#CA8702',
+    stroke: '#201600',
+  },
+  hallway: {
+    fill: '#BFBEC5',
+    stroke: '#18171A',
+  },
+  walls: {
+    stroke: '#0F1108',
+  },
+  location: {
+    fill: '#92D5E6',
+    stroke: '#0B2A31',
+    innerStroke: "#70CADF",
+  },
+  room: {
+    fill: '#C4F6B7',
+    stroke: '#113507',
+  },
+
   // input: {
   //   height: 40,
   //   margin: 12,

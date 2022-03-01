@@ -4,36 +4,47 @@ import * as d3 from 'd3';
 import { Path } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
-import { server } from './App';
 import { Circle } from 'react-native-svg';
 
-const DrawMapLocation = (location, proj) => {
-  console.log('PROJECTION');
-  console.log(proj);
-  console.log('---');
-
+const DrawMapLocation = ({ location, projection }) => {
+  let radius = 100;
   if (Object.keys(location).length === 0) {
-    return <></>;
+    return null;
   }
 
-  const point = proj(location.point);
-  // TODO
-  // const radius = projection(location.error);
-  const radius = 10;
+  const point = projection(location.point);
+  // Longitude, Latitude -> y, x
+  const [y, x] = point;
+  console.log(point, y, x);
+  if (location.error !== -1) {
+    radius = projection(location.error);
+  }
 
   // Hopefully, a stacked set of 3 circles that represent the location and the error.
   return (
     <>
-      <Circle cx={point[0]} cy={point[1]} r={radius} stroke="lightblue" />,
       <Circle
-        cx={point[0]}
-        cy={point[1]}
+        cx={x}
+        cy={y}
         r={radius}
-        fill="lightblue"
+        stroke={styles.location.stroke}
+        strokeWidth={3}
+      />
+      <Circle
+        cx={x}
+        cy={y}
+        r={radius}
+        fill={styles.location.fill}
         opacity={0.5}
       />
-      ,
-      <Circle cx={point[0]} cy={point[1]} r="5" fill="blue" />,
+      <Circle
+        cx={x}
+        cy={y}
+        r="10"
+        fill={styles.location.fill}
+        stroke={styles.location.innerStroke}
+        strokeWidth={5}
+      />
     </>
   );
 };
@@ -47,8 +58,16 @@ function DrawMapElement(feature, index, path, projection) {
       <Path
         d={featurePath}
         key={index}
-        fill={feature.properties.indoor === 'room' ? 'lightblue' : 'lightgrey'}
-        stroke={feature.properties.indoor === 'room' ? 'blue' : 'black'}
+        fill={
+          feature.properties.indoor === 'room'
+            ? styles.room.fill
+            : styles.hallway.fill
+        }
+        stroke={
+          feature.properties.indoor === 'room'
+            ? styles.room.stroke
+            : styles.hallway.stroke
+        }
       />
     );
   } else if (feature.geometry.type === 'Point') {
@@ -57,11 +76,11 @@ function DrawMapElement(feature, index, path, projection) {
       <Circle
         cx={point[0]}
         cy={point[1]}
-        r="5"
+        r="7"
         key={index}
-        fill="red"
-        stroke="black"
-        strokeWidth="1"
+        fill={styles.poi.fill}
+        stroke={styles.poi.stroke}
+        strokeWidth="3"
       />
     );
   } else if (feature.geometry.type === 'LineString') {
@@ -69,19 +88,16 @@ function DrawMapElement(feature, index, path, projection) {
       <Path
         d={featurePath}
         key={index}
-        stroke="black"
+        stroke={styles.walls.stroke}
         strokeWidth="5"
         fill="none"
+        strokeLinecap="round"
       />
     );
   }
 }
 
-export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
-  if (error) {
-    console.error(error);
-  }
-
+export const DrawMap = ({ geoJson, location, level = 0 }) => {
   const W = 1000;
   const H = 1000;
 
@@ -90,16 +106,6 @@ export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
 
   return (
     <>
-      {loading ? (
-        <Text style={styles.info}>Loading from {server}...</Text>
-      ) : null}
-
-      {!geoJson ? (
-        <Text style={styles.info}>Processing map data...</Text>
-      ) : null}
-
-      {error ? <Text style={styles.error}>{error.message}</Text> : null}
-
       <SvgPanZoom
         canvasHeight={1500}
         canvasWidth={1920}
@@ -109,7 +115,7 @@ export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
         {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
         {geoJson ? (
           geoJson.features.map((feature, index) => {
-            if (parseFloat(feature.properties.level) === parseFloat(level)) {
+            if (feature.properties.level.includes(level)) {
               // There could be more flexibility with this but
               // Only call this if the filters match the element?
               return DrawMapElement(feature, index, path, projection);
@@ -120,7 +126,9 @@ export const DrawMap = ({ loading, error, geoJson, location, level = [] }) => {
         )}
 
         {/* TODO some other option for no location found */}
-        {/* {location ? <DrawMapLocation location={location} proj={projection} /> : <></>} */}
+        {location ? (
+          <DrawMapLocation location={location} projection={projection} />
+        ) : null}
       </SvgPanZoom>
     </>
   );
