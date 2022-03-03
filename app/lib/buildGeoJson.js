@@ -81,7 +81,7 @@ export const buildGeoJson = (polygons, nodes, walls, pois, edges) => ({
   },
   features: [
     ...polyFeatures(polygons),
-    ...nodeFeatures(pois),
     ...buildLineString(walls, edges),
+    ...nodeFeatures(pois),
   ],
 });
