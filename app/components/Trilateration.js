@@ -1,10 +1,8 @@
 import LatLon from 'geodesy/latlon-nvector-spherical.js';
 
-let a = -40;
-let n = 2;
-const rssiToDistance = rssi => Math.pow(10, (rssi - a) / (-10 * n));
+const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 
-export function trilateration(visibleNetworks, knownNetworks) {
+export function trilateration(visibleNetworks, knownNetworks, a, n) {
   let commonNetworks = [];
 
   // for each scanned network, map it to the corresponding read network
@@ -24,7 +22,7 @@ export function trilateration(visibleNetworks, knownNetworks) {
       );
       if (findKnown.length > 0) {
         network.coordinates = findKnown[0].coordinates;
-        network.distance = rssiToDistance(network.RSSI);
+        network.distance = rssiToDistance(network.RSSI, a, n);
         commonNetworks.push(network);
       }
     }
@@ -34,6 +32,9 @@ export function trilateration(visibleNetworks, knownNetworks) {
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
   console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
+  commonNetworks.forEach(n => {
+    console.log(n.BSSID)
+  });
 
   return startTrilateration(commonNetworks);
 }
@@ -58,20 +59,18 @@ function startTrilateration(networks) {
     };
   }
 
-  // data in form { point, error, networks }
-  console.log();
-  let data1 = lastThree(networks);
-  console.log('LAST THREE: ');
-  console.log(data1);
 
-  let data = firstThree(networks);
-  console.log('FIRST THREE: ');
-  console.log(data);
-  console.log();
-
-  iterateAll(networks);
+  //let data_all = iterateAll(networks);
+  //let data_last = lastThree(networks);
+  let data_first = firstThree(networks);
 
   // do more processing maybe
+
+  let data = data_first;
+
+  data.networks.forEach(n=> {
+    console.log(n);
+  });
 
   // finally set best attributes
   // defined like this for easier adaption in future
@@ -87,6 +86,8 @@ function startTrilateration(networks) {
 function trilaterate(networks) {
   let error = -1;
   let pointArr = [-1, -1];
+
+  console.log(networks);
 
   let points = networks.map(
     network => new LatLon(network.coordinates[0], network.coordinates[1]),
@@ -142,4 +143,8 @@ function iterateAll(networks) {
   console.log('----------------');
   console.log(predictedSum);
   console.log(combinations);
+  let averagePoint = [predictedSum[0] / combinations, predictedSum[1] / combinations];
+  return { pointArr: averagePoint, error: -1, networks: []}
+
+
 }
