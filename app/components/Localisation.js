@@ -5,7 +5,7 @@ import { styles } from './styles';
 import { APVisualisation } from './APVisualisation';
 import { NetworkContext } from './NetworkProvider';
 import { trilateration } from './Trilateration';
-import {Slider} from "@miblanchard/react-native-slider";
+import { Slider } from '@miblanchard/react-native-slider';
 
 export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
@@ -50,19 +50,19 @@ export const Localisation = () => {
       <View style={styles.background}>
         <Text style={styles.small}>N = {n.toFixed(2)}</Text>
         <Slider
-            minimumValue={1}
-            maximumValue={3}
-            value={n}
-            onValueChange={v => setN(v[0])}
+          minimumValue={1}
+          maximumValue={3}
+          value={n}
+          onValueChange={v => setN(v[0])}
         />
         <Text style={styles.small}>A = {a.toFixed(2)}</Text>
         <Slider
-            minimumValue={-100}
-            maximumValue={0}
-            value={a}
-            onValueChange={v => setA(v[0])}
+          minimumValue={-100}
+          maximumValue={0}
+          value={a}
+          onValueChange={v => setA(v[0])}
         />
-      <Button style={styles.button} title="Scan Networks" onPress={scan} />
+        <Button style={styles.button} title="Scan Networks" onPress={scan} />
         {knownNetworks.length > 0 ? (
           <Text style={styles.info}>Loaded network data from JSON.</Text>
         ) : null}

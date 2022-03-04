@@ -24,7 +24,7 @@ export const APVisualisation = ({
   const getColour = network => {
     const key = getNetworkKey(network);
     if (usedBSSIDs.has(key)) {
-      console.log("FOUND: " + key + " -> base " + network.BSSID);
+      console.log('FOUND: ' + key + ' -> base ' + network.BSSID);
       return networkColours[NetworkType.USED];
     }
     if (scannedBSSIDs.has(key)) {

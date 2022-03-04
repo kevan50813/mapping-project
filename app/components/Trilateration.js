@@ -33,7 +33,7 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
 
   console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
   commonNetworks.forEach(n => {
-    console.log(n.BSSID)
+    console.log(n.BSSID);
   });
 
   return startTrilateration(commonNetworks);
@@ -59,7 +59,6 @@ function startTrilateration(networks) {
     };
   }
 
-
   //let data_all = iterateAll(networks);
   //let data_last = lastThree(networks);
   let data_first = firstThree(networks);
@@ -68,7 +67,7 @@ function startTrilateration(networks) {
 
   let data = data_first;
 
-  data.networks.forEach(n=> {
+  data.networks.forEach(n => {
     console.log(n);
   });
 
@@ -143,8 +142,9 @@ function iterateAll(networks) {
   console.log('----------------');
   console.log(predictedSum);
   console.log(combinations);
-  let averagePoint = [predictedSum[0] / combinations, predictedSum[1] / combinations];
-  return { pointArr: averagePoint, error: -1, networks: []}
-
-
+  let averagePoint = [
+    predictedSum[0] / combinations,
+    predictedSum[1] / combinations,
+  ];
+  return { pointArr: averagePoint, error: -1, networks: [] };
 }
