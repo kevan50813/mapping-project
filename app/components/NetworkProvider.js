@@ -3,7 +3,7 @@ import { PermissionsAndroid } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
 
 // OFFLINE FLAG
-export const Offline = true;
+export const Offline = false;
 
 export const NetworkType = {
   UNSCANNED: 1,
@@ -40,6 +40,7 @@ export const NetworkProvider = ({ children }) => {
   const startScan = async () => {
     // if offline, skip all the rest and just load from a file
     if (Offline) {
+      // update this to the offline path you want
       const networkData = require('../components/offline_scans/test.json');
       setScanning(networkData.state.scanning);
       setNetworks(networkData.networks);
