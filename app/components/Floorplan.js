@@ -3,7 +3,7 @@ import { Text, Button, View } from 'react-native';
 import { useLazyQuery, gql } from '@apollo/client';
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
-import { buildGeoJson } from '../lib/buildGeoJson';
+import { buildGeoJson } from '../lib/geoJson';
 import { DrawMap } from './DrawMap';
 import { trilateration } from './Trilateration';
 

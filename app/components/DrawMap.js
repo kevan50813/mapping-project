@@ -5,6 +5,7 @@ import { Path } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { Circle } from 'react-native-svg';
+import { onLevel } from '../lib/geoJson';
 
 const DrawMapLocation = ({ location, projection }) => {
   let radius = 100;
@@ -113,17 +114,15 @@ export const DrawMap = ({ geoJson, location, level = 0 }) => {
         maxScale={1}
         initialZoom={0.7}>
         {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
-        {geoJson ? (
-          geoJson.features.map((feature, index) => {
-            if (feature.properties.level.includes(level)) {
-              // There could be more flexibility with this but
-              // Only call this if the filters match the element?
-              return DrawMapElement(feature, index, path, projection);
-            }
-          })
-        ) : (
-          <></>
-        )}
+        {geoJson
+          ? // There could be more flexibility with this but
+            // Only call this if the filters match the element?
+            geoJson.features
+              .filter(onLevel(level))
+              .map((feature, index) =>
+                DrawMapElement(feature, index, path, projection),
+              )
+          : null}
 
         {/* TODO some other option for no location found */}
         {location ? (

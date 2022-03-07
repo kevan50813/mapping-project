@@ -72,6 +72,9 @@ const buildLineString = (nodes, edges) => {
     });
 };
 
+export const onLevel = level => feature =>
+  feature.properties.level.includes(level);
+
 export const buildGeoJson = (polygons, nodes, walls, pois, edges) => ({
   type: 'FeatureCollection',
   name: 'Map',
