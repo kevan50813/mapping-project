@@ -186,10 +186,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
 
       <TouchableOpacity
         onPress={prevFloor}
-        style={[
-          styles.mapButton,
-          { position: 'absolute', top: 70, right: 0 },
-        ]}>
+        style={[styles.mapButton, { position: 'absolute', top: 70, right: 0 }]}>
         <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faAngleDown}
@@ -213,7 +210,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
           />
         </Text>
       </TouchableOpacity>
-      
+
       <View style={styles.levelView}>
         <Text style={[styles.big, styles.levelViewText]}>
           Level: {floor_list[floorId]}

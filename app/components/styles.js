@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
     color: '#ddd',
     borderRadius: 15,
     padding: 10,
-  }
+  },
   // input: {
   //   height: 40,
   //   margin: 12,

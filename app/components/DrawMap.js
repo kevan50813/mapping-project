@@ -131,7 +131,11 @@ export const DrawMap = ({ geoJson, location, level = 0 }) => {
 
         {/* TODO some other option for no location found */}
         {location ? (
-          <DrawMapLocation location={location} projection={projection} level={level} />
+          <DrawMapLocation
+            location={location}
+            projection={projection}
+            level={level}
+          />
         ) : null}
       </SvgPanZoom>
     </>
