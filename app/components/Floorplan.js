@@ -178,8 +178,8 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
         <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faAngleUp}
-            size={styles.mapButtonIcon.size}
             style={styles.mapButtonIcon}
+            size={styles.mapButtonIconSvg.size}
           />
         </Text>
       </TouchableOpacity>
@@ -190,8 +190,8 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
         <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faAngleDown}
-            size={styles.mapButtonIcon.size}
             style={styles.mapButtonIcon}
+            size={styles.mapButtonIconSvg.size}
           />
         </Text>
       </TouchableOpacity>
