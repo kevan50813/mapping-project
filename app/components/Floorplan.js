@@ -15,6 +15,50 @@ import { buildGeoJson } from '../lib/geoJson';
 import { DrawMap } from './DrawMap';
 import { trilateration } from './Trilateration';
 
+const findNearestNode = (location, geoJson) => {
+  const nodes = geoJson.features.filter(feature => feature.properties.indoor === 'way' && feature.properties.level[0] === location.level);
+  var minDistance = Number.MAX_SAFE_INTEGER;
+  var closestNode = null;
+
+  for (let i = 0; i < nodes.length; i++) {
+    const nodeLocation = nodes[i].geometry.coordinates[0];
+    const distanceTo = Math.hypot(location.point[0] - nodeLocation[0], 
+                                  location.point[1] - nodeLocation[1]);
+
+    if (distanceTo < minDistance) {
+      closestNode = nodes[i];
+      minDistance = distanceTo;
+    }
+  }
+
+  return closestNode;
+}
+
+const findPath = (start, end) => {
+  const qPath = gql`
+    query get_route($graph: String!, $start: Int!, $end: Int!) {
+      find_route(graph: $graph, start_id: $start, end_id: $end) {
+        ids
+      }
+    }
+  `
+
+  const [
+    getPath,
+    {
+      loading,
+      error,
+      data: {find_route: find_route} = {find_route: {}},
+    },
+  ] = useLazyQuery(qPath);
+  
+  useEffect(() => {
+    getPath({ variables: { graph: 'test_bragg', start: start, end: end } });
+  }, [getPath]);
+  
+  return {loading, error, find_route};
+}
+
 export const LoadFloorplan = () => {
   const qMap = gql`
     query get_map($graph: String!) {
@@ -43,6 +87,9 @@ export const LoadFloorplan = () => {
         lat
         lon
         tags
+        polygon {
+          id
+        }
       }
 
       walls(graph: $graph) {
@@ -126,12 +173,22 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const [floorId, setFloorId] = useState(2);
   const [shownToast, setShownToast] = useState(false);
   let predictedLocation = {};
+  let nearestNode = null;
+  let path = [];
 
   const {
     networks: visibleNetworks,
     state: { scanning },
-    startScan,
+    startScan
   } = useContext(NetworkContext);
+  
+  const floor_set = new Set(polygons.map(f => f.level));
+  const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
+
+  const find_route = findPath(1800, 2878);
+  if (find_route.find_route.ids) {
+    path = find_route.find_route.ids;
+  }
 
   const scan = async () => {
     startScan();
@@ -139,13 +196,9 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
 
   if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
     let data = trilateration(visibleNetworks, knownNetworks, -50, 3);
-    console.log(data);
-    console.log(data.predictedLocation);
     predictedLocation = data.predictedLocation;
+    nearestNode = findNearestNode(predictedLocation, geoJson);
   }
-
-  const floor_set = new Set(polygons.map(f => f.level));
-  const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
   const prevFloor = () => {
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
@@ -170,6 +223,8 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
         geoJson={geoJson}
         location={predictedLocation}
         level={parseInt(floor_list[floorId], 10)}
+        nearestNode={nearestNode}
+        currentPath={path}
       />
 
       <TouchableOpacity

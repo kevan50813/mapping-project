@@ -21,7 +21,6 @@ const DrawMapLocation = ({ location, projection, level }) => {
   // TODO - confirm this? had to reverse it on merge to make results make sense...
   // Longitude, Latitude -> y, x
   const [x, y] = point;
-  console.log(point, x, y);
   if (location.error !== -1) {
     radius = projection(location.error);
   }
@@ -55,20 +54,24 @@ const DrawMapLocation = ({ location, projection, level }) => {
   );
 };
 
-function DrawMapElement(feature, index, path, projection) {
+function DrawMapElement(feature, index, path, projection, currentRoom, currentPath) {
   // TODO make this work with level ranges
   const featurePath = path(feature);
 
+  //list.includes
+
   if (feature.geometry.type === 'Polygon') {
+    var fill = feature.properties.indoor === 'room' ? styles.room.fill : styles.hallway.fill;
+    
+    if (feature.properties.queryObject.id === currentRoom) {
+      fill = styles.currentRoom.fill;
+    }
+
     return (
       <Path
         d={featurePath}
         key={index}
-        fill={
-          feature.properties.indoor === 'room'
-            ? styles.room.fill
-            : styles.hallway.fill
-        }
+        fill={fill}
         stroke={
           feature.properties.indoor === 'room'
             ? styles.room.stroke
@@ -78,7 +81,7 @@ function DrawMapElement(feature, index, path, projection) {
     );
   } else if (feature.geometry.type === 'Point') {
     const point = projection(feature.geometry.coordinates[0]);
-    return (
+    return feature.properties.indoor === 'way' || feature.properties.indoor === 'door' ? null :
       <Circle
         cx={point[0]}
         cy={point[1]}
@@ -87,25 +90,44 @@ function DrawMapElement(feature, index, path, projection) {
         fill={styles.poi.fill}
         stroke={styles.poi.stroke}
         strokeWidth="3"
-      />
-    );
+      />;
   } else if (feature.geometry.type === 'LineString') {
-    return (
-      <Path
-        d={featurePath}
-        key={index}
-        stroke={styles.walls.stroke}
-        strokeWidth="5"
-        fill="none"
-        strokeLinecap="round"
-      />
-    );
+    let stroke = styles.walls.stroke;
+
+    if (feature.properties.indoor === 'wall') {
+      return (
+        <Path
+          d={featurePath}
+          key={index}
+          stroke={stroke}
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      );
+    } else if (feature.properties.edge.every(f => currentPath.includes(f))) {
+      return (
+        <Path
+          d={featurePath}
+          key={index}
+          stroke='#f00'
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      );
+    }
   }
 }
 
-export const DrawMap = ({ geoJson, location, level = 0 }) => {
+export const DrawMap = ({ geoJson, location, level = 0, nearestNode, currentPath}) => {
   const W = 1000;
   const H = 1000;
+  var currentRoom = null;
+
+  if (nearestNode) {
+    currentRoom = nearestNode.properties.queryObject.polygon.id;
+  }
 
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
   const path = d3.geoPath().projection(projection);
@@ -125,7 +147,7 @@ export const DrawMap = ({ geoJson, location, level = 0 }) => {
             geoJson.features
               .filter(onLevel(level))
               .map((feature, index) =>
-                DrawMapElement(feature, index, path, projection),
+                DrawMapElement(feature, index, path, projection, currentRoom, currentPath),
               )
           : null}
 

@@ -24,6 +24,7 @@ const polyFeatures = polygons =>
     },
     properties: {
       ...polygon.tags,
+      queryObject: polygon,
       level: levelToArray(polygon.level),
     },
   }));
@@ -37,6 +38,7 @@ const nodeFeatures = nodes =>
     },
     properties: {
       ...node.tags,
+      queryObject: node,
       level: levelToArray(node.level),
     },
   }));
@@ -47,6 +49,7 @@ const buildLineString = (nodes, edges) => {
   var nodeLookup = {};
   nodes.map(n => (nodeLookup[n.id] = n));
 
+
   // then use edges to find all links between them
   // for now these are just pairs
   return edges
@@ -54,7 +57,7 @@ const buildLineString = (nodes, edges) => {
     .map(edge => {
       const node1 = nodeLookup[edge.edge[0].toString()];
       const node2 = nodeLookup[edge.edge[1].toString()];
-
+      
       return {
         type: 'Feature',
         geometry: {
@@ -66,6 +69,7 @@ const buildLineString = (nodes, edges) => {
         },
         properties: {
           ...node1.tags,
+          edge: edge.edge,
           level: levelToArray(node1.level),
         },
       };
@@ -85,6 +89,8 @@ export const buildGeoJson = (polygons, nodes, walls, pois, edges) => ({
   features: [
     ...polyFeatures(polygons),
     ...buildLineString(walls, edges),
+    ...buildLineString(nodes, edges),
+    ...nodeFeatures(nodes),
     ...nodeFeatures(pois),
   ],
 });

@@ -96,6 +96,9 @@ export const styles = StyleSheet.create({
     fill: '#C4F6B7',
     stroke: '#113507',
   },
+  currentRoom: {
+    fill: '#E05263',
+  },
   mapButton: {
     backgroundColor: '#0F3843',
     borderRadius: 15,
