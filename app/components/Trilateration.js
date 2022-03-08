@@ -5,6 +5,9 @@ const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 export function trilateration(visibleNetworks, knownNetworks, a, n) {
   let commonNetworks = [];
 
+  // count of networks on each floor
+  let levelCount = [0, 0, 0, 0, 0, 0];
+
   // for each scanned network, map it to the corresponding read network
   // also embeds the coordinates of the AP for trilateration
   // output of this is placed into commonNetworks
@@ -23,10 +26,16 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
       if (findKnown.length > 0) {
         network.coordinates = findKnown[0].coordinates;
         network.distance = rssiToDistance(network.RSSI, a, n);
+        network.level = findKnown[0].level;
+        levelCount[network.level] += 1;
         commonNetworks.push(network);
       }
     }
   });
+
+  // get level with the most networks on it
+  let predictedLevel = levelCount.indexOf(Math.max.apply(null, levelCount));
+  console.log('PREDICTED LEVEL: ' + predictedLevel);
 
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
@@ -36,12 +45,12 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
     console.log(n.BSSID);
   });
 
-  return startTrilateration(commonNetworks);
+  return startTrilateration(commonNetworks, predictedLevel);
 }
 
 const getNetworkKey = network => network.BSSID.slice(0, -1);
 
-function startTrilateration(networks) {
+function startTrilateration(networks, level) {
   // trilat stuff
   // wrapping this in a parent function so we can potentially do more stuff with this
   // i.e. run multiple methods and take smallest error etc
@@ -52,6 +61,7 @@ function startTrilateration(networks) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
     return {
       usedNetworks: [],
+      level: level,
       predictedLocation: {
         point: [-1, -1],
         error: -1,
@@ -67,14 +77,16 @@ function startTrilateration(networks) {
 
   let data = data_first;
 
+  /*
   data.networks.forEach(n => {
     console.log(n);
-  });
+  }); */
 
   // finally set best attributes
   // defined like this for easier adaption in future
   return {
     usedNetworks: data.networks,
+    level: level,
     predictedLocation: {
       point: data.pointArr,
       error: data.error,
@@ -103,7 +115,7 @@ function trilaterate(networks) {
   let error = -1;
   let pointArr = [-1, -1];
 
-  console.log(networks);
+  //console.log(networks);
 
   let points = networks.map(
     network => new LatLon(network.coordinates[0], network.coordinates[1]),
@@ -156,9 +168,9 @@ function iterateAll(networks) {
     }
   }
 
-  console.log('----------------');
-  console.log(predictedSum);
-  console.log(combinations);
+  //console.log('----------------');
+  //console.log(predictedSum);
+  //console.log(combinations);
   let averagePoint = [
     predictedSum[0] / combinations,
     predictedSum[1] / combinations,

@@ -19,12 +19,9 @@ export const APVisualisation = ({
   const scannedBSSIDs = new Set(visibleNetworks.map(getNetworkKey));
   const usedBSSIDs = new Set(usedNetworks.map(getNetworkKey));
 
-  console.log(usedBSSIDs);
-
   const getColour = network => {
     const key = getNetworkKey(network);
     if (usedBSSIDs.has(key)) {
-      console.log('FOUND: ' + key + ' -> base ' + network.BSSID);
       return networkColours[NetworkType.USED];
     }
     if (scannedBSSIDs.has(key)) {
