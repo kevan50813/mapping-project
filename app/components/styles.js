@@ -107,11 +107,12 @@ export const styles = StyleSheet.create({
   },
   mapButtonIcon: {
     flex: 1,
-    size: 50,
+    size: 40,
+    padding: 5,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-  },
+  }
   // input: {
   //   height: 40,
   //   margin: 12,
