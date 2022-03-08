@@ -14,9 +14,10 @@ const DrawMapLocation = ({ location, projection }) => {
   }
 
   const point = projection(location.point);
+  // TODO - confirm this? had to reverse it on merge to make results make sense...
   // Longitude, Latitude -> y, x
-  const [y, x] = point;
-  console.log(point, y, x);
+  const [x, y] = point;
+  console.log(point, x, y);
   if (location.error !== -1) {
     radius = projection(location.error);
   }
