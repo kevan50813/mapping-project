@@ -17,7 +17,7 @@
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:5d:2e:00", "AP_Name": "wap70268" }, "geometry": { "type": "Point", "coordinates": [ -1.554213250625657, 53.809295102404754 ] } },
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:5d:2b:80", "AP_Name": "wap70270" }, "geometry": { "type": "Point", "coordinates": [ -1.554212658452376, 53.809419162707037 ] } },
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:cf:b3:60", "AP_Name": "wap70250" }, "geometry": { "type": "Point", "coordinates": [ -1.554172094582652, 53.808729280835088 ] } },
-{ "type": "Feature", "properties": { "MacAddress": "ac:3a:67:08:29:a0", "AP_Name": "wap70259" }, "geometry": { "type": "Point", "coordinates": [ -1.554167357196407, 53.808975921006471 ] } },
+{ "type": "Feature", "properties": { "MacAddress": "ac:3a:67:08:04:00", "AP_Name": "wap70259" }, "geometry": { "type": "Point", "coordinates": [ -1.554167357196407, 53.808975921006471 ] } },
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:cf:c1:80", "AP_Name": "wap70265" }, "geometry": { "type": "Point", "coordinates": [ -1.554165284589924, 53.809174002968845 ] } },
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:5d:2b:80", "AP_Name": "wap70271" }, "geometry": { "type": "Point", "coordinates": [ -1.554164100243363, 53.809398732728859 ] } },
 { "type": "Feature", "properties": { "MacAddress": "5c:a6:2d:cf:e7:20", "AP_Name": "wap70251" }, "geometry": { "type": "Point", "coordinates": [ -1.55409777683593, 53.808730169094979 ] } },
