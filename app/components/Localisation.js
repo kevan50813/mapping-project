@@ -24,7 +24,7 @@ export const Localisation = () => {
   } = useContext(NetworkContext);
 
   const loadKnownNetworks = async () => {
-    return require('./new_nodes.json')
+    return require('../data/new_nodes.json')
       .features.filter(line => line.properties.internet === 'yes')
       .map(({ geometry, properties }) => ({
         coordinates: geometry.coordinates,

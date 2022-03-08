@@ -41,7 +41,7 @@ export const NetworkProvider = ({ children }) => {
     // if offline, skip all the rest and just load from a file
     if (Offline) {
       // update this to the offline path you want
-      const networkData = require('../components/offline_scans/test.json');
+      const networkData = require('../data/offline_scans/test.json');
       setScanning(networkData.state.scanning);
       setNetworks(networkData.networks);
       setError(networkData.state.error);
