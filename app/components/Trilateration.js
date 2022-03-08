@@ -86,9 +86,9 @@ function startTrilateration(networks, level) {
   // defined like this for easier adaption in future
   return {
     usedNetworks: data.networks,
-    level: level,
     predictedLocation: {
       point: data.pointArr,
+      level: level,
       error: data.error,
     },
   };

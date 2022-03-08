@@ -7,7 +7,11 @@ import { styles } from './styles';
 import { Circle } from 'react-native-svg';
 import { onLevel } from '../lib/geoJson';
 
-const DrawMapLocation = ({ location, projection }) => {
+const DrawMapLocation = ({ location, projection, level }) => {
+  if (level !== location.level) {
+    return null;
+  }
+
   let radius = 100;
   if (Object.keys(location).length === 0) {
     return null;
@@ -127,7 +131,7 @@ export const DrawMap = ({ geoJson, location, level = 0 }) => {
 
         {/* TODO some other option for no location found */}
         {location ? (
-          <DrawMapLocation location={location} projection={projection} />
+          <DrawMapLocation location={location} projection={projection} level={level} />
         ) : null}
       </SvgPanZoom>
     </>

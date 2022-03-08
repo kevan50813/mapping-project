@@ -165,54 +165,60 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   }
 
   return (
-    <>
-      <View style={styles.background}>
-        <DrawMap
-          geoJson={geoJson}
-          location={predictedLocation}
-          level={parseInt(floor_list[floorId], 10)}
-        />
+    <View style={styles.background}>
+      <DrawMap
+        geoJson={geoJson}
+        location={predictedLocation}
+        level={parseInt(floor_list[floorId], 10)}
+      />
 
-        <TouchableOpacity
-          onPress={nextFloor}
-          style={[styles.mapButton, { position: 'absolute', top: 0, left: 0 }]}>
+      <TouchableOpacity
+        onPress={nextFloor}
+        style={[styles.mapButton, { position: 'absolute', top: 0, right: 0 }]}>
+        <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faAngleUp}
             size={styles.mapButtonIcon.size}
             style={styles.mapButtonIcon}
           />
-        </TouchableOpacity>
+        </Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={prevFloor}
-          style={[
-            styles.mapButton,
-            { position: 'absolute', top: 70, left: 0 },
-          ]}>
+      <TouchableOpacity
+        onPress={prevFloor}
+        style={[
+          styles.mapButton,
+          { position: 'absolute', top: 70, right: 0 },
+        ]}>
+        <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faAngleDown}
             size={styles.mapButtonIcon.size}
             style={styles.mapButtonIcon}
           />
-        </TouchableOpacity>
+        </Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={scan}
-          style={[
-            styles.mapButton,
-            { position: 'absolute', bottom: 0, left: 0 },
-          ]}>
+      <TouchableOpacity
+        onPress={scan}
+        style={[
+          styles.mapButton,
+          { position: 'absolute', bottom: 0, right: 0 },
+        ]}>
+        <Text style={styles.mapButtonIcon}>
           <FontAwesomeIcon
             icon={faLocationCrosshairs}
             size={styles.mapButtonIcon.size}
             style={styles.mapButtonIcon}
           />
-        </TouchableOpacity>
+        </Text>
+      </TouchableOpacity>
+      
+      <View style={styles.levelView}>
+        <Text style={[styles.big, styles.levelViewText]}>
+          Level: {floor_list[floorId]}
+        </Text>
       </View>
-
-      <Text style={{ color: 'black', paddingLeft: '5%' }}>
-        Floor id: {floor_list[floorId]}
-      </Text>
-    </>
+    </View>
   );
 };
