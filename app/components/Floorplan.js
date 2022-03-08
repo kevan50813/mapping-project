@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, Button, View, TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faAngleDown, faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleUp,
+  faAngleDown,
+  faLocationCrosshairs,
+} from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
 import { useLazyQuery, gql } from '@apollo/client';
 
@@ -117,11 +121,7 @@ export const LoadFloorplan = () => {
   );
 };
 
-export const Floorplan = ({
-  polygons,
-  geoJson,
-  knownNetworks,
-}) => {
+export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const [floorId, setFloorId] = useState(2);
   const [shownToast, setShownToast] = useState(false);
   let predictedLocation = {};
@@ -153,14 +153,14 @@ export const Floorplan = ({
   const nextFloor = () => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
-  
+
   if (!scanning && visibleNetworks.length > 0 && !shownToast) {
-    Toast.show("Network scan successful.", Toast.LONG);
+    Toast.show('Network scan successful.', Toast.LONG);
     setShownToast(true);
   }
 
   if (scanning) {
-    Toast.show("Scanning Wifi APs...", Toast.LONG);
+    Toast.show('Scanning Wifi APs...', Toast.LONG);
   }
 
   return (
@@ -172,25 +172,40 @@ export const Floorplan = ({
           level={parseInt(floor_list[floorId], 10)}
         />
 
-        <TouchableOpacity 
-          onPress={nextFloor} 
-          style={[styles.mapButton,{position: "absolute", top: 0, left: 0}]} 
-        >
-          <FontAwesomeIcon icon={faAngleUp} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon} /> 
+        <TouchableOpacity
+          onPress={nextFloor}
+          style={[styles.mapButton, { position: 'absolute', top: 0, left: 0 }]}>
+          <FontAwesomeIcon
+            icon={faAngleUp}
+            size={styles.mapButtonIcon.size}
+            style={styles.mapButtonIcon}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          onPress={prevFloor} 
-          style={[styles.mapButton, {position: 'absolute', top: 70, left: 0}]}
-        >
-          <FontAwesomeIcon icon={faAngleDown} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon}/> 
+        <TouchableOpacity
+          onPress={prevFloor}
+          style={[
+            styles.mapButton,
+            { position: 'absolute', top: 70, left: 0 },
+          ]}>
+          <FontAwesomeIcon
+            icon={faAngleDown}
+            size={styles.mapButtonIcon.size}
+            style={styles.mapButtonIcon}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          onPress={scan} 
-          style={[styles.mapButton, {position: 'absolute', bottom: 0, left: 0}]}
-        >
-          <FontAwesomeIcon icon={faLocationCrosshairs} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon}/> 
+        <TouchableOpacity
+          onPress={scan}
+          style={[
+            styles.mapButton,
+            { position: 'absolute', bottom: 0, left: 0 },
+          ]}>
+          <FontAwesomeIcon
+            icon={faLocationCrosshairs}
+            size={styles.mapButtonIcon.size}
+            style={styles.mapButtonIcon}
+          />
         </TouchableOpacity>
       </View>
 

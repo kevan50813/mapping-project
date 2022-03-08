@@ -90,7 +90,7 @@ export const styles = StyleSheet.create({
   location: {
     fill: '#92D5E6',
     stroke: '#0B2A31',
-    innerStroke: "#70CADF",
+    innerStroke: '#70CADF',
   },
   room: {
     fill: '#C4F6B7',
@@ -111,7 +111,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-  }
+  },
   // input: {
   //   height: 40,
   //   margin: 12,
