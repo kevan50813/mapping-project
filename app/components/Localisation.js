@@ -45,7 +45,7 @@ export const Localisation = () => {
 
     predictedLocation = data.predictedLocation;
     usedNetworks = data.usedNetworks;
-    predictedLevel = data.level;
+    predictedLevel = data.predictedLocation.level;
     filteredKnownNetworks = knownNetworks.filter(
       ap => ap.level === predictedLevel,
     );
