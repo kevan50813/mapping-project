@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text, Button, View } from 'react-native';
+import { Text, Button, View, TouchableOpacity } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faAngleUp, faAngleDown, faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
+import Toast from 'react-native-simple-toast';
 import { useLazyQuery, gql } from '@apollo/client';
+
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
 import { buildGeoJson } from '../lib/geoJson';
@@ -101,7 +105,7 @@ export const LoadFloorplan = () => {
   }
 
   return loading ? (
-    <Text style={styles.info}>Loading...</Text>
+    <Text style={styles.info}>Loading Floorplan...</Text>
   ) : (
     <Floorplan
       polygons={polygons}
@@ -115,12 +119,11 @@ export const LoadFloorplan = () => {
 
 export const Floorplan = ({
   polygons,
-  loading,
-  error,
   geoJson,
   knownNetworks,
 }) => {
   const [floorId, setFloorId] = useState(2);
+  const [shownToast, setShownToast] = useState(false);
   let predictedLocation = {};
 
   const {
@@ -150,36 +153,50 @@ export const Floorplan = ({
   const nextFloor = () => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
+  
+  if (!scanning && visibleNetworks.length > 0 && !shownToast) {
+    Toast.show("Network scan successful.", Toast.LONG);
+    setShownToast(true);
+  }
+
+  if (scanning) {
+    Toast.show("Scanning Wifi APs...", Toast.LONG);
+  }
 
   return (
     <>
-      <View style={styles.background}>
-        <Button style={styles.button} title="Scan Networks" onPress={scan} />
-        {!scanning && visibleNetworks.length > 0 ? (
-          <Text style={styles.info}>Network scan successful.</Text>
-        ) : null}
-        {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
-      </View>
-
       <View style={styles.background}>
         <DrawMap
           geoJson={geoJson}
           location={predictedLocation}
           level={parseInt(floor_list[floorId], 10)}
         />
+
+        <TouchableOpacity 
+          onPress={nextFloor} 
+          style={[styles.mapButton,{position: "absolute", top: 0, left: 0}]} 
+        >
+          <FontAwesomeIcon icon={faAngleUp} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon} /> 
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={prevFloor} 
+          style={[styles.mapButton, {position: 'absolute', top: 70, left: 0}]}
+        >
+          <FontAwesomeIcon icon={faAngleDown} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon}/> 
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={scan} 
+          style={[styles.mapButton, {position: 'absolute', bottom: 0, left: 0}]}
+        >
+          <FontAwesomeIcon icon={faLocationCrosshairs} size={styles.mapButtonIcon.size} style={styles.mapButtonIcon}/> 
+        </TouchableOpacity>
       </View>
 
       <Text style={{ color: 'black', paddingLeft: '5%' }}>
         Floor id: {floor_list[floorId]}
       </Text>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ width: '50%', paddingLeft: '5%', paddingRight: '2.5%' }}>
-          <Button onPress={prevFloor} title="Previous floor" />
-        </View>
-        <View style={{ width: '50%', paddingLeft: '2.5%', paddingRight: '5%' }}>
-          <Button onPress={nextFloor} title="Next floor" />
-        </View>
-      </View>
     </>
   );
 };

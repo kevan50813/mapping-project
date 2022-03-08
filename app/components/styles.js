@@ -96,7 +96,22 @@ export const styles = StyleSheet.create({
     fill: '#C4F6B7',
     stroke: '#113507',
   },
-
+  mapButton: {
+    backgroundColor: '#def',
+    color: '#048',
+    fontSize: 18,
+    borderRadius: 4,
+    height: 50,
+    width: 50,
+    margin: 10,
+  },
+  mapButtonIcon: {
+    flex: 1,
+    size: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  }
   // input: {
   //   height: 40,
   //   margin: 12,
