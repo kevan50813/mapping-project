@@ -1,6 +1,7 @@
 import React from 'react';
 import Plotly from 'react-native-plotly';
 import { NetworkType } from './NetworkProvider';
+import Toast from "react-native-simple-toast";
 
 const networkColours = {
   [NetworkType.UNSCANNED]: 'lightgray',
@@ -59,10 +60,23 @@ export const APVisualisation = ({
   // only plot predicted location if we get one!
   try {
     if (predictedLocation.point[0] !== -1) {
+      // if we want to visualise ALL the predicted locations in the case of iterateAllVis (TEMP FOR DEBUGGING)
+      if (predictedLocation.point.length > 2) {
+        for (let i = 0; i < predictedLocation.point[2].length; i++) {
+          data[0].x.push(predictedLocation.point[2][i][0]);
+          data[0].y.push(predictedLocation.point[2][i][1]);
+          data[0].text.push('point');
+          data[0].marker.color.push('yellow');
+        }
+      }
+
       data[0].x.push(predictedLocation.point[0]);
       data[0].y.push(predictedLocation.point[1]);
       data[0].text.push('point');
       data[0].marker.color.push('purple');
+
+      Toast.show('Net count: ' + predictedLocation.point[2].length, 1);
+
     }
   } catch (e) {
     console.log(e);
