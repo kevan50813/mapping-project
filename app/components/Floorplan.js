@@ -88,6 +88,7 @@ export const LoadFloorplan = () => {
       coordinates: geometry.coordinates[0],
       name: properties.ssid,
       BSSID: properties.mac_addres, // NB: not a typo, problem with char limits in shapefiles
+      level: properties.level,
     }));
   };
 
@@ -134,7 +135,7 @@ export const Floorplan = ({
   };
 
   if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks);
+    let data = trilateration(visibleNetworks, knownNetworks, -50, 3);
     console.log(data);
     console.log(data.predictedLocation);
     predictedLocation = data.predictedLocation;
