@@ -54,15 +54,25 @@ const DrawMapLocation = ({ location, projection, level }) => {
   );
 };
 
-function DrawMapElement(feature, index, path, projection, currentRoom, currentPath) {
+function DrawMapElement(
+  feature,
+  index,
+  path,
+  projection,
+  currentRoom,
+  currentPath,
+) {
   // TODO make this work with level ranges
   const featurePath = path(feature);
 
   //list.includes
 
   if (feature.geometry.type === 'Polygon') {
-    var fill = feature.properties.indoor === 'room' ? styles.room.fill : styles.hallway.fill;
-    
+    var fill =
+      feature.properties.indoor === 'room'
+        ? styles.room.fill
+        : styles.hallway.fill;
+
     if (feature.properties.queryObject.id === currentRoom) {
       fill = styles.currentRoom.fill;
     }
@@ -81,7 +91,8 @@ function DrawMapElement(feature, index, path, projection, currentRoom, currentPa
     );
   } else if (feature.geometry.type === 'Point') {
     const point = projection(feature.geometry.coordinates[0]);
-    return feature.properties.indoor === 'way' || feature.properties.indoor === 'door' ? null :
+    return feature.properties.indoor === 'way' ||
+      feature.properties.indoor === 'door' ? null : (
       <Circle
         cx={point[0]}
         cy={point[1]}
@@ -90,7 +101,8 @@ function DrawMapElement(feature, index, path, projection, currentRoom, currentPa
         fill={styles.poi.fill}
         stroke={styles.poi.stroke}
         strokeWidth="3"
-      />;
+      />
+    );
   } else if (feature.geometry.type === 'LineString') {
     let stroke = styles.walls.stroke;
 
@@ -110,7 +122,7 @@ function DrawMapElement(feature, index, path, projection, currentRoom, currentPa
         <Path
           d={featurePath}
           key={index}
-          stroke='#f00'
+          stroke="#f00"
           strokeWidth="5"
           fill="none"
           strokeLinecap="round"
@@ -120,7 +132,13 @@ function DrawMapElement(feature, index, path, projection, currentRoom, currentPa
   }
 }
 
-export const DrawMap = ({ geoJson, location, level = 0, nearestNode, currentPath}) => {
+export const DrawMap = ({
+  geoJson,
+  location,
+  level = 0,
+  nearestNode,
+  currentPath,
+}) => {
   const W = 1000;
   const H = 1000;
   var currentRoom = null;
@@ -147,7 +165,14 @@ export const DrawMap = ({ geoJson, location, level = 0, nearestNode, currentPath
             geoJson.features
               .filter(onLevel(level))
               .map((feature, index) =>
-                DrawMapElement(feature, index, path, projection, currentRoom, currentPath),
+                DrawMapElement(
+                  feature,
+                  index,
+                  path,
+                  projection,
+                  currentRoom,
+                  currentPath,
+                ),
               )
           : null}
 

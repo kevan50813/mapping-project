@@ -49,7 +49,6 @@ const buildLineString = (nodes, edges) => {
   var nodeLookup = {};
   nodes.map(n => (nodeLookup[n.id] = n));
 
-
   // then use edges to find all links between them
   // for now these are just pairs
   return edges
@@ -57,7 +56,7 @@ const buildLineString = (nodes, edges) => {
     .map(edge => {
       const node1 = nodeLookup[edge.edge[0].toString()];
       const node2 = nodeLookup[edge.edge[1].toString()];
-      
+
       return {
         type: 'Feature',
         geometry: {

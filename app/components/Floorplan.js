@@ -16,14 +16,20 @@ import { DrawMap } from './DrawMap';
 import { trilateration } from './Trilateration';
 
 const findNearestNode = (location, geoJson) => {
-  const nodes = geoJson.features.filter(feature => feature.properties.indoor === 'way' && feature.properties.level[0] === location.level);
+  const nodes = geoJson.features.filter(
+    feature =>
+      feature.properties.indoor === 'way' &&
+      feature.properties.level[0] === location.level,
+  );
   var minDistance = Number.MAX_SAFE_INTEGER;
   var closestNode = null;
 
   for (let i = 0; i < nodes.length; i++) {
     const nodeLocation = nodes[i].geometry.coordinates[0];
-    const distanceTo = Math.hypot(location.point[0] - nodeLocation[0], 
-                                  location.point[1] - nodeLocation[1]);
+    const distanceTo = Math.hypot(
+      location.point[0] - nodeLocation[0],
+      location.point[1] - nodeLocation[1],
+    );
 
     if (distanceTo < minDistance) {
       closestNode = nodes[i];
@@ -32,7 +38,7 @@ const findNearestNode = (location, geoJson) => {
   }
 
   return closestNode;
-}
+};
 
 const findPath = (start, end) => {
   const qPath = gql`
@@ -41,23 +47,19 @@ const findPath = (start, end) => {
         ids
       }
     }
-  `
+  `;
 
   const [
     getPath,
-    {
-      loading,
-      error,
-      data: {find_route: find_route} = {find_route: {}},
-    },
+    { loading, error, data: { find_route: find_route } = { find_route: {} } },
   ] = useLazyQuery(qPath);
-  
+
   useEffect(() => {
     getPath({ variables: { graph: 'test_bragg', start: start, end: end } });
   }, [getPath]);
-  
-  return {loading, error, find_route};
-}
+
+  return { loading, error, find_route };
+};
 
 export const LoadFloorplan = () => {
   const qMap = gql`
@@ -179,9 +181,9 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const {
     networks: visibleNetworks,
     state: { scanning },
-    startScan
+    startScan,
   } = useContext(NetworkContext);
-  
+
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
