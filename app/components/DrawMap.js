@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import * as d3 from 'd3';
 import { Path } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';

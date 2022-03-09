@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text, Button, View, TouchableOpacity } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { Text, View } from 'react-native';
 import {
   faAngleUp,
   faAngleDown,
@@ -11,6 +10,7 @@ import { useLazyQuery, gql } from '@apollo/client';
 
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
+import { MapButton } from './MapButton';
 import { buildGeoJson } from '../lib/geoJson';
 import { DrawMap } from './DrawMap';
 import { trilateration } from './Trilateration';
@@ -220,59 +220,40 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   }
 
   return (
-    <View style={styles.background}>
-      <DrawMap
-        geoJson={geoJson}
-        location={predictedLocation}
-        level={parseInt(floor_list[floorId], 10)}
-        nearestNode={nearestNode}
-        currentPath={path}
-      />
+    <>
+      <View style={styles.background}>
+        <DrawMap
+          geoJson={geoJson}
+          location={predictedLocation}
+          level={parseInt(floor_list[floorId], 10)}
+          nearestNode={nearestNode}
+          currentPath={path}
+        />
 
-      <TouchableOpacity
-        onPress={nextFloor}
-        style={[styles.mapButton, { position: 'absolute', top: 0, right: 0 }]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faAngleUp}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faAngleUp}
+          position={{ position: 'absolute', top: 0, right: 0 }}
+          onPress={nextFloor}
+        />
 
-      <TouchableOpacity
-        onPress={prevFloor}
-        style={[styles.mapButton, { position: 'absolute', top: 70, right: 0 }]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faAngleDown}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faAngleDown}
+          position={{ position: 'absolute', top: 70, right: 0 }}
+          onPress={prevFloor}
+        />
 
-      <TouchableOpacity
-        onPress={scan}
-        style={[
-          styles.mapButton,
-          { position: 'absolute', bottom: 0, right: 0 },
-        ]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faLocationCrosshairs}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faLocationCrosshairs}
+          position={{ position: 'absolute', bottom: 0, right: 0 }}
+          onPress={scan}
+        />
 
-      <View style={styles.levelView}>
-        <Text style={[styles.big, styles.levelViewText]}>
-          Level: {floor_list[floorId]}
-        </Text>
+        <View style={styles.levelView}>
+          <Text style={[styles.big, styles.levelViewText]}>
+            Level: {floor_list[floorId]}
+          </Text>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
