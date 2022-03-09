@@ -6,49 +6,19 @@ import {
   faLocationCrosshairs,
 } from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-simple-toast';
-import { useLazyQuery, gql } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
 import { MapButton } from './MapButton';
 import { buildGeoJson } from '../lib/geoJson';
+import { findNearestNode } from '../lib/findNearestNode';
 import { DrawMap } from './DrawMap';
+import { qMap } from '../queries/qMap';
+import { qPath } from '../queries/qPath';
 import { trilateration } from './Trilateration';
 
-const findNearestNode = (location, geoJson) => {
-  const nodes = geoJson.features.filter(
-    feature =>
-      feature.properties.indoor === 'way' &&
-      feature.properties.level[0] === location.level,
-  );
-  var minDistance = Number.MAX_SAFE_INTEGER;
-  var closestNode = null;
-
-  for (let i = 0; i < nodes.length; i++) {
-    const nodeLocation = nodes[i].geometry.coordinates[0];
-    const distanceTo = Math.hypot(
-      location.point[0] - nodeLocation[0],
-      location.point[1] - nodeLocation[1],
-    );
-
-    if (distanceTo < minDistance) {
-      closestNode = nodes[i];
-      minDistance = distanceTo;
-    }
-  }
-
-  return closestNode;
-};
-
 const findPath = (start, end) => {
-  const qPath = gql`
-    query get_route($graph: String!, $start: Int!, $end: Int!) {
-      find_route(graph: $graph, start_id: $start, end_id: $end) {
-        ids
-      }
-    }
-  `;
-
   const [
     getPath,
     { loading, error, data: { find_route: find_route } = { find_route: {} } },
@@ -62,48 +32,6 @@ const findPath = (start, end) => {
 };
 
 export const LoadFloorplan = () => {
-  const qMap = gql`
-    query get_map($graph: String!) {
-      polygons(graph: $graph) {
-        id
-        vertices
-        level
-        tags
-      }
-
-      edges(graph: $graph) {
-        edge
-      }
-
-      pois(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-      }
-
-      nodes(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-        polygon {
-          id
-        }
-      }
-
-      walls(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-      }
-    }
-  `;
-
   const [
     getMap,
     {
@@ -132,16 +60,16 @@ export const LoadFloorplan = () => {
   const [geoJson, setGeoJson] = useState(null);
   const [knownNetworks, setKnownNetworks] = useState([]);
 
-  const loadKnownNetworks = geoJson => {
-    if (geoJson == null) {
+  const loadKnownNetworks = geo => {
+    if (geo == null) {
       return [];
     }
 
     // get the filter from the queries PoI data here
-    const nodes = geoJson.features.filter(
+    const knownWifi = geo.features.filter(
       feature => feature.properties.internet === 'yes',
     );
-    return nodes.map(({ geometry, properties }) => ({
+    return knownWifi.map(({ geometry, properties }) => ({
       coordinates: geometry.coordinates[0],
       name: properties.ssid,
       BSSID: properties.mac_addres, // NB: not a typo, problem with char limits in shapefiles
@@ -153,7 +81,7 @@ export const LoadFloorplan = () => {
     setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
   }
 
-  if (geoJson != null && knownNetworks.length == 0) {
+  if (geoJson != null && knownNetworks.length === 0) {
     const networks = loadKnownNetworks(geoJson);
     setKnownNetworks(networks);
   }
@@ -187,6 +115,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
+  // TODO PATHFINDING
   const find_route = findPath(1800, 2878);
   if (find_route.find_route.ids) {
     path = find_route.find_route.ids;
@@ -194,6 +123,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
 
   const scan = async () => {
     startScan();
+    setShownToast(false);
   };
 
   if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
@@ -201,14 +131,6 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
     predictedLocation = data.predictedLocation;
     nearestNode = findNearestNode(predictedLocation, geoJson);
   }
-
-  const prevFloor = () => {
-    setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
-  };
-
-  const nextFloor = () => {
-    setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
-  };
 
   if (!scanning && visibleNetworks.length > 0 && !shownToast) {
     Toast.show('Network scan successful.', Toast.LONG);
@@ -218,6 +140,14 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   if (scanning) {
     Toast.show('Scanning Wifi APs...', Toast.LONG);
   }
+
+  const prevFloor = () => {
+    setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
+  };
+
+  const nextFloor = () => {
+    setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
+  };
 
   return (
     <>

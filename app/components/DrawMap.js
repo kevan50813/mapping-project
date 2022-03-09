@@ -61,10 +61,7 @@ function DrawMapElement(
   currentRoom,
   currentPath,
 ) {
-  // TODO make this work with level ranges
   const featurePath = path(feature);
-
-  //list.includes
 
   if (feature.geometry.type === 'Polygon') {
     var fill =
