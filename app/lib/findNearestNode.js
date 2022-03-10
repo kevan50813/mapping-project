@@ -2,7 +2,8 @@ export const findNearestNode = (location, geoJson) => {
   const nodes = geoJson.features.filter(
     feature =>
       feature.properties.indoor === 'way' &&
-      feature.properties.level[0] === location.level,
+      feature.properties.level[0] === location.level &&
+      feature.geometry.type !== 'LineString', // Oops, both have these properties
   );
   var minDistance = Number.MAX_SAFE_INTEGER;
   var closestNode = null;
