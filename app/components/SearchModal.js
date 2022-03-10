@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Text, View, Button } from 'react-native';
+import { Text, View, Button, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
 import { SearchBar } from 'react-native-elements';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
 import { server } from './App';
 
-const RoomList = ({ loading, error, polygons = [] }) => {
+const RoomList = ({ loading, error, polygons = [], setDestination }) => {
   if (error) {
     console.error(error);
   }
@@ -22,11 +22,15 @@ const RoomList = ({ loading, error, polygons = [] }) => {
       <Text style={styles.info}>Results: {polygons.length}</Text>
 
       {polygons.map(p => (
-        <View key={p.id} style={styles.box}>
+        <TouchableOpacity
+          key={p.polygon.id}
+          style={styles.box}
+          onPress={() => setDestination(p.node.id)}>
+          {/* Add p.node.id (probably) ontouch to select node */}
           <Text style={styles.small}>
-            {p.tags['room-no']} - {p.tags['room-name']}
+            {p.polygon.tags['room-no']} - {p.polygon.tags['room-name']}
           </Text>
-        </View>
+        </TouchableOpacity>
       ))}
     </>
   );
@@ -34,6 +38,7 @@ const RoomList = ({ loading, error, polygons = [] }) => {
 
 export const SearchModal = ({ setDestination, setModalVisible }) => {
   const [search, setSearch] = useState('');
+  let search_polygons = [];
 
   const [
     getNodes,
@@ -45,7 +50,15 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
   ] = useLazyQuery(qPolygons);
 
   console.log(search_nodes);
-  const search_polygons = [...new Set(search_nodes.map(node => node.polygon))];
+  if (search_nodes) {
+    search_polygons = [
+      ...new Set(
+        search_nodes.map(node => {
+          return { polygon: node.polygon, node: node };
+        }),
+      ),
+    ];
+  }
 
   const updateSearch = newSearch => {
     setSearch(newSearch);
@@ -65,7 +78,15 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
         placeholder="Enter destination here..."
         onChangeText={updateSearch}
       />
-      <RoomList loading={loading} error={error} polygons={search_polygons} />
+
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <RoomList
+          loading={loading}
+          error={error}
+          polygons={search_polygons}
+          setDestination={setDestination}
+        />
+      </ScrollView>
     </View>
   );
 };
