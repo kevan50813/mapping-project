@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { PermissionsAndroid } from 'react-native';
+import Toast from 'react-native-simple-toast';
 import WifiManager from 'react-native-wifi-reborn';
 
 // OFFLINE FLAG
@@ -48,6 +49,7 @@ export const NetworkProvider = ({ children }) => {
       setDuration(networkData.info.duration);
     } else {
       console.log('Starting scan at', new Date());
+      Toast.show('Scanning Wifi APs...', Toast.LONG);
 
       setScanning(true);
       setError('');
@@ -69,6 +71,7 @@ export const NetworkProvider = ({ children }) => {
         try {
           const wifiNetworks = await WifiManager.reScanAndLoadWifiList();
           console.log('Scan complete!');
+          Toast.show('Network scan successful.', Toast.LONG);
 
           setDuration(new Date().getTime() - start);
 
@@ -106,7 +109,7 @@ export const NetworkProvider = ({ children }) => {
     },
   };
 
-  console.log(JSON.stringify(networkValue));
+  // console.log(JSON.stringify(networkValue));
 
   return (
     <NetworkContext.Provider value={networkValue}>

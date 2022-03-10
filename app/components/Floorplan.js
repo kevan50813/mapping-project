@@ -1,35 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text, View } from 'react-native';
+import { Modal, Text, View, Button } from 'react-native';
 import {
   faAngleUp,
   faAngleDown,
   faLocationCrosshairs,
 } from '@fortawesome/free-solid-svg-icons';
-import Toast from 'react-native-simple-toast';
 import { useLazyQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
 import { MapButton } from './MapButton';
+import { SearchModal } from './SearchModal';
 import { buildGeoJson } from '../lib/geoJson';
 import { findNearestNode } from '../lib/findNearestNode';
 import { DrawMap } from './DrawMap';
 import { qMap } from '../queries/qMap';
 import { qPath } from '../queries/qPath';
 import { trilateration } from './Trilateration';
-
-const findPath = (start, end) => {
-  const [
-    getPath,
-    { loading, error, data: { find_route: find_route } = { find_route: {} } },
-  ] = useLazyQuery(qPath);
-
-  useEffect(() => {
-    getPath({ variables: { graph: 'test_bragg', start: start, end: end } });
-  }, [getPath]);
-
-  return { loading, error, find_route };
-};
 
 export const LoadFloorplan = () => {
   const [
@@ -101,10 +88,12 @@ export const LoadFloorplan = () => {
 
 export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const [floorId, setFloorId] = useState(2);
-  const [shownToast, setShownToast] = useState(false);
+  const [modalVisable, setModalVisible] = useState(false);
+  const [path, setPath] = useState([]);
+  const [destination, setDestination] = useState(2878);
   let predictedLocation = {};
   let nearestNode = null;
-  let path = [];
+  let nearestId = -1;
 
   const {
     networks: visibleNetworks,
@@ -115,30 +104,15 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
-  // TODO PATHFINDING
-  const find_route = findPath(1800, 2878);
-  if (find_route.find_route.ids) {
-    path = find_route.find_route.ids;
-  }
-
   const scan = async () => {
     startScan();
-    setShownToast(false);
   };
 
   if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
     let data = trilateration(visibleNetworks, knownNetworks, -50, 3);
     predictedLocation = data.predictedLocation;
     nearestNode = findNearestNode(predictedLocation, geoJson);
-  }
-
-  if (!scanning && visibleNetworks.length > 0 && !shownToast) {
-    Toast.show('Network scan successful.', Toast.LONG);
-    setShownToast(true);
-  }
-
-  if (scanning) {
-    Toast.show('Scanning Wifi APs...', Toast.LONG);
+    nearestId = nearestNode.properties.queryObject.id;
   }
 
   const prevFloor = () => {
@@ -149,8 +123,47 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
+  const [
+    getPath,
+    { loading, error, data: { find_route: find_route } = { find_route: {} } },
+  ] = useLazyQuery(qPath);
+
+  useEffect(() => {
+    if (nearestId === -1) {
+      return;
+    }
+
+    getPath({
+      variables: { graph: 'test_bragg', start: nearestId, end: destination },
+    });
+  }, [getPath, nearestId, destination]);
+
+  useEffect(() => {
+    if (error) {
+      console.error('Pathfinding error');
+    }
+
+    if (!loading && find_route.ids) {
+      setPath(find_route.ids);
+    }
+  }, [error, loading, find_route]);
+
   return (
     <>
+      <Button
+        style={styles.button}
+        title="MODAL"
+        onPress={() => setModalVisible(!modalVisable)}
+      />
+
+      <Modal animationType="slide" visible={modalVisable}>
+        <SearchModal
+          nearestNode={nearestNode}
+          setDestination={setDestination}
+          setModalVisible={setModalVisible}
+        />
+      </Modal>
+
       <View style={styles.background}>
         <DrawMap
           geoJson={geoJson}

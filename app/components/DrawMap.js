@@ -24,7 +24,7 @@ const DrawMapLocation = ({ location, projection, level }) => {
     radius = projection(location.error);
   }
 
-  // Hopefully, a stacked set of 3 circles that represent the location and the error.
+  // A stacked set of 3 circles that represent the location and the error.
   return (
     <>
       <Circle
@@ -62,7 +62,6 @@ function DrawMapElement(
   currentPath,
 ) {
   const featurePath = path(feature);
-
   if (feature.geometry.type === 'Polygon') {
     var fill =
       feature.properties.indoor === 'room'
@@ -113,7 +112,10 @@ function DrawMapElement(
           strokeLinecap="round"
         />
       );
-    } else if (feature.properties.edge.every(f => currentPath.includes(f))) {
+    } else if (
+      currentPath &&
+      feature.properties.edge.every(f => currentPath.includes(f))
+    ) {
       return (
         <Path
           d={featurePath}
@@ -154,7 +156,6 @@ export const DrawMap = ({
         minScale={0.1}
         maxScale={1}
         initialZoom={0.7}>
-        {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
         {geoJson
           ? // There could be more flexibility with this but
             // Only call this if the filters match the element?
