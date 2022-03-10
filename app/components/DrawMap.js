@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import * as d3 from 'd3';
-import { Path, G } from 'react-native-svg';
+import { Path, G, Polygon } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { Circle } from 'react-native-svg';
 import { onLevel } from '../lib/geoJson';
+import {Image, StyleSheet} from 'react-native';
+import CompassHeading from 'react-native-compass-heading';
 
 function GetRotatedTriangle(x, y, rotation) {
   // Initial triangle coordinates.
-  let xs = [-9,  9, 0];
+  let xs = [-9, 9, 0];
   let ys = [-8, -8, 15];
   let tmp = [0, 0, 0];
 
@@ -28,17 +30,25 @@ function GetRotatedTriangle(x, y, rotation) {
     ys[i] += y;
   }
 
-  // Create path for <Path/>
-  let path =
-    "M "  + xs[0] + " " + ys[0] +
-    " L " + xs[1] + " " + ys[1] +
-    " L " + xs[2] + " " + ys[2] + " z";
-  return path;
+  // Create points for <Polygon/>
+  let points =
+    xs[0] +
+    ',' +
+    ys[0] +
+    ' ' +
+    xs[1] +
+    ',' +
+    ys[1] +
+    ' ' +
+    xs[2] +
+    ',' +
+    ys[2];
+  return points;
 }
 
 export const Marker = ({ x, y, rotation }) => (
-  <Path
-    d={GetRotatedTriangle(x, y, rotation)}
+  <Polygon
+    points={GetRotatedTriangle(x, y, rotation)}
     fill={styles.location.fill}
     stroke={styles.location.innerStroke}
     strokeWidth="3"
@@ -46,6 +56,21 @@ export const Marker = ({ x, y, rotation }) => (
 );
 
 const DrawMapLocation = ({ location, projection, level }) => {
+  // State and effect for compass rotation.
+  const [compassHeading, setCompassHeading] = useState(0);
+  useEffect(() => {
+    const degree_update_rate = 3;
+    
+    // Accuracy is hardcoded to 1 in the library.
+    CompassHeading.start(degree_update_rate, ({heading, accuracy}) => {
+      setCompassHeading(heading);
+    });
+
+    return () => {
+      CompassHeading.stop();
+    };
+  }, []);
+  
   if (level !== location.level) {
     return null;
   }
@@ -92,8 +117,7 @@ const DrawMapLocation = ({ location, projection, level }) => {
       <Marker
         x={x}
         y={y}
-        rotation={90}
-      />
+        rotation={compassHeading+180} />
     </>
   );
 };
