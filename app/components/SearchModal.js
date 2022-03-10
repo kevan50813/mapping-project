@@ -6,7 +6,13 @@ import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
 import { server } from './App';
 
-const RoomList = ({ loading, error, polygons = [], setDestination }) => {
+const RoomList = ({
+  loading,
+  error,
+  polygons = [],
+  setDestination,
+  setModalVisible,
+}) => {
   if (error) {
     console.error(error);
   }
@@ -21,17 +27,21 @@ const RoomList = ({ loading, error, polygons = [], setDestination }) => {
 
       <Text style={styles.info}>Results: {polygons.length}</Text>
 
-      {polygons.map(p => (
-        <TouchableOpacity
-          key={p.polygon.id}
-          style={styles.box}
-          onPress={() => setDestination(p.node.id)}>
-          {/* Add p.node.id (probably) ontouch to select node */}
-          <Text style={styles.small}>
-            {p.polygon.tags['room-no']} - {p.polygon.tags['room-name']}
-          </Text>
-        </TouchableOpacity>
-      ))}
+      {polygons.map(p => {
+        return (
+          <TouchableOpacity
+            key={p.polygon.id}
+            style={styles.box}
+            onPress={() => {
+              setDestination(p.node.id);
+              setModalVisible(false);
+            }}>
+            <Text style={styles.small}>
+              {p.polygon.tags['room-no']} - {p.polygon.tags['room-name']}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </>
   );
 };
@@ -85,6 +95,7 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
           error={error}
           polygons={search_polygons}
           setDestination={setDestination}
+          setModalVisible={setModalVisible}
         />
       </ScrollView>
     </View>
