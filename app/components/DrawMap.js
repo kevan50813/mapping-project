@@ -1,11 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 import { Path, G, Polygon } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { Circle } from 'react-native-svg';
 import { onLevel } from '../lib/geoJson';
-import {Image, StyleSheet} from 'react-native';
 import CompassHeading from 'react-native-compass-heading';
 
 function GetRotatedTriangle(x, y, rotation) {
@@ -32,17 +31,7 @@ function GetRotatedTriangle(x, y, rotation) {
 
   // Create points for <Polygon/>
   let points =
-    xs[0] +
-    ',' +
-    ys[0] +
-    ' ' +
-    xs[1] +
-    ',' +
-    ys[1] +
-    ' ' +
-    xs[2] +
-    ',' +
-    ys[2];
+    xs[0] + ',' + ys[0] + ' ' + xs[1] + ',' + ys[1] + ' ' + xs[2] + ',' + ys[2];
   return points;
 }
 
@@ -60,9 +49,9 @@ const DrawMapLocation = ({ location, projection, level }) => {
   const [compassHeading, setCompassHeading] = useState(0);
   useEffect(() => {
     const degree_update_rate = 3;
-    
+
     // Accuracy is hardcoded to 1 in the library.
-    CompassHeading.start(degree_update_rate, ({heading, accuracy}) => {
+    CompassHeading.start(degree_update_rate, ({ heading, accuracy }) => {
       setCompassHeading(heading);
     });
 
@@ -70,7 +59,7 @@ const DrawMapLocation = ({ location, projection, level }) => {
       CompassHeading.stop();
     };
   }, []);
-  
+
   if (level !== location.level) {
     return null;
   }
@@ -106,18 +95,7 @@ const DrawMapLocation = ({ location, projection, level }) => {
         fill={styles.location.fill}
         opacity={0.5}
       />
-      {/* <Circle
-        cx={x}
-        cy={y}
-        r="10"
-        fill={styles.location.fill}
-        stroke={styles.location.innerStroke}
-        strokeWidth={5}
-      /> */}
-      <Marker
-        x={x}
-        y={y}
-        rotation={compassHeading+180} />
+      <Marker x={x} y={y} rotation={compassHeading + 180} />
     </>
   );
 };
