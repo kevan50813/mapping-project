@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import * as d3 from 'd3';
 import { Path } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
@@ -21,12 +20,11 @@ const DrawMapLocation = ({ location, projection, level }) => {
   // TODO - confirm this? had to reverse it on merge to make results make sense...
   // Longitude, Latitude -> y, x
   const [x, y] = point;
-  console.log(point, x, y);
   if (location.error !== -1) {
     radius = projection(location.error);
   }
 
-  // Hopefully, a stacked set of 3 circles that represent the location and the error.
+  // A stacked set of 3 circles that represent the location and the error.
   return (
     <>
       <Circle
@@ -55,20 +53,35 @@ const DrawMapLocation = ({ location, projection, level }) => {
   );
 };
 
-function DrawMapElement(feature, index, path, projection) {
-  // TODO make this work with level ranges
+function DrawMapElement(
+  feature,
+  index,
+  path,
+  projection,
+  currentRoom,
+  finalRoom,
+  currentPath,
+) {
   const featurePath = path(feature);
-
   if (feature.geometry.type === 'Polygon') {
+    var fill =
+      feature.properties.indoor === 'room'
+        ? styles.room.fill
+        : styles.hallway.fill;
+
+    if (feature.properties.queryObject.id === currentRoom) {
+      fill = styles.currentRoom.fill;
+    }
+
+    if (feature.properties.queryObject.id === finalRoom) {
+      fill = styles.currentRoom.fill;
+    }
+
     return (
       <Path
         d={featurePath}
         key={index}
-        fill={
-          feature.properties.indoor === 'room'
-            ? styles.room.fill
-            : styles.hallway.fill
-        }
+        fill={fill}
         stroke={
           feature.properties.indoor === 'room'
             ? styles.room.stroke
@@ -78,7 +91,8 @@ function DrawMapElement(feature, index, path, projection) {
     );
   } else if (feature.geometry.type === 'Point') {
     const point = projection(feature.geometry.coordinates[0]);
-    return (
+    return feature.properties.indoor === 'way' ||
+      feature.properties.indoor === 'door' ? null : (
       <Circle
         cx={point[0]}
         cy={point[1]}
@@ -90,22 +104,69 @@ function DrawMapElement(feature, index, path, projection) {
       />
     );
   } else if (feature.geometry.type === 'LineString') {
-    return (
-      <Path
-        d={featurePath}
-        key={index}
-        stroke={styles.walls.stroke}
-        strokeWidth="5"
-        fill="none"
-        strokeLinecap="round"
-      />
-    );
+    let stroke = styles.walls.stroke;
+
+    if (feature.properties.indoor === 'wall') {
+      return (
+        <Path
+          d={featurePath}
+          key={index}
+          stroke={stroke}
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      );
+    } else if (
+      currentPath &&
+      feature.properties.edge.every(f => currentPath.includes(f))
+    ) {
+      return (
+        <Path
+          d={featurePath}
+          key={index}
+          stroke="#f00"
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      );
+    }
   }
 }
 
-export const DrawMap = ({ geoJson, location, level = 0 }) => {
+export const DrawMap = ({
+  geoJson,
+  location,
+  level = 0,
+  nearestNode,
+  currentPath,
+}) => {
   const W = 1000;
   const H = 1000;
+  let currentRoom = null;
+  let finalNodeId = null;
+  let finalRoom = null;
+
+  if (nearestNode) {
+    currentRoom = nearestNode.properties.queryObject.polygon.id;
+  }
+
+  if (currentPath && geoJson) {
+    finalNodeId = currentPath[currentPath.length - 1];
+    const finalNode = geoJson.features.filter(feature => {
+      if (!feature.properties.queryObject) {
+        return false;
+      }
+      return (
+        feature.geometry.type === 'Point' &&
+        feature.properties.queryObject.id === finalNodeId
+      );
+    })[0];
+    if (finalNode) {
+      finalRoom = finalNode.properties.queryObject.polygon.id;
+    }
+  }
 
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
   const path = d3.geoPath().projection(projection);
@@ -118,14 +179,21 @@ export const DrawMap = ({ geoJson, location, level = 0 }) => {
         minScale={0.1}
         maxScale={1}
         initialZoom={0.7}>
-        {/* render with empty jsx tag if geoJson isn't ready, keeps the svg canvas size */}
         {geoJson
           ? // There could be more flexibility with this but
             // Only call this if the filters match the element?
             geoJson.features
               .filter(onLevel(level))
               .map((feature, index) =>
-                DrawMapElement(feature, index, path, projection),
+                DrawMapElement(
+                  feature,
+                  index,
+                  path,
+                  projection,
+                  currentRoom,
+                  finalRoom,
+                  currentPath,
+                ),
               )
           : null}
 
