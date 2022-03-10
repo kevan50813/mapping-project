@@ -403,7 +403,7 @@ class Controller:
 
     async def search_room_nodes(
         self, graph_name: str, search_string: str
-    ) -> Tuple[List[Polygon], List[PathNode]]:  # noqa: E501
+    ) -> List[PathNode]:  # noqa: E501
         """
         Search for room nodes by name
 
@@ -427,7 +427,7 @@ class Controller:
             graph = Graph(graph_name, self.redis_db)
 
             query = """MATCH (n:way {poly_id: $poly_id}) RETURN n"""
-            res = graph.query(query, {"poly_id": poly_id})
+            res = graph.query(query, {"poly_id": poly_id})[0]
             nodes.append(self.__redisgraph_result_to_node(res))
 
         return nodes
