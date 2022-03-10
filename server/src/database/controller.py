@@ -427,8 +427,8 @@ class Controller:
             graph = Graph(graph_name, self.redis_db)
 
             query = """MATCH (n:way {poly_id: $poly_id}) RETURN n"""
-            res = graph.query(query, {"poly_id": poly_id})[0]
-            nodes.append(self.__redisgraph_result_to_node(res))
+            res = graph.query(query, {"poly_id": poly_id})
+            nodes.append(self.__redisgraph_result_to_node(res)[0])
 
         return nodes
 
