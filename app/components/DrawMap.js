@@ -1,10 +1,49 @@
 import React from 'react';
 import * as d3 from 'd3';
-import { Path } from 'react-native-svg';
+import { Path, G } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { Circle } from 'react-native-svg';
 import { onLevel } from '../lib/geoJson';
+
+function GetRotatedTriangle(x, y, rotation) {
+  // Initial triangle coordinates.
+  let xs = [-9,  9, 0];
+  let ys = [-8, -8, 15];
+  let tmp = [0, 0, 0];
+
+  // Convert to radians.
+  let angle = rotation * (Math.PI / 180);
+
+  // Rotate triangle.
+  for (let i = 0; i < 3; i++) {
+    tmp[i] = Math.cos(angle) * xs[i] - Math.sin(angle) * ys[i];
+    ys[i] = Math.sin(angle) * xs[i] + Math.cos(angle) * ys[i];
+    xs[i] = tmp[i];
+  }
+
+  // Move the triangle to the current location.
+  for (let i = 0; i < 3; i++) {
+    xs[i] += x;
+    ys[i] += y;
+  }
+
+  // Create path for <Path/>
+  let path =
+    "M "  + xs[0] + " " + ys[0] +
+    " L " + xs[1] + " " + ys[1] +
+    " L " + xs[2] + " " + ys[2] + " z";
+  return path;
+}
+
+export const Marker = ({ x, y, rotation }) => (
+  <Path
+    d={GetRotatedTriangle(x, y, rotation)}
+    fill={styles.location.fill}
+    stroke={styles.location.innerStroke}
+    strokeWidth="3"
+  />
+);
 
 const DrawMapLocation = ({ location, projection, level }) => {
   if (level !== location.level) {
@@ -24,7 +63,8 @@ const DrawMapLocation = ({ location, projection, level }) => {
     radius = projection(location.error);
   }
 
-  // A stacked set of 3 circles that represent the location and the error.
+  // A stacked set of 2 circles and a triangle that represent the location,
+  // facing direction, and the error.
   return (
     <>
       <Circle
@@ -41,13 +81,18 @@ const DrawMapLocation = ({ location, projection, level }) => {
         fill={styles.location.fill}
         opacity={0.5}
       />
-      <Circle
+      {/* <Circle
         cx={x}
         cy={y}
         r="10"
         fill={styles.location.fill}
         stroke={styles.location.innerStroke}
         strokeWidth={5}
+      /> */}
+      <Marker
+        x={x}
+        y={y}
+        rotation={90}
       />
     </>
   );
