@@ -59,6 +59,7 @@ function DrawMapElement(
   path,
   projection,
   currentRoom,
+  finalRoom,
   currentPath,
 ) {
   const featurePath = path(feature);
@@ -69,6 +70,10 @@ function DrawMapElement(
         : styles.hallway.fill;
 
     if (feature.properties.queryObject.id === currentRoom) {
+      fill = styles.currentRoom.fill;
+    }
+
+    if (feature.properties.queryObject.id === finalRoom) {
       fill = styles.currentRoom.fill;
     }
 
@@ -139,10 +144,28 @@ export const DrawMap = ({
 }) => {
   const W = 1000;
   const H = 1000;
-  var currentRoom = null;
+  let currentRoom = null;
+  let finalNodeId = null;
+  let finalRoom = null;
 
   if (nearestNode) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
+  }
+
+  if (currentPath && geoJson) {
+    finalNodeId = currentPath[currentPath.length - 1];
+    const finalNode = geoJson.features.filter(feature => {
+      if (!feature.properties.queryObject) {
+        return false;
+      }
+      return (
+        feature.geometry.type === 'Point' &&
+        feature.properties.queryObject.id === finalNodeId
+      );
+    })[0];
+    if (finalNode) {
+      finalRoom = finalNode.properties.queryObject.polygon.id;
+    }
   }
 
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
@@ -168,6 +191,7 @@ export const DrawMap = ({
                   path,
                   projection,
                   currentRoom,
+                  finalRoom,
                   currentPath,
                 ),
               )
