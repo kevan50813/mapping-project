@@ -109,9 +109,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mapButtonIcon: {
-    size: 50,
     color: '#ddd',
     // padding: 10,
+  },
+  mapButtonIconSvg: {
+    size: 50,
   },
   levelView: {
     position: 'absolute',
