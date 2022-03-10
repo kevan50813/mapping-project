@@ -95,11 +95,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   let nearestNode = null;
   let nearestId = -1;
 
-  const {
-    networks: visibleNetworks,
-    state: { scanning },
-    startScan,
-  } = useContext(NetworkContext);
+  const { networks: visibleNetworks, startScan } = useContext(NetworkContext);
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();

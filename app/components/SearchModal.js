@@ -10,6 +10,7 @@ const RoomList = ({ loading, error, polygons = [] }) => {
   if (error) {
     console.error(error);
   }
+
   return (
     <>
       {loading ? (
@@ -17,6 +18,7 @@ const RoomList = ({ loading, error, polygons = [] }) => {
       ) : null}
 
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
+
       <Text style={styles.info}>Results: {polygons.length}</Text>
 
       {polygons.map(p => (
@@ -34,17 +36,20 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
   const [search, setSearch] = useState('');
 
   const [
-    getPolygons,
+    getNodes,
     {
-      polyLoading,
-      polyError,
-      polyData: { search_polygons: polygons } = { search_polygons: [] },
+      loading,
+      error,
+      data: { search_nodes: search_nodes } = { search_nodes: [] },
     },
   ] = useLazyQuery(qPolygons);
 
+  console.log(search_nodes);
+  const search_polygons = [...new Set(search_nodes.map(node => node.polygon))];
+
   const updateSearch = newSearch => {
     setSearch(newSearch);
-    getPolygons({ variables: { search, graph: 'test_bragg' } });
+    getNodes({ variables: { search, graph: 'test_bragg' } });
   };
 
   return (
@@ -60,7 +65,7 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
         placeholder="Enter destination here..."
         onChangeText={updateSearch}
       />
-      <RoomList loading={polyLoading} error={polyError} polygons={polygons} />
+      <RoomList loading={loading} error={error} polygons={search_polygons} />
     </View>
   );
 };
