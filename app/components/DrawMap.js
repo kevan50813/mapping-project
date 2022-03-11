@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
-import { Path, G, Polygon } from 'react-native-svg';
+import { Path, Polygon } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { Circle } from 'react-native-svg';
@@ -100,6 +100,87 @@ const DrawMapLocation = ({ location, projection, level }) => {
   );
 };
 
+function DrawPolygonElement(
+  feature,
+  featurePath,
+  index,
+  currentRoom,
+  finalRoom,
+) {
+  var fill =
+    feature.properties.indoor === 'room'
+      ? styles.room.fill
+      : styles.hallway.fill;
+
+  if (feature.properties.queryObject.id === currentRoom) {
+    fill = styles.currentRoom.fill;
+  }
+
+  if (feature.properties.queryObject.id === finalRoom) {
+    fill = styles.currentRoom.fill;
+  }
+
+  return (
+    <Path
+      d={featurePath}
+      key={index}
+      fill={fill}
+      stroke={
+        feature.properties.indoor === 'room'
+          ? styles.room.stroke
+          : styles.hallway.stroke
+      }
+    />
+  );
+}
+
+function DrawPointElement(feature, projection, index) {
+  const point = projection(feature.geometry.coordinates[0]);
+  return feature.properties.indoor === 'way' ||
+    feature.properties.indoor === 'door' ? null : (
+    <Circle
+      cx={point[0]}
+      cy={point[1]}
+      r="7"
+      key={index}
+      fill={styles.poi.fill}
+      stroke={styles.poi.stroke}
+      strokeWidth="3"
+    />
+  );
+}
+
+function DrawLineStringElement(feature, path, index) {
+  let stroke = styles.walls.stroke;
+
+  if (feature.properties.indoor === 'wall') {
+    return (
+      <Path
+        d={featurePath}
+        key={index}
+        stroke={stroke}
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    );
+  } else if (
+    currentPath &&
+    feature.properties.edge.every(f => currentPath.includes(f))
+  ) {
+    return (
+      <Path
+        d={featurePath}
+        key={index}
+        stroke="#f00"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    );
+  }
+}
+
 function DrawMapElement(
   feature,
   index,
@@ -111,74 +192,16 @@ function DrawMapElement(
 ) {
   const featurePath = path(feature);
   if (feature.geometry.type === 'Polygon') {
-    var fill =
-      feature.properties.indoor === 'room'
-        ? styles.room.fill
-        : styles.hallway.fill;
-
-    if (feature.properties.queryObject.id === currentRoom) {
-      fill = styles.currentRoom.fill;
-    }
-
-    if (feature.properties.queryObject.id === finalRoom) {
-      fill = styles.currentRoom.fill;
-    }
-
-    return (
-      <Path
-        d={featurePath}
-        key={index}
-        fill={fill}
-        stroke={
-          feature.properties.indoor === 'room'
-            ? styles.room.stroke
-            : styles.hallway.stroke
-        }
-      />
+    return DrawPolygonElement(
+      feature,
+      featurePath,
+      index,
+      currentRoom,
+      finalRoom,
     );
   } else if (feature.geometry.type === 'Point') {
-    const point = projection(feature.geometry.coordinates[0]);
-    return feature.properties.indoor === 'way' ||
-      feature.properties.indoor === 'door' ? null : (
-      <Circle
-        cx={point[0]}
-        cy={point[1]}
-        r="7"
-        key={index}
-        fill={styles.poi.fill}
-        stroke={styles.poi.stroke}
-        strokeWidth="3"
-      />
-    );
+    return DrawPointElement(feature, projection, index);
   } else if (feature.geometry.type === 'LineString') {
-    let stroke = styles.walls.stroke;
-
-    if (feature.properties.indoor === 'wall') {
-      return (
-        <Path
-          d={featurePath}
-          key={index}
-          stroke={stroke}
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    } else if (
-      currentPath &&
-      feature.properties.edge.every(f => currentPath.includes(f))
-    ) {
-      return (
-        <Path
-          d={featurePath}
-          key={index}
-          stroke="#f00"
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    }
   }
 }
 
