@@ -130,6 +130,22 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
   },
+  centerAbsolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicatorText: {
+    color: 'grey',
+    fontSize: 12,
+  },
+  search: {
+    color: 'black',
+  },
   // input: {
   //   height: 40,
   //   margin: 12,

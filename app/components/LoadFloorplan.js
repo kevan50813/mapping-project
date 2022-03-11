@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text } from 'react-native';
-import { styles } from './styles';
 import { useLazyQuery } from '@apollo/client';
 import { NetworkContext } from './NetworkProvider';
 import { buildGeoJson } from '../lib/geoJson';
@@ -9,6 +7,7 @@ import { qMap } from '../queries/qMap';
 import { qPath } from '../queries/qPath';
 import { trilateration } from './Trilateration';
 import { Floorplan } from './Floorplan';
+import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 
 export const LoadFloorplan = () => {
   const [destination, setDestination] = useState(-1);
@@ -112,7 +111,7 @@ export const LoadFloorplan = () => {
   }
 
   return loading ? (
-    <Text style={styles.info}>Loading Floorplan...</Text>
+    <CenteredActivityIndicator text={'Loading Floorplan...'} />
   ) : (
     <Floorplan
       polygons={polygons}

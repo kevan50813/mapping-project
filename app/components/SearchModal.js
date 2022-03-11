@@ -7,9 +7,9 @@ import {
 import { Text, View, Button, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
 import { SearchBar } from 'react-native-elements';
+import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
-import { server } from './App';
 
 const RoomList = ({
   loading,
@@ -25,7 +25,7 @@ const RoomList = ({
   return (
     <>
       {loading ? (
-        <Text style={styles.info}>Loading from {server}...</Text>
+        <CenteredActivityIndicator text="Loading search results" />
       ) : null}
 
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
@@ -83,28 +83,17 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
     <View>
       <Button
         style={styles.button}
-        title="MODAL"
+        title={'MODAL'}
         onPress={() => setModalVisible(false)}
       />
       <SearchBar
         value={search}
-        style={styles.input}
+        style={styles.search}
         placeholder="Enter destination here..."
         onChangeText={updateSearch}
-        searchIcon={
-          <FontAwesomeIcon
-            icon={faMagnifyingGlassLocation}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        }
-        clearIcon={
-          <FontAwesomeIcon
-            icon={faXmark}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        }
+        lightTheme={true}
+        searchIcon={<FontAwesomeIcon icon={faMagnifyingGlassLocation} />}
+        clearIcon={<FontAwesomeIcon icon={faXmark} />}
       />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
