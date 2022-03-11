@@ -106,7 +106,7 @@ export const NetworkProvider = ({ children }) => {
     },
   };
 
-  console.log(JSON.stringify(networkValue));
+  //console.log(JSON.stringify(networkValue));
 
   return (
     <NetworkContext.Provider value={networkValue}>

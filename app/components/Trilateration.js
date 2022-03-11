@@ -40,10 +40,10 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
-  console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
+  /*console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
   commonNetworks.forEach(n => {
     console.log(n.BSSID);
-  });
+  }); */
 
   return startTrilateration(commonNetworks, predictedLevel);
 }
@@ -200,13 +200,59 @@ function iterateAllVis(networks) {
     }
   }
 
-  //console.log('----------------');
-  //console.log(predictedSum);
-  //console.log(combinations);
   let averagePoint = [
     predictedSum[0] / combinations,
     predictedSum[1] / combinations,
-      allPoints
+    allPoints,
   ];
+
+  let sdCount = 2;
+  let pointDifference = 999;
+
+  do {
+    let originalPointCount = allPoints.length;
+    let statData = getStats(allPoints);
+
+    allPoints = allPoints.filter(point => {
+      return distance(statData.avg, point) < sdCount * statData.sd;
+    });
+
+    pointDifference = originalPointCount - allPoints.length;
+  } while (pointDifference !== 0);
+
+  averagePoint = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
+  averagePoint = [
+    averagePoint[0] / allPoints.length,
+    averagePoint[1] / allPoints.length,
+    allPoints,
+  ];
+
   return { pointArr: averagePoint, error: -1, networks: [] };
+}
+
+function getStats(dataArr) {
+  let sum = dataArr.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
+  let avg = [sum[0] / dataArr.length, sum[1] / dataArr.length];
+
+  let sumErrSq = dataArr
+    .map(point => Math.pow(distance(point, avg), 2))
+    .reduce((a, b) => a + b);
+
+  let variance = sumErrSq / dataArr.length;
+
+  let sd = Math.sqrt(variance);
+
+  console.log('AVG: ' + avg);
+  console.log('SD: ' + sd);
+
+  return {
+    avg: avg,
+    sd: sd,
+  };
+}
+
+function distance(point1, point2) {
+  return Math.sqrt(
+    Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2),
+  );
 }
