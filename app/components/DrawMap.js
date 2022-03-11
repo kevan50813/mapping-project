@@ -150,7 +150,7 @@ function DrawPointElement(feature, projection, index) {
   );
 }
 
-function DrawLineStringElement(feature, path, index) {
+function DrawLineStringElement(feature, featurePath, index, currentPath) {
   let stroke = styles.walls.stroke;
 
   if (feature.properties.indoor === 'wall') {
@@ -202,6 +202,7 @@ function DrawMapElement(
   } else if (feature.geometry.type === 'Point') {
     return DrawPointElement(feature, projection, index);
   } else if (feature.geometry.type === 'LineString') {
+    return DrawLineStringElement(feature, featurePath, index, currentPath);
   }
 }
 
@@ -222,7 +223,7 @@ export const DrawMap = ({
     currentRoom = nearestNode.properties.queryObject.polygon.id;
   }
 
-  if (currentPath && geoJson) {
+  if (currentPath && geoJson && currentPath.length > 1) {
     finalNodeId = currentPath[currentPath.length - 1];
     const finalNode = geoJson.features.filter(feature => {
       if (!feature.properties.queryObject) {

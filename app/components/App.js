@@ -15,7 +15,7 @@ import { StatusBar, View } from 'react-native';
 import { Scanner } from './Scanner';
 import { RoomSearch } from './RoomSearch';
 import { Localisation } from './Localisation';
-import { LoadFloorplan } from './Floorplan';
+import { LoadFloorplan } from './LoadFloorplan';
 import { styles } from './styles';
 import { Button } from './Button';
 import { NetworkProvider } from './NetworkProvider';

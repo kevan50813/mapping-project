@@ -59,7 +59,6 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
     },
   ] = useLazyQuery(qPolygons);
 
-  console.log(search_nodes);
   if (search_nodes) {
     search_polygons = [
       ...new Set(
