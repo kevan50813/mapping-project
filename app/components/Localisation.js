@@ -12,6 +12,7 @@ export const Localisation = () => {
   let usedNetworks = [];
   let filteredKnownNetworks = [];
   let predictedLocation = {};
+  let predictions = [];
   let predictedLevel = -1;
 
   let [a, setA] = useState(-50);
@@ -44,6 +45,7 @@ export const Localisation = () => {
     let data = trilateration(visibleNetworks, knownNetworks, a, n);
 
     predictedLocation = data.predictedLocation;
+    predictions = data.predictions;
     usedNetworks = data.usedNetworks;
     predictedLevel = data.predictedLocation.level;
     filteredKnownNetworks = knownNetworks.filter(
@@ -85,6 +87,7 @@ export const Localisation = () => {
           visibleNetworks={visibleNetworks}
           usedNetworks={usedNetworks}
           predictedLocation={predictedLocation}
+          predictions={predictions}
         />
       </View>
     </View>

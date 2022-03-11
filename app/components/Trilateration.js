@@ -61,6 +61,7 @@ function startTrilateration(networks, level) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
     return {
       usedNetworks: [],
+      predictions: [],
       level: level,
       predictedLocation: {
         point: [-1, -1],
@@ -69,24 +70,22 @@ function startTrilateration(networks, level) {
     };
   }
 
-  let data_all = iterateAll(networks);
-  let data_all_vis = iterateAllVis(networks);
+  let data_all = iterateAll(networks, true);
+  console.log('DATA_ALL');
+  console.log(data_all);
+  console.log(data_all.predictions);
   //let data_last = lastThree(networks);
   //let data_first = firstThree(networks);
 
   // do more processing maybe
 
-  let data = data_all_vis;
-
-  /*
-  data.networks.forEach(n => {
-    console.log(n);
-  }); */
+  let data = data_all;
 
   // finally set best attributes
   // defined like this for easier adaption in future
   return {
     usedNetworks: data.networks,
+    predictions: data.predictions,
     predictedLocation: {
       point: data.pointArr,
       level: level,
@@ -150,38 +149,7 @@ function lastThree(networks) {
   return trilaterate(networks.slice(0, -3));
 }
 
-function iterateAll(networks) {
-  let combinations = 0;
-  let predictedSum = [0, 0];
-
-  for (let i = 0; i < networks.length - 2; i++) {
-    for (let j = i + 1; j < networks.length - 1; j++) {
-      for (let k = j + 1; k < networks.length; k++) {
-        let triplet = [networks[i], networks[j], networks[k]];
-
-        let data = trilaterate(triplet);
-        if (data.pointArr[0] !== -1) {
-          predictedSum[0] += data.pointArr[0];
-          predictedSum[1] += data.pointArr[1];
-          combinations++;
-        }
-      }
-    }
-  }
-
-  //console.log('----------------');
-  //console.log(predictedSum);
-  //console.log(combinations);
-  let averagePoint = [
-    predictedSum[0] / combinations,
-    predictedSum[1] / combinations,
-  ];
-  return { pointArr: averagePoint, error: -1, networks: [] };
-}
-
-function iterateAllVis(networks) {
-  let combinations = 0;
-  let predictedSum = [0, 0];
+function iterateAll(networks, visualise) {
   let allPoints = [];
 
   for (let i = 0; i < networks.length - 2; i++) {
@@ -191,20 +159,11 @@ function iterateAllVis(networks) {
 
         let data = trilaterate(triplet);
         if (data.pointArr[0] !== -1) {
-          predictedSum[0] += data.pointArr[0];
-          predictedSum[1] += data.pointArr[1];
-          combinations++;
           allPoints.push(data.pointArr);
         }
       }
     }
   }
-
-  let averagePoint = [
-    predictedSum[0] / combinations,
-    predictedSum[1] / combinations,
-    allPoints,
-  ];
 
   let sdCount = 2;
   let pointDifference = 999;
@@ -218,16 +177,17 @@ function iterateAllVis(networks) {
     });
 
     pointDifference = originalPointCount - allPoints.length;
-  } while (pointDifference !== 0);
+  } while (pointDifference !== 0 && allPoints.length > 0);
 
-  averagePoint = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
-  averagePoint = [
-    averagePoint[0] / allPoints.length,
-    averagePoint[1] / allPoints.length,
-    allPoints,
-  ];
+  let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
+  let averagePoint = [sum[0] / allPoints.length, sum[1] / allPoints.length];
 
-  return { pointArr: averagePoint, error: -1, networks: [] };
+  return {
+    pointArr: averagePoint,
+    error: -1,
+    networks: [],
+    predictions: visualise ? allPoints : [],
+  };
 }
 
 function getStats(dataArr) {
@@ -239,11 +199,7 @@ function getStats(dataArr) {
     .reduce((a, b) => a + b);
 
   let variance = sumErrSq / dataArr.length;
-
   let sd = Math.sqrt(variance);
-
-  console.log('AVG: ' + avg);
-  console.log('SD: ' + sd);
 
   return {
     avg: avg,
