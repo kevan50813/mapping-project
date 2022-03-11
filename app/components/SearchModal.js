@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import {
+  faMagnifyingGlassLocation,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { Text, View, Button, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
 import { SearchBar } from 'react-native-elements';
@@ -86,6 +91,20 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
         style={styles.input}
         placeholder="Enter destination here..."
         onChangeText={updateSearch}
+        searchIcon={
+          <FontAwesomeIcon
+            icon={faMagnifyingGlassLocation}
+            size={styles.mapButtonIcon.size}
+            style={styles.mapButtonIcon}
+          />
+        }
+        clearIcon={
+          <FontAwesomeIcon
+            icon={faXmark}
+            size={styles.mapButtonIcon.size}
+            style={styles.mapButtonIcon}
+          />
+        }
       />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
