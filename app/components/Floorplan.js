@@ -138,9 +138,7 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   };
 
   if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks, -50, 3);
-    console.log(data);
-    console.log(data.predictedLocation);
+    let data = trilateration(visibleNetworks, knownNetworks, -50, 3, predictedLocation);
     predictedLocation = data.predictedLocation;
   }
 

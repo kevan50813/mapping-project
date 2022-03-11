@@ -2,8 +2,10 @@ import LatLon from 'geodesy/latlon-nvector-spherical.js';
 
 const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 
-export function trilateration(visibleNetworks, knownNetworks, a, n) {
+export function trilateration(visibleNetworks, knownNetworks, a, n, oldPredictedLocation) {
   let commonNetworks = [];
+
+  oldPredictedLocation.old = true;
 
   // count of networks on each floor
   let levelCount = [0, 0, 0, 0, 0, 0];
@@ -45,12 +47,12 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
     console.log(n.BSSID);
   }); */
 
-  return startTrilateration(commonNetworks, predictedLevel);
+  return startTrilateration(commonNetworks, predictedLevel, oldPredictedLocation);
 }
 
 const getNetworkKey = network => network.BSSID.slice(0, -1);
 
-function startTrilateration(networks, level) {
+function startTrilateration(networks, level, oldPredictedLocation) {
   // trilat stuff
   // wrapping this in a parent function so we can potentially do more stuff with this
   // i.e. run multiple methods and take smallest error etc
@@ -59,21 +61,28 @@ function startTrilateration(networks, level) {
 
   if (networks.length < 3) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
+    if (oldPredictedLocation === {}) {
+      return {
+        usedNetworks: [],
+        predictions: [],
+        predictedLocation: {
+          point: [-1, -1],
+          level: -1,
+          error: -1,
+        },
+        old: true,
+      };
+    }
     return {
       usedNetworks: [],
       predictions: [],
-      level: level,
-      predictedLocation: {
-        point: [-1, -1],
-        error: -1,
-      },
+      predictedLocation: oldPredictedLocation,
+      old: true,
     };
   }
 
   let data_all = iterateAll(networks, true);
-  console.log('DATA_ALL');
-  console.log(data_all);
-  console.log(data_all.predictions);
+
   //let data_last = lastThree(networks);
   //let data_first = firstThree(networks);
 
@@ -91,6 +100,7 @@ function startTrilateration(networks, level) {
       level: level,
       error: data.error,
     },
+    old: false,
   };
 }
 
@@ -168,8 +178,15 @@ function iterateAll(networks, visualise) {
   let sdCount = 2;
   let pointDifference = 999;
 
+  let round = 1;
+  console.log("\n\nNETWORK COUNT: " + networks.length);
+
+
   do {
+    console.log("ROUND " + round++);
     let originalPointCount = allPoints.length;
+    console.log("POINTS: " + originalPointCount);
+
     let statData = getStats(allPoints);
 
     allPoints = allPoints.filter(point => {
@@ -179,7 +196,7 @@ function iterateAll(networks, visualise) {
     pointDifference = originalPointCount - allPoints.length;
   } while (pointDifference !== 0 && allPoints.length > 0);
 
-  let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
+  let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0]);
   let averagePoint = [sum[0] / allPoints.length, sum[1] / allPoints.length];
 
   return {

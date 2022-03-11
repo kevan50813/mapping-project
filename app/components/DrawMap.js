@@ -21,7 +21,6 @@ const DrawMapLocation = ({ location, projection, level }) => {
   // TODO - confirm this? had to reverse it on merge to make results make sense...
   // Longitude, Latitude -> y, x
   const [x, y] = point;
-  console.log(point, x, y);
   if (location.error !== -1) {
     radius = projection(location.error);
   }

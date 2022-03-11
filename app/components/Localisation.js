@@ -12,6 +12,7 @@ export const Localisation = () => {
   let usedNetworks = [];
   let filteredKnownNetworks = [];
   let predictedLocation = {};
+  let oldData = {};
   let predictions = [];
   let predictedLevel = -1;
 
@@ -42,7 +43,7 @@ export const Localisation = () => {
   };
 
   if (visibleNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks, a, n);
+    let data = trilateration(visibleNetworks, knownNetworks, a, n, predictedLocation);
 
     predictedLocation = data.predictedLocation;
     predictions = data.predictions;
