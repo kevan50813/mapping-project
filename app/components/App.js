@@ -13,7 +13,6 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { StatusBar, View } from 'react-native';
 
 import { Scanner } from './Scanner';
-import { RoomSearch } from './RoomSearch';
 import { Localisation } from './Localisation';
 import { LoadFloorplan } from './LoadFloorplan';
 import { styles } from './styles';
@@ -28,10 +27,6 @@ const Home = ({ navigation }) => (
     <Button
       title="Network Scanner"
       onPress={() => navigation.navigate('Scanner')}
-    />
-    <Button
-      title="Search Rooms"
-      onPress={() => navigation.navigate('RoomSearch')}
     />
     <Button
       title="Perform Localisation"
@@ -63,7 +58,6 @@ const App = () => {
           />
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="RoomSearch" component={RoomSearch} />
             <Stack.Screen name="Scanner" component={Scanner} />
             <Stack.Screen name="Localisation" component={Localisation} />
             <Stack.Screen name="Floorplan" component={LoadFloorplan} />

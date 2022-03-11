@@ -27,11 +27,12 @@ export const styles = StyleSheet.create({
   },
   button: {
     padding: 12,
-    backgroundColor: 'black',
+    backgroundColor: '#4c94eb',
+    margin: 10,
   },
   buttonText: {
     fontSize: 18,
-    color: 'white',
+    color: '#eee',
     fontWeight: '700',
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -100,7 +101,7 @@ export const styles = StyleSheet.create({
     fill: '#E05263',
   },
   mapButton: {
-    backgroundColor: '#0F3843',
+    backgroundColor: '#4c94eb',
     borderRadius: 15,
     height: 60,
     width: 60,
@@ -109,11 +110,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mapButtonIcon: {
-    color: '#ddd',
-    // padding: 10,
+    color: '#eee',
   },
   mapButtonIconSvg: {
-    size: 50,
+    size: 30,
   },
   levelView: {
     position: 'absolute',
@@ -125,8 +125,8 @@ export const styles = StyleSheet.create({
     padding: 10,
   },
   levelViewText: {
-    backgroundColor: '#0F3843',
-    color: '#ddd',
+    backgroundColor: '#4c94eb',
+    color: '#eee',
     borderRadius: 15,
     padding: 10,
   },

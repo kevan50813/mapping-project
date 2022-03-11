@@ -5,7 +5,7 @@ import { styles } from './styles';
 export const CenteredActivityIndicator = ({ text }) => {
   return (
     <View style={styles.centerAbsolute}>
-      <ActivityIndicator size="large" color={'#000'} />
+      <ActivityIndicator size="large" color="#4c94eb" />
       <Text style={styles.indicatorText}>{text}</Text>
     </View>
   );
