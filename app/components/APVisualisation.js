@@ -73,7 +73,7 @@ export const APVisualisation = ({
       data[0].x.push(predictedLocation.point[0]);
       data[0].y.push(predictedLocation.point[1]);
       data[0].text.push('point');
-      data[0].marker.color.push((predictedLocation.old) ? 'black' : 'purple');
+      data[0].marker.color.push(predictedLocation.old ? 'black' : 'purple');
 
       //Toast.show('Net count: ' + predictedLocation.point[2].length, 1);
     }

@@ -125,7 +125,7 @@ export const LoadFloorplan = () => {
 export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
   const [floorId, setFloorId] = useState(2);
   const [shownToast, setShownToast] = useState(false);
-  const [predictedLocation, setPredictedLocation] = useState({});
+  const [predictedLocation, setPredictedLocation] = useState({ point: [] });
 
   const {
     networks: visibleNetworks,
@@ -137,14 +137,26 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
     startScan();
   };
 
-
   useEffect(() => {
     if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-      let data = trilateration(visibleNetworks, knownNetworks, -50, 3, predictedLocation);
-      setPredictedLocation(data.predictedLocation);
-    }
-  }, [visibleNetworks, knownNetworks]);
+      let data = trilateration(
+        visibleNetworks,
+        knownNetworks,
+        -50,
+        3,
+        predictedLocation,
+      );
 
+      console.log(data.predictedLocation);
+
+      if (
+        JSON.stringify(data.predictedLocation.point) !==
+        JSON.stringify(predictedLocation.point)
+      ) {
+        setPredictedLocation(data.predictedLocation);
+      }
+    }
+  }, [visibleNetworks, knownNetworks, predictedLocation]);
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();

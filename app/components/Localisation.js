@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
@@ -41,19 +41,28 @@ export const Localisation = () => {
     startScan();
   };
 
-  useEffect(() => {
-    if (visibleNetworks.length > 0) {
-      let data = trilateration(visibleNetworks, knownNetworks, a, n, predictedLocation);
+  if (visibleNetworks.length > 0) {
+    let data = trilateration(
+      visibleNetworks,
+      knownNetworks,
+      a,
+      n,
+      predictedLocation,
+    );
 
+    if (
+      JSON.stringify(data.predictedLocation.point) !==
+      JSON.stringify(predictedLocation.point)
+    ) {
       setPredictedLocation(data.predictedLocation);
-      predictions = data.predictions;
-      usedNetworks = data.usedNetworks;
-      predictedLevel = data.predictedLocation.level;
-      filteredKnownNetworks = knownNetworks.filter(
-          ap => ap.level === predictedLevel,
-      );
     }
-  }, [visibleNetworks]);
+    predictions = data.predictions;
+    usedNetworks = data.usedNetworks;
+    predictedLevel = data.predictedLocation.level;
+    filteredKnownNetworks = knownNetworks.filter(
+      ap => ap.level === predictedLevel,
+    );
+  }
 
   return (
     <View style={styles.background}>

@@ -2,7 +2,13 @@ import LatLon from 'geodesy/latlon-nvector-spherical.js';
 
 const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 
-export function trilateration(visibleNetworks, knownNetworks, a, n, oldPredictedLocation) {
+export function trilateration(
+  visibleNetworks,
+  knownNetworks,
+  a,
+  n,
+  oldPredictedLocation,
+) {
   let commonNetworks = [];
 
   oldPredictedLocation.old = true;
@@ -42,7 +48,11 @@ export function trilateration(visibleNetworks, knownNetworks, a, n, oldPredicted
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
-  return startTrilateration(commonNetworks, predictedLevel, oldPredictedLocation);
+  return startTrilateration(
+    commonNetworks,
+    predictedLevel,
+    oldPredictedLocation,
+  );
 }
 
 const getNetworkKey = network => network.BSSID.slice(0, -1);
@@ -55,7 +65,7 @@ function startTrilateration(networks, level, oldPredictedLocation) {
   // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
   if (networks.length < 3) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
-    if (oldPredictedLocation === {"old": true}) {
+    if (oldPredictedLocation === { old: true, point: [] }) {
       return {
         usedNetworks: [],
         predictions: [],
@@ -172,8 +182,7 @@ function iterateAll(networks, visualise) {
   let sdCount = 2;
   let pointDifference = 999;
 
-  console.log("\n\nNETWORK COUNT: " + networks.length);
-
+  console.log('\n\nNETWORK COUNT: ' + networks.length);
 
   do {
     let originalPointCount = allPoints.length;
@@ -186,10 +195,11 @@ function iterateAll(networks, visualise) {
     pointDifference = originalPointCount - newPoints.length;
 
     // if its going to empty the point array, quit out of the loop so we dont divide by 0
-    if (pointDifference !== allPoints.length)
+    if (pointDifference !== allPoints.length) {
       allPoints = newPoints;
-    else pointDifference = 0;
-
+    } else {
+      pointDifference = 0;
+    }
   } while (pointDifference !== 0);
 
   let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0]);

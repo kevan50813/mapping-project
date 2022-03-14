@@ -33,22 +33,24 @@ const DrawMapLocation = ({ location, projection, level }) => {
         cx={x}
         cy={y}
         r={radius}
-        stroke={(old) ? styles.locationOld.stroke : styles.location.stroke}
+        stroke={old ? styles.locationOld.stroke : styles.location.stroke}
         strokeWidth={3}
       />
       <Circle
         cx={x}
         cy={y}
         r={radius}
-        fill={(old) ? styles.locationOld.fill : styles.location.fill}
+        fill={old ? styles.locationOld.fill : styles.location.fill}
         opacity={0.5}
       />
       <Circle
         cx={x}
         cy={y}
         r="10"
-        fill={(old) ? styles.locationOld.fill : styles.location.fill}
-        stroke={(old) ? styles.locationOld.innerStroke : styles.location.innerStroke}
+        fill={old ? styles.locationOld.fill : styles.location.fill}
+        stroke={
+          old ? styles.locationOld.innerStroke : styles.location.innerStroke
+        }
         strokeWidth={5}
       />
     </>
