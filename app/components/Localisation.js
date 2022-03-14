@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { Text, View } from 'react-native';
 import { Button } from './Button';
 import { styles } from './styles';
@@ -11,8 +11,7 @@ export const Localisation = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
   let usedNetworks = [];
   let filteredKnownNetworks = [];
-  let predictedLocation = {};
-  let oldData = {};
+  const [predictedLocation, setPredictedLocation] = useState({});
   let predictions = [];
   let predictedLevel = -1;
 
@@ -42,17 +41,19 @@ export const Localisation = () => {
     startScan();
   };
 
-  if (visibleNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks, a, n, predictedLocation);
+  useEffect(() => {
+    if (visibleNetworks.length > 0) {
+      let data = trilateration(visibleNetworks, knownNetworks, a, n, predictedLocation);
 
-    predictedLocation = data.predictedLocation;
-    predictions = data.predictions;
-    usedNetworks = data.usedNetworks;
-    predictedLevel = data.predictedLocation.level;
-    filteredKnownNetworks = knownNetworks.filter(
-      ap => ap.level === predictedLevel,
-    );
-  }
+      setPredictedLocation(data.predictedLocation);
+      predictions = data.predictions;
+      usedNetworks = data.usedNetworks;
+      predictedLevel = data.predictedLocation.level;
+      filteredKnownNetworks = knownNetworks.filter(
+          ap => ap.level === predictedLevel,
+      );
+    }
+  }, [visibleNetworks]);
 
   return (
     <View style={styles.background}>

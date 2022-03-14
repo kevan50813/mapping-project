@@ -42,11 +42,6 @@ export function trilateration(visibleNetworks, knownNetworks, a, n, oldPredicted
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
-  /*console.log('COMMON NETWORK #: ' + commonNetworks.length + '\n');
-  commonNetworks.forEach(n => {
-    console.log(n.BSSID);
-  }); */
-
   return startTrilateration(commonNetworks, predictedLevel, oldPredictedLocation);
 }
 
@@ -58,10 +53,9 @@ function startTrilateration(networks, level, oldPredictedLocation) {
   // i.e. run multiple methods and take smallest error etc
 
   // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
-
   if (networks.length < 3) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
-    if (oldPredictedLocation === {}) {
+    if (oldPredictedLocation === {"old": true}) {
       return {
         usedNetworks: [],
         predictions: [],
@@ -69,15 +63,15 @@ function startTrilateration(networks, level, oldPredictedLocation) {
           point: [-1, -1],
           level: -1,
           error: -1,
+          old: true,
         },
-        old: true,
       };
     }
+
     return {
       usedNetworks: [],
       predictions: [],
       predictedLocation: oldPredictedLocation,
-      old: true,
     };
   }
 
@@ -99,8 +93,8 @@ function startTrilateration(networks, level, oldPredictedLocation) {
       point: data.pointArr,
       level: level,
       error: data.error,
+      old: false,
     },
-    old: false,
   };
 }
 
@@ -178,23 +172,25 @@ function iterateAll(networks, visualise) {
   let sdCount = 2;
   let pointDifference = 999;
 
-  let round = 1;
   console.log("\n\nNETWORK COUNT: " + networks.length);
 
 
   do {
-    console.log("ROUND " + round++);
     let originalPointCount = allPoints.length;
-    console.log("POINTS: " + originalPointCount);
-
     let statData = getStats(allPoints);
 
-    allPoints = allPoints.filter(point => {
+    let newPoints = allPoints.filter(point => {
       return distance(statData.avg, point) < sdCount * statData.sd;
     });
 
-    pointDifference = originalPointCount - allPoints.length;
-  } while (pointDifference !== 0 && allPoints.length > 0);
+    pointDifference = originalPointCount - newPoints.length;
+
+    // if its going to empty the point array, quit out of the loop so we dont divide by 0
+    if (pointDifference !== allPoints.length)
+      allPoints = newPoints;
+    else pointDifference = 0;
+
+  } while (pointDifference !== 0);
 
   let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0]);
   let averagePoint = [sum[0] / allPoints.length, sum[1] / allPoints.length];

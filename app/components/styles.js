@@ -92,6 +92,11 @@ export const styles = StyleSheet.create({
     stroke: '#0B2A31',
     innerStroke: '#70CADF',
   },
+  locationOld: {
+    fill: '#334950',
+    stroke: '#000000',
+    innerStroke: '#234149',
+  },
   room: {
     fill: '#C4F6B7',
     stroke: '#113507',

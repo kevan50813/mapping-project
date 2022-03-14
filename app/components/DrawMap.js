@@ -18,6 +18,7 @@ const DrawMapLocation = ({ location, projection, level }) => {
   }
 
   const point = projection(location.point);
+  const old = location.old;
   // TODO - confirm this? had to reverse it on merge to make results make sense...
   // Longitude, Latitude -> y, x
   const [x, y] = point;
@@ -32,22 +33,22 @@ const DrawMapLocation = ({ location, projection, level }) => {
         cx={x}
         cy={y}
         r={radius}
-        stroke={styles.location.stroke}
+        stroke={(old) ? styles.locationOld.stroke : styles.location.stroke}
         strokeWidth={3}
       />
       <Circle
         cx={x}
         cy={y}
         r={radius}
-        fill={styles.location.fill}
+        fill={(old) ? styles.locationOld.fill : styles.location.fill}
         opacity={0.5}
       />
       <Circle
         cx={x}
         cy={y}
         r="10"
-        fill={styles.location.fill}
-        stroke={styles.location.innerStroke}
+        fill={(old) ? styles.locationOld.fill : styles.location.fill}
+        stroke={(old) ? styles.locationOld.innerStroke : styles.location.innerStroke}
         strokeWidth={5}
       />
     </>
