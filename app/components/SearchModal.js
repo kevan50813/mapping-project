@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faMagnifyingGlassLocation,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { Text, View, Button, ScrollView, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { useEffect } from 'react';
+import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
-import { SearchBar } from 'react-native-elements';
 import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
@@ -51,8 +46,7 @@ const RoomList = ({
   );
 };
 
-export const SearchModal = ({ setDestination, setModalVisible }) => {
-  const [search, setSearch] = useState('');
+export const SearchModal = ({ setDestination, setModalVisible, search }) => {
   let search_polygons = [];
 
   const [
@@ -74,37 +68,21 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
     ];
   }
 
-  const updateSearch = newSearch => {
-    setSearch(newSearch);
+  useEffect(() => {
     getNodes({ variables: { search, graph: 'test_bragg' } });
-  };
+  }, [getNodes, search]);
 
   return (
-    <View>
-      <Button
-        style={styles.button}
-        title={'MODAL'}
-        onPress={() => setModalVisible(false)}
+    <ScrollView
+      style={styles.background}
+      contentInsetAdjustmentBehavior="automatic">
+      <RoomList
+        loading={loading}
+        error={error}
+        polygons={search_polygons}
+        setDestination={setDestination}
+        setModalVisible={setModalVisible}
       />
-      <SearchBar
-        value={search}
-        style={styles.search}
-        placeholder="Enter destination here..."
-        onChangeText={updateSearch}
-        lightTheme={true}
-        searchIcon={<FontAwesomeIcon icon={faMagnifyingGlassLocation} />}
-        clearIcon={<FontAwesomeIcon icon={faXmark} />}
-      />
-
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <RoomList
-          loading={loading}
-          error={error}
-          polygons={search_polygons}
-          setDestination={setDestination}
-          setModalVisible={setModalVisible}
-        />
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 };

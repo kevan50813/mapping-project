@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Text, View, Button } from 'react-native';
+import { Modal, Text, View } from 'react-native';
+import { SearchBar } from 'react-native-elements';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAngleUp,
+  faMagnifyingGlassLocation,
+  faXmark,
   faAngleDown,
   faLocationCrosshairs,
 } from '@fortawesome/free-solid-svg-icons';
@@ -22,6 +26,9 @@ export const Floorplan = ({
 }) => {
   const [floorId, setFloorId] = useState(2);
   const [modalVisable, setModalVisible] = useState(false);
+  const [search, setSearch] = useState('');
+
+  let locationSearch = React.createRef();
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
@@ -34,22 +41,12 @@ export const Floorplan = ({
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
+  const updateSearch = newSearch => {
+    setSearch(newSearch);
+  };
+
   return (
     <>
-      <Button
-        style={styles.button}
-        title="MODAL"
-        onPress={() => setModalVisible(!modalVisable)}
-      />
-
-      <Modal animationType="slide" visible={modalVisable}>
-        <SearchModal
-          nearestNode={nearestNode}
-          setDestination={setDestination}
-          setModalVisible={setModalVisible}
-        />
-      </Modal>
-
       <View style={styles.background}>
         <DrawMap
           geoJson={geoJson}
@@ -61,13 +58,13 @@ export const Floorplan = ({
 
         <MapButton
           icon={faAngleUp}
-          position={{ position: 'absolute', top: 0, right: 0 }}
+          position={{ position: 'absolute', top: 70, right: 0 }}
           onPress={nextFloor}
         />
 
         <MapButton
           icon={faAngleDown}
-          position={{ position: 'absolute', top: 70, right: 0 }}
+          position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={prevFloor}
         />
 
@@ -82,6 +79,38 @@ export const Floorplan = ({
             Level: {floor_list[floorId]}
           </Text>
         </View>
+      </View>
+      <View style={{ position: 'absolute', top: 0, width: '100%' }}>
+        <SearchBar
+          ref={s => (locationSearch = s)}
+          value={search}
+          style={styles.search}
+          placeholder="Enter destination..."
+          onChangeText={updateSearch}
+          onCancel={() => setModalVisible(false)}
+          onClear={() => {
+            setModalVisible(false);
+            setSearch('');
+          }}
+          lightTheme={true}
+          searchIcon={<FontAwesomeIcon icon={faMagnifyingGlassLocation} />}
+          clearIcon={
+            <FontAwesomeIcon
+              icon={faXmark}
+              onPress={() => locationSearch.clear()}
+            />
+          }
+          onPressIn={() => setModalVisible(true)}
+        />
+
+        {modalVisable ? (
+          <SearchModal
+            nearestNode={nearestNode}
+            setDestination={setDestination}
+            setModalVisible={setModalVisible}
+            search={search}
+          />
+        ) : null}
       </View>
     </>
   );

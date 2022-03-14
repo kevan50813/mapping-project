@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   background: {
-    // backgroundColor: '#f8f8f8',
+    backgroundColor: '#f8f8f8',
     flex: 1,
   },
   inputRow: {
@@ -41,6 +41,7 @@ export const styles = StyleSheet.create({
     padding: 8,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: '#eee',
   },
   spacedBox: {
     paddingVertical: 8,
