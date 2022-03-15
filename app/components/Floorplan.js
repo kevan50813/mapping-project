@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { NetworkContext } from './NetworkProvider';
+
 import {
   faAngleUp,
   faMagnifyingGlassLocation,
@@ -25,43 +27,10 @@ export const Floorplan = ({
   nearestNode,
 }) => {
   const [floorId, setFloorId] = useState(2);
-  const [shownToast, setShownToast] = useState(false);
-  const [predictedLocation, setPredictedLocation] = useState({ point: [] });
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
 
   let locationSearch = React.createRef();
-
-  const {
-    networks: visibleNetworks,
-    state: { scanning },
-    startScan,
-  } = useContext(NetworkContext);
-
-  const scan = async () => {
-    startScan();
-  };
-
-  useEffect(() => {
-    if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-      let data = trilateration(
-        visibleNetworks,
-        knownNetworks,
-        -50,
-        3,
-        predictedLocation,
-      );
-
-      console.log(data.predictedLocation);
-
-      if (
-        JSON.stringify(data.predictedLocation.point) !==
-        JSON.stringify(predictedLocation.point)
-      ) {
-        setPredictedLocation(data.predictedLocation);
-      }
-    }
-  }, [visibleNetworks, knownNetworks, predictedLocation]);
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();

@@ -15,7 +15,7 @@ export const LoadFloorplan = () => {
   const [knownNetworks, setKnownNetworks] = useState([]);
   const [path, setPath] = useState([]);
   const { networks: visibleNetworks, startScan } = useContext(NetworkContext);
-  let predictedLocation = null;
+  const [predictedLocation, setPredictedLocation] = useState({});
   let nearestNode = null;
   let nearestId = -1;
 
@@ -23,12 +23,24 @@ export const LoadFloorplan = () => {
     startScan();
   };
 
-  if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks, -50, 3);
-    predictedLocation = data.predictedLocation;
+  useEffect(() => {
+
+    if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
+    let data = trilateration(visibleNetworks, knownNetworks, -50, 3, predictedLocation);
+    if (
+          JSON.stringify(data.predictedLocation.point) !==
+          JSON.stringify(predictedLocation.point)
+      ) {
+        setPredictedLocation(data.predictedLocation);
+      }
+    }
+  }, [visibleNetworks, knownNetworks, predictedLocation]);
+
+  if (predictedLocation.point && predictedLocation.point[0] !== -1) {
     nearestNode = findNearestNode(predictedLocation, geoJson);
     nearestId = nearestNode.properties.queryObject.id;
   }
+
 
   const [
     getMap,
