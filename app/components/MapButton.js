@@ -10,7 +10,7 @@ export const MapButton = ({ icon, position, onPress }) => {
       <Text style={styles.mapButtonIcon}>
         <FontAwesomeIcon
           icon={icon}
-          size={styles.mapButtonIcon.size}
+          size={styles.mapButtonIconSvg.size}
           style={styles.mapButtonIcon}
         />
       </Text>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Text, View, Button, ScrollView, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { useEffect } from 'react';
+import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
-import { SearchBar } from 'react-native-elements';
+import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
-import { server } from './App';
 
 const RoomList = ({
   loading,
@@ -20,7 +20,7 @@ const RoomList = ({
   return (
     <>
       {loading ? (
-        <Text style={styles.info}>Loading from {server}...</Text>
+        <CenteredActivityIndicator text="Loading search results" />
       ) : null}
 
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
@@ -46,8 +46,7 @@ const RoomList = ({
   );
 };
 
-export const SearchModal = ({ setDestination, setModalVisible }) => {
-  const [search, setSearch] = useState('');
+export const SearchModal = ({ setDestination, setModalVisible, search }) => {
   let search_polygons = [];
 
   const [
@@ -59,7 +58,6 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
     },
   ] = useLazyQuery(qPolygons);
 
-  console.log(search_nodes);
   if (search_nodes) {
     search_polygons = [
       ...new Set(
@@ -70,34 +68,21 @@ export const SearchModal = ({ setDestination, setModalVisible }) => {
     ];
   }
 
-  const updateSearch = newSearch => {
-    setSearch(newSearch);
+  useEffect(() => {
     getNodes({ variables: { search, graph: 'test_bragg' } });
-  };
+  }, [getNodes, search]);
 
   return (
-    <View>
-      <Button
-        style={styles.button}
-        title="MODAL"
-        onPress={() => setModalVisible(false)}
+    <ScrollView
+      style={styles.background}
+      contentInsetAdjustmentBehavior="automatic">
+      <RoomList
+        loading={loading}
+        error={error}
+        polygons={search_polygons}
+        setDestination={setDestination}
+        setModalVisible={setModalVisible}
       />
-      <SearchBar
-        value={search}
-        style={styles.input}
-        placeholder="Enter destination here..."
-        onChangeText={updateSearch}
-      />
-
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <RoomList
-          loading={loading}
-          error={error}
-          polygons={search_polygons}
-          setDestination={setDestination}
-          setModalVisible={setModalVisible}
-        />
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
