@@ -1,8 +1,7 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Modal, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { NetworkContext } from './NetworkProvider';
 
 import {
   faAngleUp,
@@ -82,7 +81,7 @@ export const Floorplan = ({
           </Text>
         </View>
       </View>
-      <View style={{ position: 'absolute', top: 0, width: '100%' }}>
+      <View position={{ position: 'absolute', top: 0, width: '100%' }}>
         <SearchBar
           ref={s => (locationSearch = s)}
           value={search}
