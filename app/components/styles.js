@@ -82,6 +82,10 @@ export const styles = StyleSheet.create({
     fill: '#CA8702',
     stroke: '#201600',
   },
+  ap: {
+    fill: '#068b00',
+    stroke: '#201600',
+  },
   hallway: {
     fill: '#BFBEC5',
     stroke: '#18171A',

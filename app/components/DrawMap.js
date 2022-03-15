@@ -144,7 +144,9 @@ function DrawPointElement(feature, projection, index) {
       cy={point[1]}
       r="7"
       key={index}
-      fill={styles.poi.fill}
+      fill={
+        feature.properties.amenity === 'wap' ? styles.ap.fill : styles.poi.fill
+      }
       stroke={styles.poi.stroke}
       strokeWidth="3"
     />
