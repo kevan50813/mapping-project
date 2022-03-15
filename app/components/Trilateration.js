@@ -192,7 +192,6 @@ function iterateAll(networks, visualise) {
     } else {
       pointDifference = 0;
     }
-
   } while (pointDifference !== 0);
 
   let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0]);

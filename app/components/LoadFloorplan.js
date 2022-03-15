@@ -24,12 +24,17 @@ export const LoadFloorplan = () => {
   };
 
   useEffect(() => {
-
     if (visibleNetworks.length > 0 && knownNetworks.length > 0) {
-    let data = trilateration(visibleNetworks, knownNetworks, -50, 3, predictedLocation);
-    if (
-          JSON.stringify(data.predictedLocation.point) !==
-          JSON.stringify(predictedLocation.point)
+      let data = trilateration(
+        visibleNetworks,
+        knownNetworks,
+        -50,
+        3,
+        predictedLocation,
+      );
+      if (
+        JSON.stringify(data.predictedLocation.point) !==
+        JSON.stringify(predictedLocation.point)
       ) {
         setPredictedLocation(data.predictedLocation);
       }
@@ -40,7 +45,6 @@ export const LoadFloorplan = () => {
     nearestNode = findNearestNode(predictedLocation, geoJson);
     nearestId = nearestNode.properties.queryObject.id;
   }
-
 
   const [
     getMap,
