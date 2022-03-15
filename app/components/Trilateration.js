@@ -2,8 +2,16 @@ import LatLon from 'geodesy/latlon-nvector-spherical.js';
 
 const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 
-export function trilateration(visibleNetworks, knownNetworks, a, n) {
+export function trilateration(
+  visibleNetworks,
+  knownNetworks,
+  a,
+  n,
+  oldPredictedLocation,
+) {
   let commonNetworks = [];
+
+  oldPredictedLocation.old = true;
 
   // count of networks on each floor
   let levelCount = [0, 0, 0, 0, 0, 0];
@@ -39,51 +47,55 @@ export function trilateration(visibleNetworks, knownNetworks, a, n) {
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);
 
-  return startTrilateration(commonNetworks, predictedLevel);
+  return startTrilateration(
+    commonNetworks,
+    predictedLevel,
+    oldPredictedLocation,
+  );
 }
 
 const getNetworkKey = network => network.BSSID.slice(0, -1);
 
-function startTrilateration(networks, level) {
+function startTrilateration(networks, level, oldPredictedLocation) {
   // trilat stuff
   // wrapping this in a parent function so we can potentially do more stuff with this
   // i.e. run multiple methods and take smallest error etc
 
   // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
-
   if (networks.length < 3) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
+    if (oldPredictedLocation === { old: true, point: [] }) {
+      return {
+        usedNetworks: [],
+        predictions: [],
+        predictedLocation: {
+          point: [-1, -1],
+          level: -1,
+          error: -1,
+          old: true,
+        },
+      };
+    }
+
     return {
       usedNetworks: [],
-      level: level,
-      predictedLocation: {
-        point: [-1, -1],
-        error: -1,
-      },
+      predictions: [],
+      predictedLocation: oldPredictedLocation,
     };
   }
 
-  //let data_all = iterateAll(networks);
-  //let data_last = lastThree(networks);
-  let data_first = firstThree(networks);
-
-  // do more processing maybe
-
-  let data = data_first;
-
-  /*
-  data.networks.forEach(n => {
-    console.log(n);
-  }); */
+  let data = iterateAll(networks, true);
 
   // finally set best attributes
   // defined like this for easier adaption in future
   return {
     usedNetworks: data.networks,
+    predictions: data.predictions,
     predictedLocation: {
       point: data.pointArr,
       level: level,
       error: data.error,
+      old: false,
     },
   };
 }
@@ -143,9 +155,8 @@ function lastThree(networks) {
   return trilaterate(networks.slice(0, -3));
 }
 
-function iterateAll(networks) {
-  let combinations = 0;
-  let predictedSum = [0, 0];
+function iterateAll(networks, visualise) {
+  let allPoints = [];
 
   for (let i = 0; i < networks.length - 2; i++) {
     for (let j = i + 1; j < networks.length - 1; j++) {
@@ -154,20 +165,65 @@ function iterateAll(networks) {
 
         let data = trilaterate(triplet);
         if (data.pointArr[0] !== -1) {
-          predictedSum[0] += data.pointArr[0];
-          predictedSum[1] += data.pointArr[1];
-          combinations++;
+          allPoints.push(data.pointArr);
         }
       }
     }
   }
 
-  //console.log('----------------');
-  //console.log(predictedSum);
-  //console.log(combinations);
-  let averagePoint = [
-    predictedSum[0] / combinations,
-    predictedSum[1] / combinations,
-  ];
-  return { pointArr: averagePoint, error: -1, networks: [] };
+  let sdCount = 2;
+  let pointDifference = 999;
+
+  console.log('\n\nNETWORK COUNT: ' + networks.length);
+
+  do {
+    let originalPointCount = allPoints.length;
+    let statData = getStats(allPoints);
+
+    let newPoints = allPoints.filter(point => {
+      return distance(statData.avg, point) < sdCount * statData.sd;
+    });
+
+    pointDifference = originalPointCount - newPoints.length;
+
+    // if its going to empty the point array, quit out of the loop so we dont divide by 0
+    if (pointDifference !== allPoints.length) {
+      allPoints = newPoints;
+    } else {
+      pointDifference = 0;
+    }
+  } while (pointDifference !== 0);
+
+  let sum = allPoints.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0]);
+  let averagePoint = [sum[0] / allPoints.length, sum[1] / allPoints.length];
+
+  return {
+    pointArr: averagePoint,
+    error: -1,
+    networks: [],
+    predictions: visualise ? allPoints : [],
+  };
+}
+
+function getStats(dataArr) {
+  let sum = dataArr.reduce((a, b) => [a[0] + b[0], a[1] + b[1]]);
+  let avg = [sum[0] / dataArr.length, sum[1] / dataArr.length];
+
+  let sumErrSq = dataArr
+    .map(point => Math.pow(distance(point, avg), 2))
+    .reduce((a, b) => a + b);
+
+  let variance = sumErrSq / dataArr.length;
+  let sd = Math.sqrt(variance);
+
+  return {
+    avg: avg,
+    sd: sd,
+  };
+}
+
+function distance(point1, point2) {
+  return Math.sqrt(
+    Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2),
+  );
 }
