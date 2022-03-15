@@ -85,14 +85,7 @@ function startTrilateration(networks, level, oldPredictedLocation) {
     };
   }
 
-  let data_all = iterateAll(networks, true);
-
-  //let data_last = lastThree(networks);
-  //let data_first = firstThree(networks);
-
-  // do more processing maybe
-
-  let data = data_all;
+  let data = iterateAll(networks, true);
 
   // finally set best attributes
   // defined like this for easier adaption in future
