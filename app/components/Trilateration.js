@@ -43,7 +43,6 @@ export function trilateration(
 
   // get level with the most networks on it
   let predictedLevel = levelCount.indexOf(Math.max.apply(null, levelCount));
-  console.log('PREDICTED LEVEL: ' + predictedLevel);
 
   // sort in order of ascending distance from user
   commonNetworks.sort((n1, n2) => n1.distance - n2.distance);

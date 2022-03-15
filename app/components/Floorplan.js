@@ -1,131 +1,36 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Text, Button, View, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, Text, View } from 'react-native';
+import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAngleUp,
+  faMagnifyingGlassLocation,
+  faXmark,
   faAngleDown,
   faLocationCrosshairs,
 } from '@fortawesome/free-solid-svg-icons';
-import Toast from 'react-native-simple-toast';
-import { useLazyQuery, gql } from '@apollo/client';
 
 import { styles } from './styles';
-import { NetworkContext } from './NetworkProvider';
-import { buildGeoJson } from '../lib/geoJson';
+import { MapButton } from './MapButton';
+import { SearchModal } from './SearchModal';
 import { DrawMap } from './DrawMap';
-import { trilateration } from './Trilateration';
 
-export const LoadFloorplan = () => {
-  const qMap = gql`
-    query get_map($graph: String!) {
-      polygons(graph: $graph) {
-        id
-        vertices
-        level
-        tags
-      }
-
-      edges(graph: $graph) {
-        edge
-      }
-
-      pois(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-      }
-
-      nodes(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-      }
-
-      walls(graph: $graph) {
-        id
-        level
-        lat
-        lon
-        tags
-      }
-    }
-  `;
-
-  const [
-    getMap,
-    {
-      loading,
-      error,
-      data: {
-        polygons: polygons,
-        edges: edges,
-        nodes: nodes,
-        walls: walls,
-        pois: pois,
-      } = {
-        polygons: [],
-        edges: [],
-        nodes: [],
-        walls: [],
-        pois: [],
-      },
-    },
-  ] = useLazyQuery(qMap);
-
-  useEffect(() => {
-    getMap({ variables: { graph: 'test_bragg' } });
-  }, [getMap]);
-
-  const [geoJson, setGeoJson] = useState(null);
-  const [knownNetworks, setKnownNetworks] = useState([]);
-
-  const loadKnownNetworks = geoJson => {
-    if (geoJson == null) {
-      return [];
-    }
-
-    // get the filter from the queries PoI data here
-    const nodes = geoJson.features.filter(
-      feature => feature.properties.internet === 'yes',
-    );
-    return nodes.map(({ geometry, properties }) => ({
-      coordinates: geometry.coordinates[0],
-      name: properties.ssid,
-      BSSID: properties.mac_addres, // NB: not a typo, problem with char limits in shapefiles
-      level: properties.level,
-    }));
-  };
-
-  if (geoJson == null && polygons.length > 0) {
-    setGeoJson(buildGeoJson(polygons, nodes, walls, pois, edges));
-  }
-
-  if (geoJson != null && knownNetworks.length == 0) {
-    const networks = loadKnownNetworks(geoJson);
-    setKnownNetworks(networks);
-  }
-
-  return loading ? (
-    <Text style={styles.info}>Loading Floorplan...</Text>
-  ) : (
-    <Floorplan
-      polygons={polygons}
-      loading={loading}
-      error={error}
-      geoJson={geoJson}
-      knownNetworks={knownNetworks}
-    />
-  );
-};
-
-export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
+export const Floorplan = ({
+  polygons,
+  geoJson,
+  setDestination,
+  path,
+  scan,
+  predictedLocation,
+  nearestNode,
+}) => {
   const [floorId, setFloorId] = useState(2);
   const [shownToast, setShownToast] = useState(false);
   const [predictedLocation, setPredictedLocation] = useState({ point: [] });
+  const [modalVisable, setModalVisible] = useState(false);
+  const [search, setSearch] = useState('');
+
+  let locationSearch = React.createRef();
 
   const {
     networks: visibleNetworks,
@@ -169,67 +74,77 @@ export const Floorplan = ({ polygons, geoJson, knownNetworks }) => {
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
-  if (!scanning && visibleNetworks.length > 0 && !shownToast) {
-    Toast.show('Network scan successful.', Toast.LONG);
-    setShownToast(true);
-  }
-
-  if (scanning) {
-    Toast.show('Scanning Wifi APs...', Toast.LONG);
-  }
+  const updateSearch = newSearch => {
+    setSearch(newSearch);
+  };
 
   return (
-    <View style={styles.background}>
-      <DrawMap
-        geoJson={geoJson}
-        location={predictedLocation}
-        level={parseInt(floor_list[floorId], 10)}
-      />
+    <>
+      <View style={styles.background}>
+        <DrawMap
+          geoJson={geoJson}
+          location={predictedLocation}
+          level={parseInt(floor_list[floorId], 10)}
+          nearestNode={nearestNode}
+          currentPath={path}
+        />
 
-      <TouchableOpacity
-        onPress={nextFloor}
-        style={[styles.mapButton, { position: 'absolute', top: 0, right: 0 }]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faAngleUp}
-            style={styles.mapButtonIcon}
-            size={styles.mapButtonIconSvg.size}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faAngleUp}
+          position={{ position: 'absolute', top: 70, right: 0 }}
+          onPress={nextFloor}
+        />
 
-      <TouchableOpacity
-        onPress={prevFloor}
-        style={[styles.mapButton, { position: 'absolute', top: 70, right: 0 }]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faAngleDown}
-            style={styles.mapButtonIcon}
-            size={styles.mapButtonIconSvg.size}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faAngleDown}
+          position={{ position: 'absolute', top: 140, right: 0 }}
+          onPress={prevFloor}
+        />
 
-      <TouchableOpacity
-        onPress={scan}
-        style={[
-          styles.mapButton,
-          { position: 'absolute', bottom: 0, right: 0 },
-        ]}>
-        <Text style={styles.mapButtonIcon}>
-          <FontAwesomeIcon
-            icon={faLocationCrosshairs}
-            size={styles.mapButtonIcon.size}
-            style={styles.mapButtonIcon}
-          />
-        </Text>
-      </TouchableOpacity>
+        <MapButton
+          icon={faLocationCrosshairs}
+          position={{ position: 'absolute', bottom: 0, right: 0 }}
+          onPress={scan}
+        />
 
-      <View style={styles.levelView}>
-        <Text style={[styles.big, styles.levelViewText]}>
-          Level: {floor_list[floorId]}
-        </Text>
+        <View style={styles.levelView}>
+          <Text style={[styles.big, styles.levelViewText]}>
+            Level: {floor_list[floorId]}
+          </Text>
+        </View>
       </View>
-    </View>
+      <View style={{ position: 'absolute', top: 0, width: '100%' }}>
+        <SearchBar
+          ref={s => (locationSearch = s)}
+          value={search}
+          style={styles.search}
+          placeholder="Enter destination..."
+          onChangeText={updateSearch}
+          onCancel={() => setModalVisible(false)}
+          onClear={() => {
+            setModalVisible(false);
+            setSearch('');
+          }}
+          lightTheme={true}
+          searchIcon={<FontAwesomeIcon icon={faMagnifyingGlassLocation} />}
+          clearIcon={
+            <FontAwesomeIcon
+              icon={faXmark}
+              onPress={() => locationSearch.clear()}
+            />
+          }
+          onPressIn={() => setModalVisible(true)}
+        />
+
+        {modalVisable ? (
+          <SearchModal
+            nearestNode={nearestNode}
+            setDestination={setDestination}
+            setModalVisible={setModalVisible}
+            search={search}
+          />
+        ) : null}
+      </View>
+    </>
   );
 };

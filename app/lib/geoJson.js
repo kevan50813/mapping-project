@@ -24,6 +24,7 @@ const polyFeatures = polygons =>
     },
     properties: {
       ...polygon.tags,
+      queryObject: polygon,
       level: levelToArray(polygon.level),
     },
   }));
@@ -37,6 +38,7 @@ const nodeFeatures = nodes =>
     },
     properties: {
       ...node.tags,
+      queryObject: node,
       level: levelToArray(node.level),
     },
   }));
@@ -66,6 +68,7 @@ const buildLineString = (nodes, edges) => {
         },
         properties: {
           ...node1.tags,
+          edge: edge.edge,
           level: levelToArray(node1.level),
         },
       };
@@ -85,6 +88,8 @@ export const buildGeoJson = (polygons, nodes, walls, pois, edges) => ({
   features: [
     ...polyFeatures(polygons),
     ...buildLineString(walls, edges),
+    ...buildLineString(nodes, edges),
+    ...nodeFeatures(nodes),
     ...nodeFeatures(pois),
   ],
 });

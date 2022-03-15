@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   background: {
-    // backgroundColor: '#f8f8f8',
+    backgroundColor: '#f8f8f8',
     flex: 1,
   },
   inputRow: {
@@ -27,11 +27,12 @@ export const styles = StyleSheet.create({
   },
   button: {
     padding: 12,
-    backgroundColor: 'black',
+    backgroundColor: '#4c94eb',
+    margin: 10,
   },
   buttonText: {
     fontSize: 18,
-    color: 'white',
+    color: '#eee',
     fontWeight: '700',
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -40,6 +41,7 @@ export const styles = StyleSheet.create({
     padding: 8,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: '#eee',
   },
   spacedBox: {
     paddingVertical: 8,
@@ -101,8 +103,11 @@ export const styles = StyleSheet.create({
     fill: '#C4F6B7',
     stroke: '#113507',
   },
+  currentRoom: {
+    fill: '#E05263',
+  },
   mapButton: {
-    backgroundColor: '#0F3843',
+    backgroundColor: '#4c94eb',
     borderRadius: 15,
     height: 60,
     width: 60,
@@ -111,11 +116,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mapButtonIcon: {
-    color: '#ddd',
-    // padding: 10,
+    color: '#eee',
   },
   mapButtonIconSvg: {
-    size: 50,
+    size: 30,
   },
   levelView: {
     position: 'absolute',
@@ -127,10 +131,26 @@ export const styles = StyleSheet.create({
     padding: 10,
   },
   levelViewText: {
-    backgroundColor: '#0F3843',
-    color: '#ddd',
+    backgroundColor: '#4c94eb',
+    color: '#eee',
     borderRadius: 15,
     padding: 10,
+  },
+  centerAbsolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicatorText: {
+    color: 'grey',
+    fontSize: 12,
+  },
+  search: {
+    color: 'black',
   },
   // input: {
   //   height: 40,
