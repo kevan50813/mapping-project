@@ -81,7 +81,7 @@ export const Floorplan = ({
           </Text>
         </View>
       </View>
-      <View position={{ position: 'absolute', top: 0, width: '100%' }}>
+      <View style={{ position: 'absolute', top: 0, width: '100%' }}>
         <SearchBar
           ref={s => (locationSearch = s)}
           value={search}

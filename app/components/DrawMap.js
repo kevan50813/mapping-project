@@ -35,6 +35,34 @@ function GetRotatedTriangle(x, y, rotation) {
   return points;
 }
 
+function GetRotatedEquiTriangle(x, y, rotation) {
+  // Initial triangle coordinates.
+  let xs = [-9, 9, 0];
+  let ys = [-9, -9, 9];
+  let tmp = [0, 0, 0];
+
+  // Convert to radians.
+  let angle = rotation * (Math.PI / 180);
+
+  // Rotate triangle.
+  for (let i = 0; i < 3; i++) {
+    tmp[i] = Math.cos(angle) * xs[i] - Math.sin(angle) * ys[i];
+    ys[i] = Math.sin(angle) * xs[i] + Math.cos(angle) * ys[i];
+    xs[i] = tmp[i];
+  }
+
+  // Move the triangle to the current location.
+  for (let i = 0; i < 3; i++) {
+    xs[i] += x;
+    ys[i] += y;
+  }
+
+  // Create points for <Polygon/>
+  let points =
+    xs[0] + ',' + ys[0] + ' ' + xs[1] + ',' + ys[1] + ' ' + xs[2] + ',' + ys[2];
+  return points;
+}
+
 export const Marker = ({ x, y, rotation }) => (
   <Polygon
     points={GetRotatedTriangle(x, y, rotation)}
@@ -135,13 +163,37 @@ function DrawPolygonElement(
   );
 }
 
-function DrawPointElement(feature, projection, index) {
+function DrawPointElement(feature, projection, index, up, down) {
   const point = projection(feature.geometry.coordinates[0]);
+  const [x, y] = point;
+
+  if (up.includes(feature.properties.queryObject.id)) {
+    return (
+      <Polygon
+        points={GetRotatedEquiTriangle(x, y, 0)}
+        fill="#f00"
+        stroke="#900"
+        strokeWidth="3"
+      />
+    );
+  }
+
+  if (down.includes(feature.properties.queryObject.id)) {
+    return (
+      <Polygon
+        points={GetRotatedEquiTriangle(x, y, 180)}
+        fill="#f00"
+        stroke="#900"
+        strokeWidth="3"
+      />
+    );
+  }
+
   return feature.properties.indoor === 'way' ||
     feature.properties.indoor === 'door' ? null : (
     <Circle
-      cx={point[0]}
-      cy={point[1]}
+      cx={x}
+      cy={y}
       r="7"
       key={index}
       fill={styles.poi.fill}
@@ -190,6 +242,8 @@ function DrawMapElement(
   currentRoom,
   finalRoom,
   currentPath,
+  up,
+  down,
 ) {
   const featurePath = path(feature);
   if (feature.geometry.type === 'Polygon') {
@@ -201,7 +255,7 @@ function DrawMapElement(
       finalRoom,
     );
   } else if (feature.geometry.type === 'Point') {
-    return DrawPointElement(feature, projection, index);
+    return DrawPointElement(feature, projection, index, up, down);
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
   }
@@ -218,7 +272,11 @@ export const DrawMap = ({
   const H = 1000;
   let currentRoom = null;
   let finalNodeId = null;
+  let up = [];
+  let down = [];
   let finalRoom = null;
+  const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
+  const path = d3.geoPath().projection(projection);
 
   if (nearestNode) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
@@ -226,6 +284,15 @@ export const DrawMap = ({
 
   if (currentPath && geoJson && currentPath.length > 1) {
     finalNodeId = currentPath[currentPath.length - 1];
+
+    let nodeLookup = {};
+    const nodes = geoJson.features.filter(
+      feature =>
+        feature.geometry.type === 'Point' &&
+        feature.properties.indoor === 'way',
+    );
+    nodes.map(n => (nodeLookup[n.properties.queryObject.id] = n));
+
     const finalNode = geoJson.features.filter(feature => {
       if (!feature.properties.queryObject) {
         return false;
@@ -235,13 +302,30 @@ export const DrawMap = ({
         feature.properties.queryObject.id === finalNodeId
       );
     })[0];
+
     if (finalNode) {
       finalRoom = finalNode.properties.queryObject.polygon.id;
     }
-  }
 
-  const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
-  const path = d3.geoPath().projection(projection);
+    for (let i = 0; i < currentPath.length; i++) {
+      if (i === 0) {
+        continue;
+      }
+      const current = currentPath[i];
+      const previous = currentPath[i - 1];
+
+      const currentLevel = nodeLookup[current].properties.level[0];
+      const previousLevel = nodeLookup[previous].properties.level[0];
+
+      if (currentLevel < previousLevel) {
+        down.push(current);
+        up.push(previous);
+      } else if (currentLevel > previousLevel) {
+        up.push(current);
+        down.push(previous);
+      }
+    }
+  }
 
   return (
     <>
@@ -265,6 +349,8 @@ export const DrawMap = ({
                   currentRoom,
                   finalRoom,
                   currentPath,
+                  up,
+                  down,
                 ),
               )
           : null}
