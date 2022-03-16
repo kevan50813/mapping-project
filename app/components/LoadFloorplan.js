@@ -13,7 +13,7 @@ export const LoadFloorplan = () => {
   const [destination, setDestination] = useState(-1);
   const [geoJson, setGeoJson] = useState(null);
   const [knownNetworks, setKnownNetworks] = useState([]);
-  const [path, setPath] = useState([]);
+  const [currentPath, setPath] = useState([]);
   const { networks: visibleNetworks, startScan } = useContext(NetworkContext);
   const [predictedLocation, setPredictedLocation] = useState({});
   let nearestNode = null;
@@ -136,7 +136,7 @@ export const LoadFloorplan = () => {
       geoJson={geoJson}
       knownNetworks={knownNetworks}
       setDestination={setDestination}
-      path={path}
+      currentPath={currentPath}
       scan={scan}
       nearestId={nearestId}
       predictedLocation={predictedLocation}

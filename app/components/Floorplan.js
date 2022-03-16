@@ -20,7 +20,7 @@ export const Floorplan = ({
   polygons,
   geoJson,
   setDestination,
-  path,
+  currentPath,
   scan,
   predictedLocation,
   nearestNode,
@@ -54,7 +54,7 @@ export const Floorplan = ({
           location={predictedLocation}
           level={parseInt(floor_list[floorId], 10)}
           nearestNode={nearestNode}
-          currentPath={path}
+          currentPath={currentPath}
         />
 
         <MapButton

@@ -174,6 +174,7 @@ function DrawPointElement(feature, projection, index, up, down) {
         fill="#f00"
         stroke="#900"
         strokeWidth="3"
+        key={index}
       />
     );
   }
@@ -185,6 +186,7 @@ function DrawPointElement(feature, projection, index, up, down) {
         fill="#f00"
         stroke="#900"
         strokeWidth="3"
+        key={index}
       />
     );
   }
