@@ -4,6 +4,8 @@ import { Slider } from '@miblanchard/react-native-slider';
 import { Button } from './Button';
 import { styles } from './styles';
 import { NetworkContext } from './NetworkProvider';
+import { Dirs, FileSystem } from 'react-native-file-access';
+import Toast from 'react-native-simple-toast';
 
 export const Scanner = () => {
   const { networks, startScan, state, info } = useContext(NetworkContext);
@@ -26,9 +28,21 @@ export const Scanner = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networks]);
 
-  const saveNetworks = () => {
+  const saveNetworks = async () => {
     //  TODO - write to file
 
+    const fileName = 'SCAN_' + Date.now() + '.json';
+    const path = Dirs.DocumentDir + '/' + fileName;
+
+    await FileSystem.writeFile(path, JSON.stringify(networksToSave), 'utf8');
+    if (!FileSystem.exists(path)) {
+      console.log('File I/O error. Saved networks not discarded.');
+      return;
+    }
+    await FileSystem.cpExternal(path, fileName, 'downloads');
+
+    console.log('Saved to ' + path);
+    Toast.show('Successfully saved scan data to file.', Toast.SHORT);
     setNetworksToSave([]);
   };
 
@@ -54,7 +68,7 @@ export const Scanner = () => {
       <Button
         style={styles.button}
         title={
-          'Save ' + (networksToSave ? networksToSave.length : 0) + ' Networks'
+          'Save ' + (networksToSave ? networksToSave.length : 0) + ' Scan(s)'
         }
         onPress={saveNetworks}
       />
