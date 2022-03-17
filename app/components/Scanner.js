@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Slider } from '@miblanchard/react-native-slider';
 import { Button } from './Button';
@@ -7,11 +7,30 @@ import { NetworkContext } from './NetworkProvider';
 
 export const Scanner = () => {
   const { networks, startScan, state, info } = useContext(NetworkContext);
+  const [networksToSave, setNetworksToSave] = useState(null);
 
   let [a, setA] = useState(-50);
   let [n, setN] = useState(3);
 
   const rssiToDistance = rssi => Math.pow(10, (rssi - a) / (-10 * n));
+
+  useEffect(() => {
+    // ignore the first push applied when the screen loads. kind of a hack, but
+    if (networksToSave) {
+      networksToSave.push(networks);
+    } else {
+      setNetworksToSave([]);
+    }
+
+    // shouldnt do this. but priority right now is just getting data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networks]);
+
+  const saveNetworks = () => {
+    //  TODO - write to file
+
+    setNetworksToSave([]);
+  };
 
   return (
     <View style={styles.background}>
@@ -32,6 +51,13 @@ export const Scanner = () => {
         />
       </View>
       <Button style={styles.button} title="Scan" onPress={startScan} />
+      <Button
+        style={styles.button}
+        title={
+          'Save ' + (networksToSave ? networksToSave.length : 0) + ' Networks'
+        }
+        onPress={saveNetworks}
+      />
       {state.scanning ? <Text style={styles.info}>Scanning...</Text> : null}
       {state.error ? <Text style={styles.error}>{state.error}</Text> : null}
       <Text style={styles.info}>Took {info.duration / 1000}s</Text>
