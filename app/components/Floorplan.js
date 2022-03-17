@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { BackHandler, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
@@ -28,11 +29,23 @@ export const Floorplan = ({
   const [floorId, setFloorId] = useState(2);
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
+  const navigation = useNavigation();
 
   let locationSearch = React.createRef();
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
+
+  const backAction = () => {
+    if (modalVisable) {
+      setModalVisible(false);
+      return true;
+    }
+    navigation.pop();
+    return true;
+  };
+
+  BackHandler.addEventListener('hardwareBackPress', backAction);
 
   const prevFloor = () => {
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
 import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
+import { style } from 'd3';
 
 const RoomList = ({
   loading,
@@ -12,6 +13,8 @@ const RoomList = ({
   polygons = [],
   setDestination,
   setModalVisible,
+  setStartingPoint,
+  startingPoint,
 }) => {
   if (error) {
     console.error(error);
@@ -22,10 +25,15 @@ const RoomList = ({
       {loading ? (
         <CenteredActivityIndicator text="Loading search results" />
       ) : null}
-
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
 
-      <Text style={styles.info}>Results: {polygons.length}</Text>
+      {/* <Text style={styles.info}>Results: {polygons.length}</Text> */}
+
+      <TouchableOpacity onPress={() => setStartingPoint(!startingPoint)}>
+        <Text style={styles.info}>
+          Touch to {startingPoint ? 'set starting point' : 'set destination'}.
+        </Text>
+      </TouchableOpacity>
 
       {polygons.map(p => {
         return (
@@ -47,6 +55,7 @@ const RoomList = ({
 };
 
 export const SearchModal = ({ setDestination, setModalVisible, search }) => {
+  const [startingPoint, setStartingPoint] = useState(false);
   let search_polygons = [];
 
   const [
@@ -82,6 +91,8 @@ export const SearchModal = ({ setDestination, setModalVisible, search }) => {
         polygons={search_polygons}
         setDestination={setDestination}
         setModalVisible={setModalVisible}
+        setStartingPoint={setStartingPoint}
+        startingPoint={startingPoint}
       />
     </ScrollView>
   );

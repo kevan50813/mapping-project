@@ -1,67 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
-import { Path, Polygon } from 'react-native-svg';
+import { Path, Polygon, Circle } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
-import { Circle } from 'react-native-svg';
 import { onLevel } from '../lib/geoJson';
 import CompassHeading from 'react-native-compass-heading';
-
-function GetRotatedTriangle(x, y, rotation) {
-  // Initial triangle coordinates.
-  let xs = [-9, 9, 0];
-  let ys = [-8, -8, 15];
-  let tmp = [0, 0, 0];
-
-  // Convert to radians.
-  let angle = rotation * (Math.PI / 180);
-
-  // Rotate triangle.
-  for (let i = 0; i < 3; i++) {
-    tmp[i] = Math.cos(angle) * xs[i] - Math.sin(angle) * ys[i];
-    ys[i] = Math.sin(angle) * xs[i] + Math.cos(angle) * ys[i];
-    xs[i] = tmp[i];
-  }
-
-  // Move the triangle to the current location.
-  for (let i = 0; i < 3; i++) {
-    xs[i] += x;
-    ys[i] += y;
-  }
-
-  // Create points for <Polygon/>
-  let points =
-    xs[0] + ',' + ys[0] + ' ' + xs[1] + ',' + ys[1] + ' ' + xs[2] + ',' + ys[2];
-  return points;
-}
-
-function GetRotatedEquiTriangle(x, y, rotation) {
-  // Initial triangle coordinates.
-  let xs = [-9, 9, 0];
-  let ys = [-9, -9, 9];
-  let tmp = [0, 0, 0];
-
-  // Convert to radians.
-  let angle = rotation * (Math.PI / 180);
-
-  // Rotate triangle.
-  for (let i = 0; i < 3; i++) {
-    tmp[i] = Math.cos(angle) * xs[i] - Math.sin(angle) * ys[i];
-    ys[i] = Math.sin(angle) * xs[i] + Math.cos(angle) * ys[i];
-    xs[i] = tmp[i];
-  }
-
-  // Move the triangle to the current location.
-  for (let i = 0; i < 3; i++) {
-    xs[i] += x;
-    ys[i] += y;
-  }
-
-  // Create points for <Polygon/>
-  let points =
-    xs[0] + ',' + ys[0] + ' ' + xs[1] + ',' + ys[1] + ' ' + xs[2] + ',' + ys[2];
-  return points;
-}
+import { GetRotatedEquiTriangle, GetRotatedTriangle } from '../lib/drawShapes';
 
 export const Marker = ({ x, y, rotation }) => (
   <Polygon
