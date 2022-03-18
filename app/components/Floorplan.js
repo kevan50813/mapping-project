@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { BackHandler, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
@@ -35,6 +35,15 @@ export const Floorplan = ({
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
+
+  const dispatchScan = async () => {
+    await scan();
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => dispatchScan(), 5000);
+    return () => clearTimeout(timer);
+  });
 
   const backAction = () => {
     if (modalVisable) {

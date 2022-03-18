@@ -5,7 +5,6 @@ import { useLazyQuery } from '@apollo/client';
 import { CenteredActivityIndicator } from './CenteredActivityIndicator';
 import { qPolygons } from '../queries/qPolygons';
 import { styles } from './styles';
-import { style } from 'd3';
 
 const RoomList = ({
   loading,

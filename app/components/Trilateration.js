@@ -174,7 +174,7 @@ function iterateAll(networks, visualise) {
   let sdCount = 2;
   let pointDifference = 999;
 
-  console.log('\n\nNETWORK COUNT: ' + networks.length);
+  // console.log('\n\nNETWORK COUNT: ' + networks.length);
 
   do {
     let originalPointCount = allPoints.length;
