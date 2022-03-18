@@ -10,6 +10,7 @@ import {
   faXmark,
   faAngleDown,
   faLocationCrosshairs,
+  faArrowsAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -64,6 +65,12 @@ export const Floorplan = ({
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
+  const centerFloor = () => {
+    if (predictedLocation.level && predictedLocation.level !== -1) {
+      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
+    }
+  };
+
   const updateSearch = newSearch => {
     setSearch(newSearch);
   };
@@ -86,8 +93,18 @@ export const Floorplan = ({
         />
 
         <MapButton
-          icon={faAngleDown}
+          text={
+            predictedLocation.level
+              ? predictedLocation.level
+              : floor_list[floorId]
+          }
           position={{ position: 'absolute', top: 140, right: 0 }}
+          onPress={centerFloor}
+        />
+
+        <MapButton
+          icon={faAngleDown}
+          position={{ position: 'absolute', top: 210, right: 0 }}
           onPress={prevFloor}
         />
 
@@ -103,7 +120,7 @@ export const Floorplan = ({
           </Text>
         </View>
       </View>
-      <View style={{ position: 'absolute', top: 0, width: '100%' }}>
+      <View style={styles.searchBar}>
         <SearchBar
           ref={s => (locationSearch = s)}
           value={search}

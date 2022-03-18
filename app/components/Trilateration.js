@@ -11,8 +11,6 @@ export function trilateration(
 ) {
   let commonNetworks = [];
 
-  oldPredictedLocation.old = true;
-
   // count of networks on each floor
   let levelCount = [0, 0, 0, 0, 0, 0];
 
@@ -64,7 +62,7 @@ function startTrilateration(networks, level, oldPredictedLocation) {
   // maybe turn every coordinates [] into LatLon first as going to be iterating all of them many a time?
   if (networks.length < 3) {
     console.log('TRILAT ERR: not enough networks to trilaterate');
-    if (oldPredictedLocation === { old: true, point: [] }) {
+    if (oldPredictedLocation === { point: [] }) {
       return {
         usedNetworks: [],
         predictions: [],
@@ -77,6 +75,7 @@ function startTrilateration(networks, level, oldPredictedLocation) {
       };
     }
 
+    oldPredictedLocation.old = true;
     return {
       usedNetworks: [],
       predictions: [],

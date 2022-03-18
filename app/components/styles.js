@@ -117,6 +117,7 @@ export const styles = StyleSheet.create({
   },
   mapButtonIcon: {
     color: '#eee',
+    fontSize: 30,
   },
   mapButtonIconSvg: {
     size: 30,
@@ -151,6 +152,11 @@ export const styles = StyleSheet.create({
   },
   search: {
     color: 'black',
+  },
+  searchBar: {
+    position: 'absolute',
+    top: 0,
+    width: '100%',
   },
   // input: {
   //   height: 40,

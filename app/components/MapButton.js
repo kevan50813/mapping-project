@@ -4,15 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import { styles } from './styles';
 
-export const MapButton = ({ icon, position, onPress }) => {
+export const MapButton = ({ icon, position, onPress, text }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.mapButton, position]}>
       <Text style={styles.mapButtonIcon}>
-        <FontAwesomeIcon
-          icon={icon}
-          size={styles.mapButtonIconSvg.size}
-          style={styles.mapButtonIcon}
-        />
+        {icon ? (
+          <FontAwesomeIcon
+            icon={icon}
+            size={styles.mapButtonIconSvg.size}
+            style={styles.mapButtonIcon}
+          />
+        ) : null}
+
+        {text ? text : null}
       </Text>
     </TouchableOpacity>
   );
