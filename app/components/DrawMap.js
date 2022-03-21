@@ -94,6 +94,8 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        stroke={'white'}
+        strokeWidth={3}
         r={10}
         fill={old ? styles.locationOld.fill : styles.location.fill}
       />
