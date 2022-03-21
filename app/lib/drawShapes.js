@@ -28,8 +28,8 @@ export function GetRotatedTriangle(x, y, rotation) {
 
 export function GetRotatedEquiTriangle(x, y, rotation) {
   // Initial triangle coordinates.
-  let xs = [-9, 9, 0];
-  let ys = [-9, -9, 9];
+  let xs = [-13, 13, 0];
+  let ys = [-13, -13, 13];
   let tmp = [0, 0, 0];
 
   // Convert to radians.

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useDeviceMotion } from '@use-expo/sensors';
 import { useNavigation } from '@react-navigation/native';
 import { BackHandler, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
@@ -10,7 +11,6 @@ import {
   faXmark,
   faAngleDown,
   faLocationCrosshairs,
-  faArrowsAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -31,18 +31,35 @@ export const Floorplan = ({
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
   const navigation = useNavigation();
+  const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
+  const moving = useRef(false);
+  const motion = useRef({ x: 0, y: 0, z: 0 });
 
   let locationSearch = React.createRef();
 
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
-  const dispatchScan = async () => {
-    await scan();
-  };
+  if (accAvailable && accData) {
+    motion.current = {
+      x: motion.current.x * 0.4 + accData.acceleration.x * 0.6,
+      y: motion.current.y * 0.4 + accData.acceleration.y * 0.6,
+      z: motion.current.z * 0.4 + accData.acceleration.z * 0.6,
+    };
+  }
+
+  if (
+    Math.abs(motion.current.x) > 0.7 ||
+    Math.abs(motion.current.y) > 0.7 ||
+    Math.abs(motion.current.z) > 0.7
+  ) {
+    moving.current = true;
+  } else {
+    moving.current = false;
+  }
 
   useEffect(() => {
-    const timer = setTimeout(() => dispatchScan(), 5000);
+    const timer = setTimeout(() => scan(), 5000);
     return () => clearTimeout(timer);
   });
 
@@ -75,6 +92,14 @@ export const Floorplan = ({
     setSearch(newSearch);
   };
 
+  const handleScanButton = () => {
+    // dispatch a scan
+    scan();
+
+    // toggle centering
+    // Then we can do some sort of centering
+  };
+
   return (
     <>
       <View style={styles.background}>
@@ -84,6 +109,7 @@ export const Floorplan = ({
           level={parseInt(floor_list[floorId], 10)}
           nearestNode={nearestNode}
           currentPath={currentPath}
+          moving={moving}
         />
 
         <MapButton
@@ -94,7 +120,7 @@ export const Floorplan = ({
 
         <MapButton
           text={
-            predictedLocation.level
+            predictedLocation.level !== undefined
               ? predictedLocation.level
               : floor_list[floorId]
           }
@@ -111,7 +137,7 @@ export const Floorplan = ({
         <MapButton
           icon={faLocationCrosshairs}
           position={{ position: 'absolute', bottom: 0, right: 0 }}
-          onPress={scan}
+          onPress={handleScanButton}
         />
 
         <View style={styles.levelView}>

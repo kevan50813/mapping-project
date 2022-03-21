@@ -87,11 +87,11 @@ export const styles = StyleSheet.create({
     stroke: '#18171A',
   },
   walls: {
-    stroke: '#0F1108',
+    stroke: '#6e6e6e',
   },
   location: {
     fill: '#92D5E6',
-    stroke: '#0B2A31',
+    stroke: '#31bede',
     innerStroke: '#70CADF',
   },
   locationOld: {
@@ -104,7 +104,7 @@ export const styles = StyleSheet.create({
     stroke: '#113507',
   },
   currentRoom: {
-    fill: '#E05263',
+    fill: '#5acff2',
   },
   mapButton: {
     backgroundColor: '#4c94eb',
