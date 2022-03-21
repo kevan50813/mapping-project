@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { Path, Polygon, Circle } from 'react-native-svg';
+import { Path, Polygon, Circle, Text } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
 import { onLevel } from '../lib/geoJson';
 import CompassHeading from 'react-native-compass-heading';
 import { GetRotatedEquiTriangle, GetRotatedTriangle } from '../lib/drawShapes';
+import { TSpan } from 'react-native-svg';
 
 function getVector(angle, length) {
   angle = (angle * Math.PI) / 180;
@@ -111,6 +112,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
 function DrawPolygonElement(
   feature,
   featurePath,
+  centroid,
   index,
   currentRoom,
   finalRoom,
@@ -132,18 +134,38 @@ function DrawPolygonElement(
     opacity = 0.5;
   }
 
+  let roomString = `${feature.properties.queryObject.tags['room-name']}\n${feature.properties.queryObject.tags['room-no']}`;
+  roomString = roomString.replace(/(.{10}[^ ]* )/g, '$1\n');
+  let roomParts = roomString.split('\n');
+
   return (
-    <Path
-      d={featurePath}
-      key={index}
-      fill={fill}
-      opacity={opacity}
-      stroke={
-        feature.properties.indoor === 'room'
-          ? styles.room.stroke
-          : styles.hallway.stroke
-      }
-    />
+    <>
+      <Path
+        d={featurePath}
+        key={index}
+        fill={fill}
+        opacity={opacity}
+        stroke={
+          feature.properties.indoor === 'room'
+            ? styles.room.stroke
+            : styles.hallway.stroke
+        }
+      />
+      <Text
+        fill="black"
+        x={centroid[0]}
+        y={centroid[1]}
+        fontSize={13}
+        textAnchor="middle">
+        {roomParts.map(part => {
+          return (
+            <TSpan x={centroid[0]} dy="15">
+              {part}
+            </TSpan>
+          );
+        })}
+      </Text>
+    </>
   );
 }
 
@@ -232,16 +254,18 @@ function DrawMapElement(
   down,
 ) {
   const featurePath = path(feature);
+  const centroid = path.centroid(feature);
   if (feature.geometry.type === 'Polygon') {
     return DrawPolygonElement(
       feature,
       featurePath,
+      centroid,
       index,
       currentRoom,
       finalRoom,
     );
-  } else if (feature.geometry.type === 'Point') {
-    return DrawPointElement(feature, projection, index, up, down);
+    // } else if (feature.geometry.type === 'Point') {
+    //   return DrawPointElement(feature, projection, index, up, down);
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
   }
