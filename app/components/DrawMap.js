@@ -7,6 +7,7 @@ import { onLevel } from '../lib/geoJson';
 import CompassHeading from 'react-native-compass-heading';
 import { GetRotatedEquiTriangle, GetRotatedTriangle } from '../lib/drawShapes';
 import { TSpan } from 'react-native-svg';
+import Toast from 'react-native-simple-toast';
 
 function getVector(angle, length) {
   angle = (angle * Math.PI) / 180;
@@ -116,6 +117,7 @@ function DrawPolygonElement(
   index,
   currentRoom,
   finalRoom,
+  zoom,
 ) {
   let fill =
     feature.properties.indoor === 'room'
@@ -155,7 +157,7 @@ function DrawPolygonElement(
         fill="black"
         x={centroid[0]}
         y={centroid[1]}
-        fontSize={13}
+        fontSize={10 * (1 - zoom.current) + 10}
         textAnchor="middle">
         {roomParts.map(part => {
           return (
@@ -252,6 +254,7 @@ function DrawMapElement(
   currentPath,
   up,
   down,
+  zoom,
 ) {
   const featurePath = path(feature);
   const centroid = path.centroid(feature);
@@ -263,6 +266,7 @@ function DrawMapElement(
       index,
       currentRoom,
       finalRoom,
+      zoom,
     );
     // } else if (feature.geometry.type === 'Point') {
     //   return DrawPointElement(feature, projection, index, up, down);
@@ -288,6 +292,7 @@ export const DrawMap = ({
   let finalRoom = null;
   const projection = d3.geoEquirectangular().fitSize([W, H], geoJson);
   const path = d3.geoPath().projection(projection);
+  let zoom = useRef(0.7);
 
   if (nearestNode) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
@@ -343,7 +348,10 @@ export const DrawMap = ({
         canvasWidth={1920}
         minScale={0.1}
         maxScale={1}
-        initialZoom={0.7}>
+        onZoom={newZoom => {
+          zoom.current = newZoom;
+        }}
+        initialZoom={zoom.current}>
         {geoJson
           ? // There could be more flexibility with this but
             // Only call this if the filters match the element?
@@ -360,6 +368,7 @@ export const DrawMap = ({
                   currentPath,
                   up,
                   down,
+                  zoom,
                 ),
               )
           : null}
