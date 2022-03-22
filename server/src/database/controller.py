@@ -387,8 +387,10 @@ class Controller:
         Search for room by name
         """
         # First search the rooms keys for the search string
-        quer = Query(search_string).limit(0, 25).slop(2)
-        number_quer = Query(f"@room-no:{search_string}").limit(0, 25)
+        quer = Query(search_string).slop(2)
+        quer._num = 25
+        number_quer = Query(f"@room-no:{search_string}")
+        number_quer._num = 25
         res = self.room_search_client.search(quer)
         number_res = self.room_search_client.search(number_quer)
 
