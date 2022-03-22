@@ -87,11 +87,11 @@ export const styles = StyleSheet.create({
     stroke: '#18171A',
   },
   walls: {
-    stroke: '#0F1108',
+    stroke: '#6e6e6e',
   },
   location: {
     fill: '#92D5E6',
-    stroke: '#0B2A31',
+    stroke: '#31bede',
     innerStroke: '#70CADF',
   },
   locationOld: {
@@ -99,12 +99,16 @@ export const styles = StyleSheet.create({
     stroke: '#000000',
     innerStroke: '#234149',
   },
+  ap: {
+    fill: '#068b00',
+    stroke: '#201600',
+  },
   room: {
     fill: '#C4F6B7',
     stroke: '#113507',
   },
   currentRoom: {
-    fill: '#E05263',
+    fill: '#5acff2',
   },
   mapButton: {
     backgroundColor: '#4c94eb',
@@ -117,6 +121,7 @@ export const styles = StyleSheet.create({
   },
   mapButtonIcon: {
     color: '#eee',
+    fontSize: 30,
   },
   mapButtonIconSvg: {
     size: 30,
@@ -151,6 +156,11 @@ export const styles = StyleSheet.create({
   },
   search: {
     color: 'black',
+  },
+  searchBar: {
+    position: 'absolute',
+    top: 0,
+    width: '100%',
   },
   // input: {
   //   height: 40,

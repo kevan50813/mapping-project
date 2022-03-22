@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLazyQuery } from '@apollo/client';
@@ -22,10 +22,9 @@ const RoomList = ({
       {loading ? (
         <CenteredActivityIndicator text="Loading search results" />
       ) : null}
-
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
 
-      <Text style={styles.info}>Results: {polygons.length}</Text>
+      {/* <Text style={styles.info}>Results: {polygons.length}</Text> */}
 
       {polygons.map(p => {
         return (
@@ -47,6 +46,7 @@ const RoomList = ({
 };
 
 export const SearchModal = ({ setDestination, setModalVisible, search }) => {
+  const [startingPoint, setStartingPoint] = useState(false);
   let search_polygons = [];
 
   const [
@@ -69,7 +69,8 @@ export const SearchModal = ({ setDestination, setModalVisible, search }) => {
   }
 
   useEffect(() => {
-    getNodes({ variables: { search, graph: 'test_bragg' } });
+    const escaped = search.replace('.', '.\\');
+    getNodes({ variables: { search: escaped, graph: 'test_bragg' } });
   }, [getNodes, search]);
 
   return (
@@ -82,6 +83,8 @@ export const SearchModal = ({ setDestination, setModalVisible, search }) => {
         polygons={search_polygons}
         setDestination={setDestination}
         setModalVisible={setModalVisible}
+        setStartingPoint={setStartingPoint}
+        startingPoint={startingPoint}
       />
     </ScrollView>
   );
