@@ -45,6 +45,11 @@ export const Floorplan = ({
   const floor_set = new Set(polygons.map(f => f.level));
   const floor_list = [...floor_set].filter(f => f.indexOf(';') === -1).sort();
 
+  useEffect(() => {
+    const timer = setTimeout(() => scan(), 5000);
+    return () => clearTimeout(timer);
+  }, [scan]);
+
   if (accAvailable && accData) {
     motion.current = {
       x: motion.current.x * 0.4 + accData.acceleration.x * 0.6,
@@ -62,11 +67,6 @@ export const Floorplan = ({
   } else {
     moving.current = false;
   }
-
-  useEffect(() => {
-    const timer = setTimeout(() => scan(), 5000);
-    return () => clearTimeout(timer);
-  });
 
   const backAction = () => {
     if (modalVisable) {
@@ -147,7 +147,7 @@ export const Floorplan = ({
 
         <MapButton
           text={
-            predictedLocation.level !== undefined
+            'level' in predictedLocation
               ? predictedLocation.level
               : floor_list[floorId]
           }

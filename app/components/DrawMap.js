@@ -180,7 +180,15 @@ function DrawPolygonElement(
   );
 }
 
-function DrawPointElement(feature, projection, index, up, down, showWifi) {
+function DrawPointElement(
+  feature,
+  projection,
+  index,
+  up,
+  down,
+  showPoIs,
+  showWifi,
+) {
   if (feature.properties.amenity === 'wap' && !showWifi) {
     return null;
   }
@@ -212,20 +220,24 @@ function DrawPointElement(feature, projection, index, up, down, showWifi) {
     );
   }
 
-  return feature.properties.indoor === 'way' ||
-    feature.properties.indoor === 'door' ? null : (
-    <Circle
-      cx={x}
-      cy={y}
-      r="7"
-      key={index}
-      fill={
-        feature.properties.amenity === 'wap' ? styles.ap.fill : styles.poi.fill
-      }
-      stroke={styles.poi.stroke}
-      strokeWidth="3"
-    />
-  );
+  if (showPoIs) {
+    return feature.properties.indoor === 'way' ||
+      feature.properties.indoor === 'door' ? null : (
+      <Circle
+        cx={x}
+        cy={y}
+        r="7"
+        key={index}
+        fill={
+          feature.properties.amenity === 'wap'
+            ? styles.ap.fill
+            : styles.poi.fill
+        }
+        stroke={styles.poi.stroke}
+        strokeWidth="3"
+      />
+    );
+  }
 }
 
 function DrawLineStringElement(feature, featurePath, index, currentPath) {
@@ -290,8 +302,16 @@ function DrawMapElement(
       showLabels,
       zoom,
     );
-  } else if (feature.geometry.type === 'Point' && showPoIs) {
-    return DrawPointElement(feature, projection, index, up, down, showWifi);
+  } else if (feature.geometry.type === 'Point') {
+    return DrawPointElement(
+      feature,
+      projection,
+      index,
+      up,
+      down,
+      showPoIs,
+      showWifi,
+    );
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
   }

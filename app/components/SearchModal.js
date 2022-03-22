@@ -12,8 +12,6 @@ const RoomList = ({
   polygons = [],
   setDestination,
   setModalVisible,
-  setStartingPoint,
-  startingPoint,
 }) => {
   if (error) {
     console.error(error);
@@ -27,12 +25,6 @@ const RoomList = ({
       {error ? <Text style={styles.error}>{error.message}</Text> : null}
 
       {/* <Text style={styles.info}>Results: {polygons.length}</Text> */}
-
-      <TouchableOpacity onPress={() => setStartingPoint(!startingPoint)}>
-        <Text style={styles.info}>
-          Touch to {startingPoint ? 'set starting point' : 'set destination'}.
-        </Text>
-      </TouchableOpacity>
 
       {polygons.map(p => {
         return (
