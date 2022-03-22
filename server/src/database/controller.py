@@ -7,7 +7,7 @@ from typing import List, Type, Tuple
 import dataclasses
 import redis
 from redisgraph import Node, Edge, Graph
-from redisearch import Client, IndexDefinition, TextField
+from redisearch import Client, IndexDefinition, TextField, Query
 from src.types.map_types import PathNode, PoI, Polygon
 
 
@@ -387,16 +387,26 @@ class Controller:
         Search for room by name
         """
         # First search the rooms keys for the search string
-        res = self.room_search_client.search(search_string)
-        rooms = []
+        quer = Query(search_string).limit(0, 25).slop(2)
+        number_quer = Query(f"@room-no:{search_string}").limit(0,25)
+        res = self.room_search_client.search(quer)
+        number_res = self.room_search_client.search(number_quer)
 
-        for doc in res.docs:
+        docs = res.docs + number_res.docs
+
+        added = []
+        rooms = []
+        for doc in docs:
             # transform back to the standard form
             room = doc.__dict__
             room.pop("payload")
             # remove prefix from redis db
             room["id"] = room["id"].rsplit(":", 1)[1]
+            if room["id"] in added:
+                continue
+
             room_object = self.__flat_dict_to_dataclass(room, Polygon)
+            added.append(room["id"])
             rooms.append(room_object)
 
         return [r for r in rooms if r.graph == graph_name]
