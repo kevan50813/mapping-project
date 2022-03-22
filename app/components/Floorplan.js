@@ -11,6 +11,8 @@ import {
   faXmark,
   faAngleDown,
   faLocationCrosshairs,
+  faTags,
+  faLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -30,6 +32,8 @@ export const Floorplan = ({
   const [floorId, setFloorId] = useState(2);
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
+  const [showLabels, setShowLabels] = useState(false);
+  const [showPoIs, setShowPoIs] = useState(false);
   const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
@@ -110,6 +114,24 @@ export const Floorplan = ({
           nearestNode={nearestNode}
           currentPath={currentPath}
           moving={moving}
+          showLabels={showLabels}
+          showPoIs={showPoIs}
+        />
+
+        <MapButton
+          icon={faTags}
+          position={{ position: 'absolute', top: 70, left: 0 }}
+          onPress={() => {
+            setShowLabels(!showLabels);
+          }}
+        />
+
+        <MapButton
+          icon={faLocationDot}
+          position={{ position: 'absolute', top: 140, left: 0 }}
+          onPress={() => {
+            setShowPoIs(!showPoIs);
+          }}
         />
 
         <MapButton

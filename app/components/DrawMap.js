@@ -7,7 +7,6 @@ import { onLevel } from '../lib/geoJson';
 import CompassHeading from 'react-native-compass-heading';
 import { GetRotatedEquiTriangle, GetRotatedTriangle } from '../lib/drawShapes';
 import { TSpan } from 'react-native-svg';
-import Toast from 'react-native-simple-toast';
 
 function getVector(angle, length) {
   angle = (angle * Math.PI) / 180;
@@ -114,9 +113,11 @@ function DrawPolygonElement(
   feature,
   featurePath,
   centroid,
+  area,
   index,
   currentRoom,
   finalRoom,
+  showLabels,
   zoom,
 ) {
   let fill =
@@ -140,6 +141,10 @@ function DrawPolygonElement(
   roomString = roomString.replace(/(.{10}[^ ]* )/g, '$1\n');
   let roomParts = roomString.split('\n');
 
+  if (area < 1600) {
+    showLabels = false;
+  }
+
   return (
     <>
       <Path
@@ -153,25 +158,33 @@ function DrawPolygonElement(
             : styles.hallway.stroke
         }
       />
-      <Text
-        fill="black"
-        x={centroid[0]}
-        y={centroid[1]}
-        fontSize={10 * (1 - zoom.current) + 10}
-        textAnchor="middle">
-        {roomParts.map(part => {
-          return (
-            <TSpan x={centroid[0]} dy="15">
-              {part}
-            </TSpan>
-          );
-        })}
-      </Text>
+      {showLabels ? (
+        <Text
+          fill="black"
+          stroke="white"
+          strokeWidth={0.2}
+          x={centroid[0]}
+          y={centroid[1]}
+          fontSize={10 * (1 - zoom.current) + 10}
+          textAnchor="middle">
+          {roomParts.map(part => {
+            return (
+              <TSpan x={centroid[0]} dy="15">
+                {part}
+              </TSpan>
+            );
+          })}
+        </Text>
+      ) : null}
     </>
   );
 }
 
 function DrawPointElement(feature, projection, index, up, down) {
+  if (feature.properties.amenity === 'wap') {
+    return null;
+  }
+
   const point = projection(feature.geometry.coordinates[0]);
   const [x, y] = point;
 
@@ -252,24 +265,30 @@ function DrawMapElement(
   currentRoom,
   finalRoom,
   currentPath,
+  showLabels,
+  showPoIs,
   up,
   down,
   zoom,
 ) {
   const featurePath = path(feature);
   const centroid = path.centroid(feature);
+  const area = path.area(feature);
+
   if (feature.geometry.type === 'Polygon') {
     return DrawPolygonElement(
       feature,
       featurePath,
       centroid,
+      area,
       index,
       currentRoom,
       finalRoom,
+      showLabels,
       zoom,
     );
-    // } else if (feature.geometry.type === 'Point') {
-    //   return DrawPointElement(feature, projection, index, up, down);
+  } else if (feature.geometry.type === 'Point' && showPoIs) {
+    return DrawPointElement(feature, projection, index, up, down);
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
   }
@@ -281,6 +300,8 @@ export const DrawMap = ({
   level = 0,
   nearestNode,
   currentPath,
+  showLabels,
+  showPoIs,
   moving,
 }) => {
   const W = 1000;
@@ -366,6 +387,8 @@ export const DrawMap = ({
                   currentRoom,
                   finalRoom,
                   currentPath,
+                  showLabels,
+                  showPoIs,
                   up,
                   down,
                   zoom,
