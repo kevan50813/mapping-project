@@ -99,6 +99,10 @@ export const styles = StyleSheet.create({
     stroke: '#000000',
     innerStroke: '#234149',
   },
+  ap: {
+    fill: '#068b00',
+    stroke: '#201600',
+  },
   room: {
     fill: '#C4F6B7',
     stroke: '#113507',

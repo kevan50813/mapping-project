@@ -180,8 +180,8 @@ function DrawPolygonElement(
   );
 }
 
-function DrawPointElement(feature, projection, index, up, down) {
-  if (feature.properties.amenity === 'wap') {
+function DrawPointElement(feature, projection, index, up, down, showWifi) {
+  if (feature.properties.amenity === 'wap' && !showWifi) {
     return null;
   }
 
@@ -219,7 +219,9 @@ function DrawPointElement(feature, projection, index, up, down) {
       cy={y}
       r="7"
       key={index}
-      fill={styles.poi.fill}
+      fill={
+        feature.properties.amenity === 'wap' ? styles.ap.fill : styles.poi.fill
+      }
       stroke={styles.poi.stroke}
       strokeWidth="3"
     />
@@ -267,6 +269,7 @@ function DrawMapElement(
   currentPath,
   showLabels,
   showPoIs,
+  showWifi,
   up,
   down,
   zoom,
@@ -288,7 +291,7 @@ function DrawMapElement(
       zoom,
     );
   } else if (feature.geometry.type === 'Point' && showPoIs) {
-    return DrawPointElement(feature, projection, index, up, down);
+    return DrawPointElement(feature, projection, index, up, down, showWifi);
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
   }
@@ -302,6 +305,7 @@ export const DrawMap = ({
   currentPath,
   showLabels,
   showPoIs,
+  showWifi,
   moving,
 }) => {
   const W = 1000;
@@ -389,6 +393,7 @@ export const DrawMap = ({
                   currentPath,
                   showLabels,
                   showPoIs,
+                  showWifi,
                   up,
                   down,
                   zoom,

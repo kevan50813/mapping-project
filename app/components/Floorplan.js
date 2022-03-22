@@ -34,6 +34,7 @@ export const Floorplan = ({
   const [search, setSearch] = useState('');
   const [showLabels, setShowLabels] = useState(false);
   const [showPoIs, setShowPoIs] = useState(false);
+  const [showWifi, setShowWifi] = useState(false);
   const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
@@ -116,6 +117,7 @@ export const Floorplan = ({
           moving={moving}
           showLabels={showLabels}
           showPoIs={showPoIs}
+          showWifi={showWifi}
         />
 
         <MapButton
@@ -131,6 +133,9 @@ export const Floorplan = ({
           position={{ position: 'absolute', top: 140, left: 0 }}
           onPress={() => {
             setShowPoIs(!showPoIs);
+          }}
+          onLongPress={() => {
+            setShowWifi(!showWifi);
           }}
         />
 

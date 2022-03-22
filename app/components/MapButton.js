@@ -4,9 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import { styles } from './styles';
 
-export const MapButton = ({ icon, position, onPress, text }) => {
+export const MapButton = ({ icon, position, onPress, onLongPress, text }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.mapButton, position]}>
+    <TouchableOpacity
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={[styles.mapButton, position]}>
       <Text style={styles.mapButtonIcon}>
         {icon ? (
           <FontAwesomeIcon
