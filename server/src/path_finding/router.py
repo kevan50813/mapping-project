@@ -115,9 +115,9 @@ class Router:
             n_poly = self.lookup_polys[n_node.poly_id]
             m_poly = self.lookup_polys[m_node.poly_id]
 
-            if n_poly.tags["indoor"] == "room" and m_poly.tags["indoor"] == "room":
+            if n_poly.tags["indoor"] == "room" or m_poly.tags["indoor"] == "room":
                 # tune this
-                weight += 1000
+                weight += 10000
         except KeyError:
             pass
 
