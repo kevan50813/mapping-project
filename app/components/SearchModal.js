@@ -69,7 +69,8 @@ export const SearchModal = ({ setDestination, setModalVisible, search }) => {
   }
 
   useEffect(() => {
-    getNodes({ variables: { search, graph: 'test_bragg' } });
+    const escaped = search.replace('.', '.\\');
+    getNodes({ variables: { search: escaped, graph: 'test_bragg' } });
   }, [getNodes, search]);
 
   return (
