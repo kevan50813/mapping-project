@@ -389,26 +389,16 @@ class Controller:
         # First search the rooms keys for the search string
         quer = Query(search_string).slop(2)
         quer._num = 25
-        number_quer = Query(f"@room-no:{search_string}")
-        number_quer._num = 25
         res = self.room_search_client.search(quer)
-        number_res = self.room_search_client.search(number_quer)
 
-        docs = res.docs + number_res.docs
-
-        added = []
         rooms = []
-        for doc in docs:
+        for doc in res.docs:
             # transform back to the standard form
             room = doc.__dict__
             room.pop("payload")
             # remove prefix from redis db
             room["id"] = room["id"].rsplit(":", 1)[1]
-            if room["id"] in added:
-                continue
-
             room_object = self.__flat_dict_to_dataclass(room, Polygon)
-            added.append(room["id"])
             rooms.append(room_object)
 
         return [r for r in rooms if r.graph == graph_name]
