@@ -88,7 +88,10 @@ export const Floorplan = ({
   };
 
   const centerFloor = () => {
-    if (predictedLocation.level && predictedLocation.level !== -1) {
+    if (
+      predictedLocation.level !== undefined &&
+      predictedLocation.level !== -1
+    ) {
       setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
     }
   };
@@ -148,8 +151,8 @@ export const Floorplan = ({
         <MapButton
           text={
             'level' in predictedLocation
-              ? predictedLocation.level
-              : floor_list[floorId]
+              ? predictedLocation.level.toString()
+              : floor_list[floorId].toString()
           }
           position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={centerFloor}

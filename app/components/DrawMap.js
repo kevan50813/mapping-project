@@ -32,7 +32,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
 
   // add x component, add y component
   if (isMoving) {
-    const angledVector = getVector(compassHeading + 180, 0.3);
+    const angledVector = getVector(compassHeading + 180, 0.5);
     offset.current = {
       x: offset.current.x - angledVector.x,
       y: offset.current.y + angledVector.y,
@@ -163,6 +163,7 @@ function DrawPolygonElement(
           fill="black"
           stroke="white"
           strokeWidth={0.2}
+          // key={index + new Date().getTime()}
           x={centroid[0]}
           y={centroid[1]}
           fontSize={10 * (1 - zoom.current) + 10}
