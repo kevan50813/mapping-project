@@ -7,7 +7,7 @@ from typing import List, Type, Tuple
 import dataclasses
 import redis
 from redisgraph import Node, Edge, Graph
-from redisearch import Client, IndexDefinition, TextField
+from redisearch import Client, IndexDefinition, TextField, Query
 from src.types.map_types import PathNode, PoI, Polygon
 
 
@@ -387,9 +387,11 @@ class Controller:
         Search for room by name
         """
         # First search the rooms keys for the search string
-        res = self.room_search_client.search(search_string)
-        rooms = []
+        quer = Query(search_string).slop(2)
+        quer._num = 25
+        res = self.room_search_client.search(quer)
 
+        rooms = []
         for doc in res.docs:
             # transform back to the standard form
             room = doc.__dict__
