@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { PermissionsAndroid } from 'react-native';
+import { PermissionsAndroid, Vibration } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
 
 // OFFLINE FLAG
@@ -72,6 +72,7 @@ export const NetworkProvider = ({ children }) => {
           // Toast.show('Network scan successful.', Toast.LONG);
 
           setDuration(new Date().getTime() - start);
+          Vibration.vibrate(5);
 
           setNetworks(
             wifiNetworks

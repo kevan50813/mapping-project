@@ -15,8 +15,8 @@ export const Localisation = () => {
   let predictions = [];
   let predictedLevel = -1;
 
-  let [a, setA] = useState(-50);
-  let [n, setN] = useState(3);
+  let [a, setA] = useState(-12);
+  let [n, setN] = useState(5.8);
 
   const {
     networks: visibleNetworks,

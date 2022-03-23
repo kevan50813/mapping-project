@@ -87,7 +87,7 @@ export const styles = StyleSheet.create({
     stroke: '#18171A',
   },
   walls: {
-    stroke: '#6e6e6e',
+    stroke: '#777',
   },
   location: {
     fill: '#92D5E6',

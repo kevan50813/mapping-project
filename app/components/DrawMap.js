@@ -141,8 +141,9 @@ function DrawPolygonElement(
   roomString = roomString.replace(/(.{10}[^ ]* )/g, '$1\n');
   let roomParts = roomString.split('\n');
 
-  if (area < 1600) {
-    showLabels = false;
+  if (area < 1700) {
+    roomParts = [roomParts[roomParts.length - 1]];
+    // showLabels = false;
   }
 
   return (
@@ -161,11 +162,9 @@ function DrawPolygonElement(
       {showLabels ? (
         <Text
           fill="black"
-          stroke="white"
-          strokeWidth={0.2}
-          // key={index + new Date().getTime()}
+          fontWeight={800}
           x={centroid[0]}
-          y={centroid[1]}
+          y={centroid[1] - 15}
           fontSize={10 * (1 - zoom.current) + 10}
           textAnchor="middle">
           {roomParts.map(part => {

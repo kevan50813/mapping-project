@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDeviceMotion } from '@use-expo/sensors';
 import { useNavigation } from '@react-navigation/native';
-import { BackHandler, Text, View } from 'react-native';
+import { BackHandler, Text, View, Vibration } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
@@ -80,14 +80,17 @@ export const Floorplan = ({
   BackHandler.addEventListener('hardwareBackPress', backAction);
 
   const prevFloor = () => {
+    Vibration.vibrate(20);
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
   };
 
   const nextFloor = () => {
+    Vibration.vibrate(20);
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
   };
 
   const centerFloor = () => {
+    Vibration.vibrate(20);
     if (
       predictedLocation.level !== undefined &&
       predictedLocation.level !== -1
@@ -101,6 +104,7 @@ export const Floorplan = ({
   };
 
   const handleScanButton = () => {
+    Vibration.vibrate(20);
     // dispatch a scan
     scan();
 
@@ -127,6 +131,7 @@ export const Floorplan = ({
           icon={faTags}
           position={{ position: 'absolute', top: 70, left: 0 }}
           onPress={() => {
+            Vibration.vibrate(20);
             setShowLabels(!showLabels);
           }}
         />
@@ -135,9 +140,11 @@ export const Floorplan = ({
           icon={faLocationDot}
           position={{ position: 'absolute', top: 140, left: 0 }}
           onPress={() => {
+            Vibration.vibrate(20);
             setShowPoIs(!showPoIs);
           }}
           onLongPress={() => {
+            Vibration.vibrate(50);
             setShowWifi(!showWifi);
           }}
         />
@@ -152,7 +159,7 @@ export const Floorplan = ({
           text={
             'level' in predictedLocation
               ? predictedLocation.level.toString()
-              : floor_list[floorId].toString()
+              : floor_list[floorId]
           }
           position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={centerFloor}
