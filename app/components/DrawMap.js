@@ -339,7 +339,7 @@ export const DrawMap = ({
   const path = d3.geoPath().projection(projection);
   let zoom = useRef(0.7);
 
-  if (nearestNode) {
+  if (nearestNode && nearestNode.properties.queryObject.polygon.id) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
   }
 
