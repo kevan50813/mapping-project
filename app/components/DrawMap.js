@@ -188,6 +188,7 @@ function DrawPointElement(
   down,
   showPoIs,
   showWifi,
+  finalNodeId,
 ) {
   if (feature.properties.amenity === 'wap' && !showWifi) {
     return null;
@@ -216,6 +217,20 @@ function DrawPointElement(
         stroke="#900"
         strokeWidth="3"
         key={index}
+      />
+    );
+  }
+
+  if (feature.properties.queryObject.id === finalNodeId) {
+    return (
+      <Circle
+        cx={x}
+        cy={y}
+        r="7"
+        key={index}
+        fill="#f00"
+        stroke="#900"
+        strokeWidth="3"
       />
     );
   }
@@ -285,6 +300,7 @@ function DrawMapElement(
   up,
   down,
   zoom,
+  finalNodeId,
 ) {
   const featurePath = path(feature);
   const centroid = path.centroid(feature);
@@ -311,6 +327,7 @@ function DrawMapElement(
       down,
       showPoIs,
       showWifi,
+      finalNodeId,
     );
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
@@ -327,6 +344,7 @@ export const DrawMap = ({
   showPoIs,
   showWifi,
   moving,
+  destination,
 }) => {
   const W = 1000;
   const H = 1000;
@@ -339,20 +357,12 @@ export const DrawMap = ({
   const path = d3.geoPath().projection(projection);
   let zoom = useRef(0.7);
 
-  if (nearestNode && nearestNode.properties.queryObject.polygon.id) {
+  if (nearestNode && nearestNode.properties.queryObject.polygon) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
   }
 
-  if (currentPath && geoJson && currentPath.length > 1) {
-    finalNodeId = currentPath[currentPath.length - 1];
-
-    let nodeLookup = {};
-    const nodes = geoJson.features.filter(
-      feature =>
-        feature.geometry.type === 'Point' &&
-        feature.properties.indoor === 'way',
-    );
-    nodes.map(n => (nodeLookup[n.properties.queryObject.id] = n));
+  if (destination && geoJson) {
+    finalNodeId = destination;
 
     const finalNode = geoJson.features.filter(feature => {
       if (!feature.properties.queryObject) {
@@ -367,6 +377,16 @@ export const DrawMap = ({
     if (finalNode) {
       finalRoom = finalNode.properties.queryObject.polygon.id;
     }
+  }
+
+  if (currentPath && geoJson && currentPath.length > 1) {
+    let nodeLookup = {};
+    const nodes = geoJson.features.filter(
+      feature =>
+        feature.geometry.type === 'Point' &&
+        feature.properties.indoor === 'way',
+    );
+    nodes.map(n => (nodeLookup[n.properties.queryObject.id] = n));
 
     for (let i = 0; i < currentPath.length; i++) {
       if (i === 0) {
@@ -417,6 +437,7 @@ export const DrawMap = ({
                   up,
                   down,
                   zoom,
+                  finalNodeId,
                 ),
               )
           : null}

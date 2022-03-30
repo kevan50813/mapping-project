@@ -13,6 +13,7 @@ import {
   faLocationCrosshairs,
   faTags,
   faLocationDot,
+  faStreetView,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -24,6 +25,7 @@ export const Floorplan = ({
   polygons,
   geoJson,
   setDestination,
+  destination,
   currentPath,
   scan,
   predictedLocation,
@@ -35,6 +37,7 @@ export const Floorplan = ({
   const [showLabels, setShowLabels] = useState(false);
   const [showPoIs, setShowPoIs] = useState(false);
   const [showWifi, setShowWifi] = useState(false);
+  const [following, setFollowing] = useState(false);
   const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
@@ -82,21 +85,13 @@ export const Floorplan = ({
   const prevFloor = () => {
     Vibration.vibrate(20);
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
+    setFollowing(false);
   };
 
   const nextFloor = () => {
     Vibration.vibrate(20);
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
-  };
-
-  const centerFloor = () => {
-    Vibration.vibrate(20);
-    if (
-      predictedLocation.level !== undefined &&
-      predictedLocation.level !== -1
-    ) {
-      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
-    }
+    setFollowing(false);
   };
 
   const updateSearch = newSearch => {
@@ -109,8 +104,18 @@ export const Floorplan = ({
     scan();
 
     // toggle centering
-    // Then we can do some sort of centering
+    setFollowing(!following);
   };
+
+  useEffect(() => {
+    if (
+      predictedLocation.level !== undefined &&
+      predictedLocation.level !== -1 &&
+      following
+    ) {
+      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
+    }
+  }, [floor_list, following, predictedLocation.level]);
 
   return (
     <>
@@ -125,6 +130,7 @@ export const Floorplan = ({
           showLabels={showLabels}
           showPoIs={showPoIs}
           showWifi={showWifi}
+          destination={destination}
         />
 
         <MapButton
@@ -156,23 +162,13 @@ export const Floorplan = ({
         />
 
         <MapButton
-          text={
-            'level' in predictedLocation
-              ? predictedLocation.level.toString()
-              : floor_list[floorId]
-          }
-          position={{ position: 'absolute', top: 140, right: 0 }}
-          onPress={centerFloor}
-        />
-
-        <MapButton
           icon={faAngleDown}
-          position={{ position: 'absolute', top: 210, right: 0 }}
+          position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={prevFloor}
         />
 
         <MapButton
-          icon={faLocationCrosshairs}
+          icon={following ? faStreetView : faLocationCrosshairs}
           position={{ position: 'absolute', bottom: 0, right: 0 }}
           onPress={handleScanButton}
         />

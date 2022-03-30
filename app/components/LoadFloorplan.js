@@ -136,6 +136,7 @@ export const LoadFloorplan = () => {
       geoJson={geoJson}
       knownNetworks={knownNetworks}
       setDestination={setDestination}
+      destination={destination}
       currentPath={currentPath}
       scan={scan}
       nearestId={nearestId}
