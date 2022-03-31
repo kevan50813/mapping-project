@@ -162,6 +162,9 @@ export const styles = StyleSheet.create({
     top: 0,
     width: '100%',
   },
+  modalHeight: {
+    height: 700,
+  },
   // input: {
   //   height: 40,
   //   margin: 12,

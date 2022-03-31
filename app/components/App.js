@@ -1,7 +1,4 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
  * @format
  * @flow strict-local
  */
@@ -56,7 +53,7 @@ const App = () => {
             backgroundColor={'#ffffff00'}
             translucent={true}
           />
-          <Stack.Navigator initialRouteName="Home">
+          <Stack.Navigator initialRouteName="Floorplan">
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Scanner" component={Scanner} />
             <Stack.Screen name="Localisation" component={Localisation} />

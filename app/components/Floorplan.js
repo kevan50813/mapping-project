@@ -31,13 +31,13 @@ export const Floorplan = ({
   predictedLocation,
   nearestNode,
 }) => {
-  const [floorId, setFloorId] = useState(2);
+  const [floorId, setFloorId] = useState(0);
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [showLabels, setShowLabels] = useState(false);
   const [showPoIs, setShowPoIs] = useState(false);
   const [showWifi, setShowWifi] = useState(false);
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useState(true);
   const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
@@ -53,7 +53,7 @@ export const Floorplan = ({
     return () => clearTimeout(timer);
   }, [scan]);
 
-  if (accAvailable && accData) {
+  if (accAvailable && accData && accData.acceleration) {
     motion.current = {
       x: motion.current.x * 0.4 + accData.acceleration.x * 0.6,
       y: motion.current.y * 0.4 + accData.acceleration.y * 0.6,

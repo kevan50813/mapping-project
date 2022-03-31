@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import { Path, Polygon, Circle, Text } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
@@ -18,6 +20,7 @@ function getVector(angle, length) {
 
 export const Marker = ({ x, y, rotation, fill }) => (
   <Polygon
+    key={uuidv4()}
     points={GetRotatedTriangle(x, y, rotation)}
     fill={fill ? fill : styles.location.fill}
     stroke={styles.location.innerStroke}
@@ -81,6 +84,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         r={radius}
         stroke={old ? styles.locationOld.stroke : styles.location.stroke}
         strokeWidth={3}
@@ -88,6 +92,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         r={radius}
         fill={old ? styles.locationOld.fill : styles.location.fill}
         opacity={0.5}
@@ -95,6 +100,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         stroke={'white'}
         strokeWidth={3}
         r={10}
@@ -162,6 +168,7 @@ function DrawPolygonElement(
       {showLabels ? (
         <Text
           fill="black"
+          key={uuidv4()}
           fontWeight={800}
           x={centroid[0]}
           y={centroid[1] - 15}
@@ -169,7 +176,7 @@ function DrawPolygonElement(
           textAnchor="middle">
           {roomParts.map(part => {
             return (
-              <TSpan x={centroid[0]} dy="15">
+              <TSpan x={centroid[0]} dy="15" key={uuidv4()}>
                 {part}
               </TSpan>
             );
