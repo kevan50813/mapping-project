@@ -1,87 +1,49 @@
-import React, { useState } from 'react';
-import { ScrollView, Text, View, PermissionsAndroid } from 'react-native';
-import WifiManager from 'react-native-wifi-reborn';
+import React, { useContext, useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { Slider } from '@miblanchard/react-native-slider';
 import { Button } from './Button';
 import { styles } from './styles';
+import { NetworkContext } from './NetworkProvider';
 
 export const Scanner = () => {
-  const [networks, setNetworks] = useState([]);
-  const [scanning, setScanning] = useState(false);
-  const [error, setError] = useState('');
+  const { networks, startScan, state, info } = useContext(NetworkContext);
 
-  const [time, setTime] = useState({ start: new Date(), end: new Date() });
+  let [a, setA] = useState(-50);
+  let [n, setN] = useState(3);
 
-  const rssiToDistance = rssi => {
-    const A = -50; // Signal strength at 1 meter
-    const N = 2; // Path exponent
-
-    // rssi = -10 * N * log(D) + A
-    // D = 10^((rssi - A) / (-10 * N))
-    return Math.pow(10, (rssi - A) / (-10 * N));
-  };
-
-  const startScan = async () => {
-    console.log('Starting scan at', new Date());
-    setTime({ start: new Date(), end: new Date() });
-    setScanning(true);
-    setError('');
-
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location permission is required for WiFi connections',
-        message:
-          'This app needs location permission as this is required to scan for wifi networks.',
-        buttonNegative: 'DENY',
-        buttonPositive: 'ALLOW',
-      },
-    );
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      try {
-        const wifiNetworks = await WifiManager.reScanAndLoadWifiList();
-        console.log('Scan complete!');
-        setTime(s => ({ ...s, end: new Date() }));
-
-        const list = wifiNetworks
-          .map(({ SSID, BSSID, level }) => ({
-            SSID,
-            BSSID,
-            level,
-          }))
-          // Highest to lowest
-          .sort((n1, n2) => n2.level - n1.level);
-
-        setNetworks(list);
-      } catch (e) {
-        console.error(e);
-        setNetworks([
-          { SSID: 'Problem while scanning', BSSID: 'n/a', level: 0 },
-        ]);
-      }
-    } else {
-      setNetworks([{ SSID: 'Permission denied', BSSID: 'n/a', level: 0 }]);
-    }
-
-    setScanning(false);
-  };
+  const rssiToDistance = rssi => Math.pow(10, (rssi - a) / (-10 * n));
 
   return (
     <View style={styles.background}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Button style={styles.button} title="Scan" onPress={startScan} />
-        {scanning ? <Text style={styles.info}>Scanning...</Text> : null}
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Text style={styles.info}>
-          Took {(time.end.getTime() - time.start.getTime()) / 1000}s
-        </Text>
-        {networks.map(({ SSID, BSSID, level }) => (
+      <View style={styles.spacedBox}>
+        <Text style={styles.small}>N = {n.toFixed(2)}</Text>
+        <Slider
+          minimumValue={1}
+          maximumValue={3}
+          value={n}
+          onValueChange={v => setN(v[0])}
+        />
+        <Text style={styles.small}>A = {a.toFixed(2)}</Text>
+        <Slider
+          minimumValue={-100}
+          maximumValue={0}
+          value={a}
+          onValueChange={v => setA(v[0])}
+        />
+      </View>
+      <Button style={styles.button} title="Scan" onPress={startScan} />
+      {state.scanning ? <Text style={styles.info}>Scanning...</Text> : null}
+      {state.error ? <Text style={styles.error}>{state.error}</Text> : null}
+      <Text style={styles.info}>Took {info.duration / 1000}s</Text>
+
+      <ScrollView>
+        {networks.map(({ SSID, BSSID, RSSI }) => (
           <View key={BSSID} style={styles.box}>
             <Text style={styles.big}>
               {SSID} ({BSSID})
             </Text>
             <Text style={styles.small}>
-              {level} = {rssiToDistance(level).toFixed(2)}m
+              {RSSI}dBm = {rssiToDistance(RSSI)}m
             </Text>
           </View>
         ))}

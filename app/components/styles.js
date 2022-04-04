@@ -27,11 +27,12 @@ export const styles = StyleSheet.create({
   },
   button: {
     padding: 12,
-    backgroundColor: 'black',
+    backgroundColor: '#4c94eb',
+    margin: 10,
   },
   buttonText: {
     fontSize: 18,
-    color: 'white',
+    color: '#eee',
     fontWeight: '700',
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -40,6 +41,11 @@ export const styles = StyleSheet.create({
     padding: 8,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: '#eee',
+  },
+  spacedBox: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
   big: {
     fontSize: 18,
@@ -69,4 +75,100 @@ export const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  plotly: {
+    height: '70%',
+  },
+  poi: {
+    fill: '#CA8702',
+    stroke: '#201600',
+  },
+  hallway: {
+    fill: '#BFBEC5',
+    stroke: '#18171A',
+  },
+  walls: {
+    stroke: '#777',
+  },
+  location: {
+    fill: '#92D5E6',
+    stroke: '#31bede',
+    innerStroke: '#70CADF',
+  },
+  locationOld: {
+    fill: '#334950',
+    stroke: '#000000',
+    innerStroke: '#234149',
+  },
+  ap: {
+    fill: '#068b00',
+    stroke: '#201600',
+  },
+  room: {
+    fill: '#C4F6B7',
+    stroke: '#113507',
+  },
+  currentRoom: {
+    fill: '#5acff2',
+  },
+  mapButton: {
+    backgroundColor: '#4c94eb',
+    borderRadius: 15,
+    height: 60,
+    width: 60,
+    margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapButtonIcon: {
+    color: '#eee',
+    fontSize: 30,
+  },
+  mapButtonIconSvg: {
+    size: 30,
+  },
+  levelView: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    left: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  levelViewText: {
+    backgroundColor: '#4c94eb',
+    color: '#eee',
+    borderRadius: 15,
+    padding: 10,
+  },
+  centerAbsolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicatorText: {
+    color: 'grey',
+    fontSize: 12,
+  },
+  search: {
+    color: 'black',
+  },
+  searchBar: {
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+  },
+  modalHeight: {
+    height: 700,
+  },
+  // input: {
+  //   height: 40,
+  //   margin: 12,
+  //   borderWidth: 1,
+  //   padding: 10,
+  // },
 });
