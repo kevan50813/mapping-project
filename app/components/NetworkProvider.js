@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react';
-import { PermissionsAndroid } from 'react-native';
+import { PermissionsAndroid, Vibration } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
+import RNReactLogging from 'react-native-file-log';
 
 // OFFLINE FLAG
 export const Offline = false;
@@ -48,7 +49,8 @@ export const NetworkProvider = ({ children }) => {
       setDuration(networkData.info.duration);
     } else {
       console.log('Starting scan at', new Date());
-      // Toast.show('Scanning Wifi APs...', Toast.LONG);
+      RNReactLogging.setTag('NETWORKPROVIDER');
+      RNReactLogging.printLog(`Starting scan at ${Date.now()}`);
 
       setScanning(true);
       setError('');
@@ -69,9 +71,9 @@ export const NetworkProvider = ({ children }) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         try {
           const wifiNetworks = await WifiManager.reScanAndLoadWifiList();
-          // Toast.show('Network scan successful.', Toast.LONG);
 
           setDuration(new Date().getTime() - start);
+          Vibration.vibrate(5);
 
           setNetworks(
             wifiNetworks
@@ -83,8 +85,11 @@ export const NetworkProvider = ({ children }) => {
               // Highest to lowest
               .sort((n1, n2) => n2.RSSI - n1.RSSI),
           );
-          console.log('Finished scan in', duration);
+          // console.log('Finished scan in', duration);
+          RNReactLogging.setTag('NETWORKPROVIDER');
+          RNReactLogging.printLog(`Finished scan in ${duration}`);
         } catch (e) {
+          RNReactLogging.printLog(e);
           console.error(e);
           setError('Problem while scanning');
         }

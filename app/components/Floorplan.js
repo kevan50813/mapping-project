@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDeviceMotion } from '@use-expo/sensors';
 import { useNavigation } from '@react-navigation/native';
-import { BackHandler, Text, View } from 'react-native';
+import { FileSystem } from 'react-native-file-access';
+import {
+  TouchableOpacity,
+  BackHandler,
+  Text,
+  View,
+  Vibration,
+} from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import RNReactLogging from 'react-native-file-log';
 
 import {
   faAngleUp,
@@ -13,6 +21,7 @@ import {
   faLocationCrosshairs,
   faTags,
   faLocationDot,
+  faStreetView,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -24,21 +33,24 @@ export const Floorplan = ({
   polygons,
   geoJson,
   setDestination,
+  destination,
   currentPath,
   scan,
   predictedLocation,
   nearestNode,
 }) => {
-  const [floorId, setFloorId] = useState(2);
+  const [floorId, setFloorId] = useState(0);
   const [modalVisable, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [showLabels, setShowLabels] = useState(false);
   const [showPoIs, setShowPoIs] = useState(false);
   const [showWifi, setShowWifi] = useState(false);
+  const [following, setFollowing] = useState(true);
   const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
   const motion = useRef({ x: 0, y: 0, z: 0 });
+  RNReactLogging.setTag('FLOORPLAN');
 
   let locationSearch = React.createRef();
 
@@ -50,7 +62,7 @@ export const Floorplan = ({
     return () => clearTimeout(timer);
   }, [scan]);
 
-  if (accAvailable && accData) {
+  if (accAvailable && accData && accData.acceleration) {
     motion.current = {
       x: motion.current.x * 0.4 + accData.acceleration.x * 0.6,
       y: motion.current.y * 0.4 + accData.acceleration.y * 0.6,
@@ -80,30 +92,56 @@ export const Floorplan = ({
   BackHandler.addEventListener('hardwareBackPress', backAction);
 
   const prevFloor = () => {
+    Vibration.vibrate(20);
+    RNReactLogging.printLog('User down floor');
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
+    setFollowing(false);
   };
 
   const nextFloor = () => {
+    Vibration.vibrate(20);
+    RNReactLogging.printLog('User up floor');
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
-  };
-
-  const centerFloor = () => {
-    if (predictedLocation.level && predictedLocation.level !== -1) {
-      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
-    }
+    setFollowing(false);
   };
 
   const updateSearch = newSearch => {
+    RNReactLogging.printLog('Updated search');
     setSearch(newSearch);
   };
 
   const handleScanButton = () => {
+    RNReactLogging.printLog(`Scan pressed, following: ${following}`);
+    Vibration.vibrate(20);
     // dispatch a scan
     scan();
 
     // toggle centering
-    // Then we can do some sort of centering
+    setFollowing(!following);
   };
+
+  const saveLog = async () => {
+    RNReactLogging.setTag('LOG SAVE');
+    RNReactLogging.printLog(`Saving Log at ${Date.now()}`);
+    RNReactLogging.listAllLogFiles().then(paths => {
+      var decodedURL = decodeURIComponent(paths[0]);
+      const fileName = 'LOG_' + Date.now() + '.txt';
+      FileSystem.cpExternal(decodedURL, fileName, 'downloads').then(
+        console.log('Saved Log'),
+      );
+      FileSystem.unlink(decodedURL).then(console.log('Deleted old log'));
+    });
+  };
+
+  useEffect(() => {
+    if (
+      predictedLocation.level !== undefined &&
+      predictedLocation.level !== -1 &&
+      following
+    ) {
+      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
+    }
+  }, [floor_list, following, predictedLocation.level]);
 
   return (
     <>
@@ -118,12 +156,14 @@ export const Floorplan = ({
           showLabels={showLabels}
           showPoIs={showPoIs}
           showWifi={showWifi}
+          destination={destination}
         />
 
         <MapButton
           icon={faTags}
           position={{ position: 'absolute', top: 70, left: 0 }}
           onPress={() => {
+            Vibration.vibrate(20);
             setShowLabels(!showLabels);
           }}
         />
@@ -132,9 +172,11 @@ export const Floorplan = ({
           icon={faLocationDot}
           position={{ position: 'absolute', top: 140, left: 0 }}
           onPress={() => {
+            Vibration.vibrate(20);
             setShowPoIs(!showPoIs);
           }}
           onLongPress={() => {
+            Vibration.vibrate(50);
             setShowWifi(!showWifi);
           }}
         />
@@ -146,33 +188,26 @@ export const Floorplan = ({
         />
 
         <MapButton
-          text={
-            'level' in predictedLocation
-              ? predictedLocation.level
-              : floor_list[floorId]
-          }
-          position={{ position: 'absolute', top: 140, right: 0 }}
-          onPress={centerFloor}
-        />
-
-        <MapButton
           icon={faAngleDown}
-          position={{ position: 'absolute', top: 210, right: 0 }}
+          position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={prevFloor}
         />
 
         <MapButton
-          icon={faLocationCrosshairs}
+          icon={following ? faStreetView : faLocationCrosshairs}
           position={{ position: 'absolute', bottom: 0, right: 0 }}
           onPress={handleScanButton}
         />
 
         <View style={styles.levelView}>
-          <Text style={[styles.big, styles.levelViewText]}>
-            Level: {floor_list[floorId]}
-          </Text>
+          <TouchableOpacity onLongPress={saveLog}>
+            <Text style={[styles.big, styles.levelViewText]}>
+              Level: {floor_list[floorId]}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
+
       <View style={styles.searchBar}>
         <SearchBar
           ref={s => (locationSearch = s)}
