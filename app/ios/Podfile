@@ -6,6 +6,8 @@ platform :ios, '12.0'
 
 target 'app' do
   use_expo_modules!
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   post_integrate do |installer|
     begin
       expo_patch_react_imports!(installer)

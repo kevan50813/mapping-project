@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDeviceMotion } from '@use-expo/sensors';
 import { useNavigation } from '@react-navigation/native';
-import { BackHandler, Text, View, Vibration } from 'react-native';
+import {
+  TouchableOpacity,
+  BackHandler,
+  Text,
+  View,
+  Vibration,
+} from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import RNReactLogging from 'react-native-file-log';
+const RNFS = require('react-native-fs');
 
 import {
   faAngleUp,
@@ -107,6 +115,24 @@ export const Floorplan = ({
     setFollowing(!following);
   };
 
+  const saveLog = () => {
+    console.log('test');
+    RNReactLogging.listAllLogFiles()
+      .then(paths => {
+        var decodedURL = decodeURIComponent(paths[0]);
+        console.log(decodedURL);
+
+        RNFS.exists(decodedURL).then(success => {
+          console.log('File Exists!'); // <--- here RNFS can read the file and returns this
+        });
+
+        RNFS.copyFile(decodedURL, '/storage/emulated/0/Download/').then(
+          console.log('Saved').catch(console.error('Error')),
+        );
+      })
+      .catch(console.error('Log saving error'));
+  };
+
   useEffect(() => {
     if (
       predictedLocation.level !== undefined &&
@@ -174,11 +200,14 @@ export const Floorplan = ({
         />
 
         <View style={styles.levelView}>
-          <Text style={[styles.big, styles.levelViewText]}>
-            Level: {floor_list[floorId]}
-          </Text>
+          <TouchableOpacity onLongPress={saveLog}>
+            <Text style={[styles.big, styles.levelViewText]}>
+              Level: {floor_list[floorId]}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
+
       <View style={styles.searchBar}>
         <SearchBar
           ref={s => (locationSearch = s)}
