@@ -19,6 +19,7 @@ import { NetworkProvider } from './NetworkProvider';
 
 RNReactLogging.setTag('MAPAPP');
 RNReactLogging.setFileLogEnabled(true);
+RNReactLogging.setConsoleLogEnabled(true);
 RNReactLogging.printLog('=== NEW LOG ===');
 
 // Replace with local IP for development

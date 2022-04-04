@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDeviceMotion } from '@use-expo/sensors';
 import { useNavigation } from '@react-navigation/native';
+import { FileSystem } from 'react-native-file-access';
 import {
   TouchableOpacity,
   BackHandler,
@@ -11,7 +12,6 @@ import {
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import RNReactLogging from 'react-native-file-log';
-const RNFS = require('react-native-fs');
 
 import {
   faAngleUp,
@@ -50,6 +50,7 @@ export const Floorplan = ({
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
   const motion = useRef({ x: 0, y: 0, z: 0 });
+  RNReactLogging.setTag('FLOORPLAN');
 
   let locationSearch = React.createRef();
 
@@ -92,21 +93,25 @@ export const Floorplan = ({
 
   const prevFloor = () => {
     Vibration.vibrate(20);
+    RNReactLogging.printLog('User down floor');
     setFloorId(floorId - 1 < 0 ? 0 : floorId - 1);
     setFollowing(false);
   };
 
   const nextFloor = () => {
     Vibration.vibrate(20);
+    RNReactLogging.printLog('User up floor');
     setFloorId(floorId + 1 < floor_list.length ? floorId + 1 : floorId);
     setFollowing(false);
   };
 
   const updateSearch = newSearch => {
+    RNReactLogging.printLog('Updated search');
     setSearch(newSearch);
   };
 
   const handleScanButton = () => {
+    RNReactLogging.printLog(`Scan pressed, following: ${following}`);
     Vibration.vibrate(20);
     // dispatch a scan
     scan();
@@ -115,22 +120,17 @@ export const Floorplan = ({
     setFollowing(!following);
   };
 
-  const saveLog = () => {
-    console.log('test');
-    RNReactLogging.listAllLogFiles()
-      .then(paths => {
-        var decodedURL = decodeURIComponent(paths[0]);
-        console.log(decodedURL);
-
-        RNFS.exists(decodedURL).then(success => {
-          console.log('File Exists!'); // <--- here RNFS can read the file and returns this
-        });
-
-        RNFS.copyFile(decodedURL, '/storage/emulated/0/Download/').then(
-          console.log('Saved').catch(console.error('Error')),
-        );
-      })
-      .catch(console.error('Log saving error'));
+  const saveLog = async () => {
+    RNReactLogging.setTag('LOG SAVE');
+    RNReactLogging.printLog(`Saving Log at ${Date.now()}`);
+    RNReactLogging.listAllLogFiles().then(paths => {
+      var decodedURL = decodeURIComponent(paths[0]);
+      const fileName = 'LOG_' + Date.now() + '.txt';
+      FileSystem.cpExternal(decodedURL, fileName, 'downloads').then(
+        console.log('Saved Log'),
+      );
+      FileSystem.unlink(decodedURL).then(console.log('Deleted old log'));
+    });
   };
 
   useEffect(() => {
