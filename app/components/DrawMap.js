@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import { Path, Polygon, Circle, Text } from 'react-native-svg';
 import SvgPanZoom from 'react-native-svg-pan-zoom';
 import { styles } from './styles';
@@ -18,6 +20,7 @@ function getVector(angle, length) {
 
 export const Marker = ({ x, y, rotation, fill }) => (
   <Polygon
+    key={uuidv4()}
     points={GetRotatedTriangle(x, y, rotation)}
     fill={fill ? fill : styles.location.fill}
     stroke={styles.location.innerStroke}
@@ -32,7 +35,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
 
   // add x component, add y component
   if (isMoving) {
-    const angledVector = getVector(compassHeading + 180, 0.3);
+    const angledVector = getVector(compassHeading + 180, 0.5);
     offset.current = {
       x: offset.current.x - angledVector.x,
       y: offset.current.y + angledVector.y,
@@ -81,6 +84,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         r={radius}
         stroke={old ? styles.locationOld.stroke : styles.location.stroke}
         strokeWidth={3}
@@ -88,6 +92,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         r={radius}
         fill={old ? styles.locationOld.fill : styles.location.fill}
         opacity={0.5}
@@ -95,6 +100,7 @@ const DrawMapLocation = ({ location, projection, level, isMoving }) => {
       <Circle
         cx={x}
         cy={y}
+        key={uuidv4()}
         stroke={'white'}
         strokeWidth={3}
         r={10}
@@ -141,8 +147,9 @@ function DrawPolygonElement(
   roomString = roomString.replace(/(.{10}[^ ]* )/g, '$1\n');
   let roomParts = roomString.split('\n');
 
-  if (area < 1600) {
-    showLabels = false;
+  if (area < 1700) {
+    roomParts = [roomParts[roomParts.length - 1]];
+    // showLabels = false;
   }
 
   return (
@@ -161,15 +168,15 @@ function DrawPolygonElement(
       {showLabels ? (
         <Text
           fill="black"
-          stroke="white"
-          strokeWidth={0.2}
+          key={uuidv4()}
+          fontWeight={800}
           x={centroid[0]}
-          y={centroid[1]}
+          y={centroid[1] - 15}
           fontSize={10 * (1 - zoom.current) + 10}
           textAnchor="middle">
           {roomParts.map(part => {
             return (
-              <TSpan x={centroid[0]} dy="15">
+              <TSpan x={centroid[0]} dy="15" key={uuidv4()}>
                 {part}
               </TSpan>
             );
@@ -188,6 +195,7 @@ function DrawPointElement(
   down,
   showPoIs,
   showWifi,
+  finalNodeId,
 ) {
   if (feature.properties.amenity === 'wap' && !showWifi) {
     return null;
@@ -216,6 +224,20 @@ function DrawPointElement(
         stroke="#900"
         strokeWidth="3"
         key={index}
+      />
+    );
+  }
+
+  if (feature.properties.queryObject.id === finalNodeId) {
+    return (
+      <Circle
+        cx={x}
+        cy={y}
+        r="7"
+        key={index}
+        fill="#f00"
+        stroke="#900"
+        strokeWidth="3"
       />
     );
   }
@@ -285,6 +307,7 @@ function DrawMapElement(
   up,
   down,
   zoom,
+  finalNodeId,
 ) {
   const featurePath = path(feature);
   const centroid = path.centroid(feature);
@@ -311,6 +334,7 @@ function DrawMapElement(
       down,
       showPoIs,
       showWifi,
+      finalNodeId,
     );
   } else if (feature.geometry.type === 'LineString') {
     return DrawLineStringElement(feature, featurePath, index, currentPath);
@@ -327,6 +351,7 @@ export const DrawMap = ({
   showPoIs,
   showWifi,
   moving,
+  destination,
 }) => {
   const W = 1000;
   const H = 1000;
@@ -339,20 +364,12 @@ export const DrawMap = ({
   const path = d3.geoPath().projection(projection);
   let zoom = useRef(0.7);
 
-  if (nearestNode) {
+  if (nearestNode && nearestNode.properties.queryObject.polygon) {
     currentRoom = nearestNode.properties.queryObject.polygon.id;
   }
 
-  if (currentPath && geoJson && currentPath.length > 1) {
-    finalNodeId = currentPath[currentPath.length - 1];
-
-    let nodeLookup = {};
-    const nodes = geoJson.features.filter(
-      feature =>
-        feature.geometry.type === 'Point' &&
-        feature.properties.indoor === 'way',
-    );
-    nodes.map(n => (nodeLookup[n.properties.queryObject.id] = n));
+  if (destination && geoJson) {
+    finalNodeId = destination;
 
     const finalNode = geoJson.features.filter(feature => {
       if (!feature.properties.queryObject) {
@@ -367,6 +384,16 @@ export const DrawMap = ({
     if (finalNode) {
       finalRoom = finalNode.properties.queryObject.polygon.id;
     }
+  }
+
+  if (currentPath && geoJson && currentPath.length > 1) {
+    let nodeLookup = {};
+    const nodes = geoJson.features.filter(
+      feature =>
+        feature.geometry.type === 'Point' &&
+        feature.properties.indoor === 'way',
+    );
+    nodes.map(n => (nodeLookup[n.properties.queryObject.id] = n));
 
     for (let i = 0; i < currentPath.length; i++) {
       if (i === 0) {
@@ -417,6 +444,7 @@ export const DrawMap = ({
                   up,
                   down,
                   zoom,
+                  finalNodeId,
                 ),
               )
           : null}

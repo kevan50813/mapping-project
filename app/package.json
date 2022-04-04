@@ -28,7 +28,11 @@
     "react-native": "0.67.2",
     "react-native-compass-heading": "^1.4.0",
     "react-native-elements": "^3.4.2",
+    "react-native-file-access": "^2.4.1",
+    "react-native-file-log": "^1.0.1",
+    "react-native-fs": "^2.19.0",
     "react-native-gesture-handler": "^2.2.0",
+    "react-native-get-random-values": "^1.7.2",
     "react-native-pedometer-ios-android": "^0.1.0",
     "react-native-plotly": "^6.0.0",
     "react-native-safe-area-context": "^3.3.2",
@@ -38,7 +42,8 @@
     "react-native-svg-pan-zoom": "^0.1.2",
     "react-native-vector-icons": "^9.1.0",
     "react-native-webview": "^11.17.1",
-    "react-native-wifi-reborn": "^4.5.0"
+    "react-native-wifi-reborn": "^4.5.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

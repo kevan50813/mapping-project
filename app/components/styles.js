@@ -87,7 +87,7 @@ export const styles = StyleSheet.create({
     stroke: '#18171A',
   },
   walls: {
-    stroke: '#6e6e6e',
+    stroke: '#777',
   },
   location: {
     fill: '#92D5E6',
@@ -161,6 +161,9 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: '100%',
+  },
+  modalHeight: {
+    height: 700,
   },
   // input: {
   //   height: 40,

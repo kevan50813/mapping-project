@@ -13,17 +13,12 @@ const RoomList = ({
   setDestination,
   setModalVisible,
 }) => {
-  if (error) {
-    console.error(error);
-  }
-
   return (
     <>
       {loading ? (
         <CenteredActivityIndicator text="Loading search results" />
       ) : null}
-      {error ? <Text style={styles.error}>{error.message}</Text> : null}
-
+      {/* {error ? <Text style={styles.error}>{error.message}</Text> : null} */}
       {/* <Text style={styles.info}>Results: {polygons.length}</Text> */}
 
       {polygons.map(p => {
@@ -75,7 +70,7 @@ export const SearchModal = ({ setDestination, setModalVisible, search }) => {
 
   return (
     <ScrollView
-      style={styles.background}
+      style={{ ...styles.background, ...styles.modalHeight }}
       contentInsetAdjustmentBehavior="automatic">
       <RoomList
         loading={loading}

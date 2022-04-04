@@ -1,7 +1,4 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
  * @format
  * @flow strict-local
  */
@@ -11,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { StatusBar, View } from 'react-native';
+import RNReactLogging from 'react-native-file-log';
 
 import { Scanner } from './Scanner';
 import { Localisation } from './Localisation';
@@ -18,6 +16,11 @@ import { LoadFloorplan } from './LoadFloorplan';
 import { styles } from './styles';
 import { Button } from './Button';
 import { NetworkProvider } from './NetworkProvider';
+
+RNReactLogging.setTag('MAPAPP');
+RNReactLogging.setFileLogEnabled(true);
+RNReactLogging.setConsoleLogEnabled(true);
+RNReactLogging.printLog('=== NEW LOG ===');
 
 // Replace with local IP for development
 export const server = 'mappingapp.azurewebsites.net';
