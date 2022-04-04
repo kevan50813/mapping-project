@@ -1,7 +1,6 @@
 import React from 'react';
 import Plotly from 'react-native-plotly';
 import { NetworkType } from './NetworkProvider';
-import Toast from 'react-native-simple-toast';
 
 const networkColours = {
   [NetworkType.UNSCANNED]: 'lightgray',

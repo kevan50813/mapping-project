@@ -100,21 +100,21 @@ function startTrilateration(networks, level, oldPredictedLocation) {
 }
 
 //imlemntion of Haversine formula that finds the distace between 2 latlon points and returns its distace in meters
-function latlonToMeters(lat1, lon1, lat2, lon2) {
-  // generally used geo measurement function
-  let Radius = 6378.137; // Radius of earth in KM
-  let dLat = (lat2 * Math.PI) / 180 - (lat1 * Math.PI) / 180; // lat disatnces
-  let dLon = (lon2 * Math.PI) / 180 - (lon1 * Math.PI) / 180; // lon distances
-  let a = //first part of Haversine formula
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // last part of Haversine formula, in order to make it neater
-  let distance = Radius * c * 1000; // calulate default is in km, so is converted to meters here
-  return distance;
-}
+// function latlonToMeters(lat1, lon1, lat2, lon2) {
+//   // generally used geo measurement function
+//   let Radius = 6378.137; // Radius of earth in KM
+//   let dLat = (lat2 * Math.PI) / 180 - (lat1 * Math.PI) / 180; // lat disatnces
+//   let dLon = (lon2 * Math.PI) / 180 - (lon1 * Math.PI) / 180; // lon distances
+//   let a = //first part of Haversine formula
+//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//     Math.cos((lat1 * Math.PI) / 180) *
+//       Math.cos((lat2 * Math.PI) / 180) *
+//       Math.sin(dLon / 2) *
+//       Math.sin(dLon / 2);
+//   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // last part of Haversine formula, in order to make it neater
+//   let predDistance = Radius * c * 1000; // calulate default is in km, so is converted to meters here
+//   return predDistance;
+// }
 
 function trilaterate(networks) {
   let error = -1;
@@ -146,13 +146,13 @@ function trilaterate(networks) {
 
 // --------- HEURISTICS ------------------------
 
-function firstThree(networks) {
-  return trilaterate(networks.slice(0, 3));
-}
+// function firstThree(networks) {
+//   return trilaterate(networks.slice(0, 3));
+// }
 
-function lastThree(networks) {
-  return trilaterate(networks.slice(0, -3));
-}
+// function lastThree(networks) {
+//   return trilaterate(networks.slice(0, -3));
+// }
 
 function iterateAll(networks, visualise) {
   let allPoints = [];
