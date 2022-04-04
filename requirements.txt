@@ -6,3 +6,4 @@ ariadne
 pydantic
 shapely
 uvicorn
+pyproj

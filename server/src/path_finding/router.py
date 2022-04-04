@@ -5,6 +5,7 @@ import dataclasses
 from typing import List, Type
 import networkx as nx
 import shapely.geometry
+from pyproj import Geod
 from src.types.map_types import PathNode
 
 
@@ -107,7 +108,9 @@ class Router:
         n_lat_lon = shapely.geometry.Point(n_node.lat, n_node.lon)
         m_lat_lon = shapely.geometry.Point(m_node.lat, m_node.lon)
 
-        weight = n_lat_lon.distance(m_lat_lon)
+        line_string = shapely.geometry.LineString([n_lat_lon, m_lat_lon])
+        geod = Geod(ellps="WGS84")
+        weight = geod.geometry_length(line_string)
 
         # Try except as there might be no polygons or broken map, shouldn't
         # break routing if it can be avoided (since this is optional)
@@ -117,7 +120,7 @@ class Router:
 
             if n_poly.tags["indoor"] == "room" and m_poly.tags["indoor"] == "room":
                 # tune this
-                weight += 1000
+                weight += 10000
         except KeyError:
             pass
 
