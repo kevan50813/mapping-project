@@ -1,4 +1,5 @@
 import LatLon from 'geodesy/latlon-nvector-spherical.js';
+import RNReactLogging from 'react-native-file-log';
 
 const rssiToDistance = (rssi, a, n) => Math.pow(10, (rssi - a) / (-10 * n));
 
@@ -87,7 +88,8 @@ function startTrilateration(networks, level, oldPredictedLocation) {
 
   // finally set best attributes
   // defined like this for easier adaption in future
-  return {
+
+  const location = {
     usedNetworks: data.networks,
     predictions: data.predictions,
     predictedLocation: {
@@ -97,6 +99,11 @@ function startTrilateration(networks, level, oldPredictedLocation) {
       old: false,
     },
   };
+
+  RNReactLogging.setTag('TRILAT');
+  RNReactLogging.printLog(`Predicted location: ${location}`);
+
+  return location;
 }
 
 //imlemntion of Haversine formula that finds the distace between 2 latlon points and returns its distace in meters
