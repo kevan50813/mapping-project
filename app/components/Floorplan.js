@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDeviceMotion } from '@use-expo/sensors';
-import { useNavigation } from '@react-navigation/native';
 import { FileSystem } from 'react-native-file-access';
 import {
   TouchableOpacity,
@@ -21,8 +20,6 @@ import {
   faAngleDown,
   faTags,
   faLocationDot,
-  faMapLocation,
-  faMapLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -47,7 +44,6 @@ export const Floorplan = ({
   const [showPoIs, setShowPoIs] = useState(false);
   const [showWifi, setShowWifi] = useState(false);
   const [following, setFollowing] = useState(true);
-  const navigation = useNavigation();
   const [accData, accAvailable] = useDeviceMotion({ interval: 1000 });
   const moving = useRef(false);
   const motion = useRef({ x: 0, y: 0, z: 0 });
@@ -143,7 +139,7 @@ export const Floorplan = ({
         setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
       }
     }
-  }, [floor_list, following, predictedLocation.level]);
+  }, [floorId, floor_list, following, predictedLocation.level]);
 
   return (
     <>
