@@ -24,8 +24,8 @@ export const NetworkContext = createContext({
     duration: 0,
   },
   params: {
-    a: -50,
-    n: 3,
+    a: 25.7,
+    n: 7.7,
     setA: () => {},
     setN: () => {},
   },

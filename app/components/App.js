@@ -47,7 +47,7 @@ const App = () => {
 
   const client = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: `http://${server}`,
+    uri: `https://${server}`,
   });
 
   return (
@@ -59,7 +59,7 @@ const App = () => {
             backgroundColor={'#ffffff00'}
             translucent={true}
           />
-          <Stack.Navigator initialRouteName="Home">
+          <Stack.Navigator initialRouteName="Floorplan">
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Scanner" component={Scanner} />
             <Stack.Screen name="Localisation" component={Localisation} />

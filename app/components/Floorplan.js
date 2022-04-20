@@ -12,16 +12,17 @@ import {
 import { SearchBar } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import RNReactLogging from 'react-native-file-log';
+import Toast from 'react-native-simple-toast';
 
 import {
   faAngleUp,
   faMagnifyingGlassLocation,
   faXmark,
   faAngleDown,
-  faLocationCrosshairs,
   faTags,
   faLocationDot,
-  faStreetView,
+  faMapLocation,
+  faMapLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { styles } from './styles';
@@ -85,7 +86,7 @@ export const Floorplan = ({
       setModalVisible(false);
       return true;
     }
-    navigation.pop();
+    // navigation.pop();
     return true;
   };
 
@@ -110,16 +111,6 @@ export const Floorplan = ({
     setSearch(newSearch);
   };
 
-  const handleScanButton = () => {
-    RNReactLogging.printLog(`Scan pressed, following: ${following}`);
-    Vibration.vibrate(20);
-    // dispatch a scan
-    scan();
-
-    // toggle centering
-    setFollowing(!following);
-  };
-
   const saveLog = async () => {
     RNReactLogging.setTag('LOG SAVE');
     RNReactLogging.printLog(`Saving Log at ${Date.now()}`);
@@ -137,9 +128,20 @@ export const Floorplan = ({
     if (
       predictedLocation.level !== undefined &&
       predictedLocation.level !== -1 &&
+      floor_list.indexOf(predictedLocation.level.toString()) === floorId
+    ) {
+      setFollowing(true);
+    }
+
+    if (
+      predictedLocation.level !== undefined &&
+      predictedLocation.level !== -1 &&
       following
     ) {
-      setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
+      if (floor_list.indexOf(predictedLocation.level.toString()) !== floorId) {
+        Toast.show(`Changed floor to ${predictedLocation.level}`);
+        setFloorId(floor_list.indexOf(predictedLocation.level.toString()));
+      }
     }
   }, [floor_list, following, predictedLocation.level]);
 
@@ -191,12 +193,6 @@ export const Floorplan = ({
           icon={faAngleDown}
           position={{ position: 'absolute', top: 140, right: 0 }}
           onPress={prevFloor}
-        />
-
-        <MapButton
-          icon={following ? faStreetView : faLocationCrosshairs}
-          position={{ position: 'absolute', bottom: 0, right: 0 }}
-          onPress={handleScanButton}
         />
 
         <View style={styles.levelView}>
