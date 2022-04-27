@@ -24,3 +24,16 @@ floor2_div16_0 - floors 2 : div 16 : A 64 -> -64 : n 2 -> 8
 floor2_div16_2 - floors 2 : div 16 : A 28 -> 8 : n 7 -> 9
 Min err of 5.307608875364487 at (A: 28.0; n: 8.714285714285714)
 Error at each scan: [2.6, 2.5, 1.8, 9.0, 2.5, 3.8, 11.8, 7.6, 6.4, 5.1]
+
+
+floor3_div16_0 - floors 3 : div 16 : A 64 -> -64 : n 2 -> 8
+
+floor3_div16_2 - floors 3 : div 16 : A 19 -> -1 : n 5.3 -> 7.3
+TODO
+
+
+floor4_div16_0 - floors 3 : div 16 : A 64 -> -64 : n 2 -> 8
+
+floor4_div16_2 - floors 3 : div 16 : A 37 -> 17 : n 6.5 -> 8.5
+Min err of 6.0354262697198635 at (A: 19.857142857142858; n: 7.071428571428571)
+Error at each scan: [5.8, 6.3, 10.9, 3.1, 3.4, 6.7]
