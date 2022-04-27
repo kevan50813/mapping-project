@@ -8,10 +8,10 @@ n_div = 15
 #A = np.linspace(64, -64, A_div)
 #n = np.linspace(2, 8, n_div)
 
-A = np.linspace(37, 17, A_div)
-n = np.linspace(6.5, 8.5, n_div)
+A = np.linspace(28, 8, A_div)
+n = np.linspace(7, 9, n_div)
 
-Z = np.load('plot_npy/floor4_div16_2.npy')
+Z = np.load('plot_npy/floor2_div16_2.npy')
 
 A, n = np.meshgrid(A, n)
 fig = plt.figure()
